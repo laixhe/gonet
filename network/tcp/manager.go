@@ -59,6 +59,7 @@ func (m *manager) Add(c net.Conn) error {
 func (m *manager) Remove(c net.Conn) {
 	index := int(reflect.ValueOf(c).Pointer()) % len(m.partitions)
 	if conn, ok := m.partitions[index].delete(c); ok {
+		conn.Clear()
 		m.pool.Put(conn)
 		atomic.AddInt64(&m.total, -1)
 	}

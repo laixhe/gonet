@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package eapp;
+
+option go_package = "github.com/laixhe/gonet/proto/gen/enum/eapp;eapp";
+
+enum language {
+  // 中文
+  zh_cn = 0;
+  // 英文
+  en    = 1;
+}

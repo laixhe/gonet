@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package eapp;
+
+option go_package = "github.com/laixhe/gonet/proto/gen/enum/eapp;eapp";
+
+// 平台
+enum platform {
+  unknown   = 0;
+  // 安卓
+  android   = 1;
+  // 苹果
+  ios       = 2;
+  // 网页
+  web       = 3;
+}

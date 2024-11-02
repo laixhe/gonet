@@ -2,9 +2,9 @@ package tcp
 
 import (
 	"errors"
-	"fmt"
 	"net"
 
+	"github.com/laixhe/gonet/logx"
 	"github.com/laixhe/gonet/network"
 )
 
@@ -26,12 +26,14 @@ func (s *server) init(addr string) error {
 	// 获取一个 TCP 的 Addr
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
+		logx.Error(err.Error())
 		return err
 	}
 
 	// 监听服务器地址
 	listener, err := net.ListenTCP(tcpAddr.Network(), tcpAddr)
 	if err != nil {
+		logx.Error(err.Error())
 		return err
 	}
 
@@ -47,18 +49,15 @@ func (s *server) accept() error {
 		conn, err := s.listener.AcceptTCP()
 		if err != nil {
 			if errors.Is(err, net.ErrClosed) {
-				// TODO: log
-				fmt.Println("tcp listener accept closed error", err)
-				return err
+				logx.Errorf("tcp listener accept closed error: %s", err)
+				continue
 			}
 			var e net.Error
 			if errors.As(err, &e) && e.Timeout() {
-				// TODO: log
-				fmt.Println("tcp listener accept timeout error", err)
+				logx.Errorf("tcp listener accept timeout error: %s", err)
 				continue
 			}
-			// TODO: log
-			fmt.Println("tcp listener accept error", err)
+			logx.Errorf("tcp listener accept error: %s", err)
 			continue
 		}
 		// 处理用户链接
@@ -82,4 +81,8 @@ func (s *server) Stop() error {
 // GetManager 获取连接管理器
 func (s *server) GetManager() network.IManager {
 	return s.manager
+}
+
+// RouterPath 路由路径
+func (s *server) RouterPath(path string) {
 }

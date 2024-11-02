@@ -1,16 +1,39 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
 	"time"
 
-	"github.com/laixhe/gonet/packet"
+	"github.com/laixhe/gonet/configx"
+	"github.com/laixhe/gonet/logx"
+	"github.com/laixhe/gonet/network/packet"
+	"github.com/laixhe/gonet/proto/gen/config/clog"
+)
+
+var (
+	// GitVersion 指定版本号 ( go build -ldflags "-X main.GitVersion=2024-11-01" )
+	GitVersion string
+)
+
+var (
+	// flagConfigFile 指定配置文件 (tcpclient --config=./config.yaml)
+	flagConfigFile string
 )
 
 func main() {
-
+	// init config
+	flag.StringVar(&flagConfigFile, "config", "./config.yaml", "config path: --config config.yaml")
+	flag.Parse()
+	fmt.Println("main show", flagConfigFile, GitVersion)
+	// init config
+	config := struct {
+		Log *clog.Log `mapstructure:"log"`
+	}{}
+	configx.Init(flagConfigFile, false, &config)
+	logx.Init(config.Log)
 	// 向服务端建立链接
 	conn, err := net.Dial("tcp", "127.0.0.1:5050")
 	if err != nil {
@@ -18,16 +41,16 @@ func main() {
 	}
 	defer conn.Close() //关闭链接
 
-	log.Println("链接建立成功！")
+	logx.Debug("链接建立成功！")
 
 	go func() {
 		for {
 			data, err := packet.TcpRead(conn)
 			if err != nil {
-				log.Println("接收服务端数据失败!")
+				logx.Errorf("接收服务端数据失败： %s", err)
 				return
 			}
-			log.Println(data.DataLen, data.ID, string(data.Data))
+			logx.Infof("%d %d %s", data.DataLen, data.ID, string(data.Data))
 		}
 	}()
 
@@ -37,12 +60,12 @@ func main() {
 			wData := "是的! " + fmt.Sprintf("%v", time.Now().UnixMilli())
 			data, err := packet.Pack(packet.NewMessage(111, []byte(wData)))
 			if err != nil {
-				log.Println("Pack data 失败!")
+				logx.Errorf("Pack data 失败： %s", err)
 				return
 			}
 			_, err = conn.Write(data)
 			if err != nil {
-				log.Println("向服务发送数据失败!")
+				logx.Errorf("向服务发送数据失败： %s", err)
 				return
 			}
 
