@@ -26,13 +26,14 @@ const (
 const AuthorizationClaimsHeaderKey = "AuthorizationClaims"
 
 // Checking 检查
-func Checking(cjwt *cauth.Jwt) {
+func Checking(cjwt *cauth.Jwt) error {
 	if cjwt == nil {
-		panic(errors.New("config jwt is nil"))
+		return errors.New("config jwt is nil")
 	}
 	if cjwt.SecretKey == "" {
-		panic(errors.New("config jwt secret_key is empty"))
+		return errors.New("config jwt secret_key is empty")
 	}
+	return nil
 }
 
 // CustomClaims 自定义声明类型 并内嵌 jwt.RegisteredClaims
