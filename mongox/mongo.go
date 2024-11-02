@@ -14,63 +14,41 @@ import (
 	"github.com/laixhe/gonet/proto/gen/config/cmongodb"
 )
 
-// Mongox 客户端
-type Mongox struct {
+// MongoClient 客户端
+type MongoClient struct {
 	client          *mongo.Client
 	defaultDatabase *mongo.Database // 默认指定的数据库
 	databaseMap     *sync.Map       // 选择其他指定的数据库
 }
 
 // Ping 判断服务是否可用
-func (m *Mongox) Ping() error {
-	return m.client.Ping(context.Background(), readpref.Primary())
+func (mc *MongoClient) Ping() error {
+	return mc.client.Ping(context.Background(), readpref.Primary())
 }
 
 // Client get mongo client
-func (m *Mongox) Client() *mongo.Client {
-	return m.client
+func (mc *MongoClient) Client() *mongo.Client {
+	return mc.client
 }
 
 // Database 指定数据库
-func (m *Mongox) Database(name string, opts ...*options.DatabaseOptions) *mongo.Database {
-	loadDatabase, ok := m.databaseMap.Load(name)
+func (mc *MongoClient) Database(name string, opts ...*options.DatabaseOptions) *mongo.Database {
+	loadDatabase, ok := mc.databaseMap.Load(name)
 	if ok {
 		return loadDatabase.(*mongo.Database)
 	}
-	database := m.client.Database(name)
-	m.databaseMap.Store(name, database)
+	database := mc.client.Database(name)
+	mc.databaseMap.Store(name, database)
 	return database
 }
 
 // Collection 选择集合(表)
-func (m *Mongox) Collection(name string, opts ...*options.CollectionOptions) *mongo.Collection {
-	return m.defaultDatabase.Collection(name, opts...)
+func (mc *MongoClient) Collection(name string, opts ...*options.CollectionOptions) *mongo.Collection {
+	return mc.defaultDatabase.Collection(name, opts...)
 }
 
-var db *Mongox
-
-// DB get mongox
-func DB() *Mongox {
-	return db
-}
-
-// Ping 判断服务是否可用
-func Ping() error {
-	return db.Ping()
-}
-
-// Database 指定数据库
-func Database(name string, opts ...*options.DatabaseOptions) *mongo.Database {
-	return db.Database(name, opts...)
-}
-
-// Collection 选择集合(表)
-func Collection(name string, opts ...*options.CollectionOptions) *mongo.Collection {
-	return db.Collection(name, opts...)
-}
-
-// Connect 连接数据库
-func Connect(c *cmongodb.MongoDB) (*Mongox, error) {
+// connect 连接数据库
+func connect(c *cmongodb.MongoDB) (*MongoClient, error) {
 	opts := options.Client()
 	opts.ApplyURI(c.Uri)
 
@@ -98,7 +76,7 @@ func Connect(c *cmongodb.MongoDB) (*Mongox, error) {
 		return nil, err
 	}
 
-	return &Mongox{
+	return &MongoClient{
 		client:          client,
 		defaultDatabase: client.Database(c.Database),
 		databaseMap:     &sync.Map{},
@@ -106,21 +84,21 @@ func Connect(c *cmongodb.MongoDB) (*Mongox, error) {
 }
 
 // Init 初始化数据库
-func Init(c *cmongodb.MongoDB) {
+func Init(c *cmongodb.MongoDB) (*MongoClient, error) {
 	if c == nil {
-		panic(errors.New("mongo config is nil"))
+		return nil, errors.New("mongo config as nil")
 	}
 	if c.Uri == "" {
-		panic(errors.New("mongo config uri is nil"))
+		return nil, errors.New("mongo config uri as empty")
 	}
 	logx.Debugf("mongo config=%v", c)
 	logx.Debug("mongo init...")
 
-	var err error
-	db, err = Connect(c)
+	mc, err := connect(c)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	logx.Debug("mongo init ok...")
+	return mc, nil
 }

@@ -13,8 +13,8 @@ type Writer struct {
 	logger.Writer
 }
 
-// NewWriter writer 构造函数
-func NewWriter(w logger.Writer) *Writer {
+// newWriter writer 构造函数
+func newWriter(w logger.Writer) *Writer {
 	return &Writer{Writer: w}
 }
 

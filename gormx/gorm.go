@@ -12,17 +12,17 @@ import (
 	"gorm.io/gorm/schema"
 
 	"github.com/laixhe/gonet/logx"
-	"github.com/laixhe/gonet/proto/gen/config/cdb"
+	"github.com/laixhe/gonet/proto/gen/config/cgorm"
 )
 
-// Gormx 客户端
-type Gormx struct {
+// GormClient 客户端
+type GormClient struct {
 	client *gorm.DB
 }
 
 // Ping 判断服务是否可用
-func (g *Gormx) Ping() error {
-	sqlDB, err := g.client.DB()
+func (gc *GormClient) Ping() error {
+	sqlDB, err := gc.client.DB()
 	if err != nil {
 		return err
 	}
@@ -30,24 +30,20 @@ func (g *Gormx) Ping() error {
 	return sqlDB.Ping()
 }
 
-var db *Gormx
-
-// Client get db client
-func Client() *gorm.DB {
-	return db.client
+// Client get gorm client
+func (gc *GormClient) Client() *gorm.DB {
+	return gc.client
 }
 
-// Connect 连接数据库
-func Connect(c *cdb.DB) (*Gormx, error) {
-
-	defaultLogger := logger.New(NewWriter(log.New(os.Stdout, " ", log.LstdFlags)), logger.Config{
+// connect 连接数据库
+func connect(c *cgorm.Gorm) (*GormClient, error) {
+	defaultLogger := logger.New(newWriter(log.New(os.Stdout, " ", log.LstdFlags)), logger.Config{
 		SlowThreshold: 200 * time.Millisecond,
 		LogLevel:      logger.Info,
 		Colorful:      true,
 	})
 
 	client, err := gorm.Open(mysql.Open(c.Dsn), &gorm.Config{
-		//Logger: logger.Default.LogMode(logger.Info),
 		Logger: defaultLogger,
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true, // 使用单数表名，启用该选项后，`User` 表将是`user`
@@ -77,27 +73,27 @@ func Connect(c *cdb.DB) (*Gormx, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Gormx{
+	return &GormClient{
 		client: client,
 	}, nil
 }
 
 // Init 初始化数据库
-func Init(c *cdb.DB) {
+func Init(c *cgorm.Gorm) (*GormClient, error) {
 	if c == nil {
-		panic(errors.New("db config is nil"))
+		return nil, errors.New("gorm config as nil")
 	}
 	if c.Dsn == "" {
-		panic(errors.New("db config dsn is nil"))
+		return nil, errors.New("gorm config dsn as nil")
 	}
-	logx.Debugf("db Config=%v", c)
-	logx.Debug("db 开始初始化...")
+	logx.Debugf("gorm config=%v", c)
+	logx.Debug("gorm init...")
 
-	var err error
-	db, err = Connect(c)
+	gc, err := connect(c)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	logx.Debug("db 初始化完毕...")
+	logx.Debug("gorm init ok...")
+	return gc, nil
 }

@@ -10,7 +10,7 @@ import (
 
 const PlatformHeaderKey = "platform"
 
-func GetPlatform(c *gin.Context) eapp.Platform {
+func GinPlatform(c *gin.Context) eapp.Platform {
 	platform := c.Request.Header.Get(PlatformHeaderKey)
 	if platform != "" {
 		value := eapp.Platform_value[platform]
@@ -21,7 +21,7 @@ func GetPlatform(c *gin.Context) eapp.Platform {
 	return eapp.Platform_unknown
 }
 
-func IsPlatform(c *gin.Context) bool {
-	platform := GetPlatform(c)
+func GinIsPlatform(c *gin.Context) bool {
+	platform := GinPlatform(c)
 	return platform != eapp.Platform_unknown
 }

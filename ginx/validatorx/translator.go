@@ -32,12 +32,10 @@ func ValidatorTranslator(language string) (err error) {
 		if !is {
 			return fmt.Errorf("translator.GetTranslator(%s) failed", language)
 		}
-		// 注册翻译器
+		// 注册默认翻译器
 		switch language {
 		case eapp.Language_en.String():
 			err = enTranslations.RegisterDefaultTranslations(v, trans)
-		case eapp.Language_zh_cn.String():
-			err = zhTranslations.RegisterDefaultTranslations(v, trans)
 		default:
 			err = zhTranslations.RegisterDefaultTranslations(v, trans)
 		}

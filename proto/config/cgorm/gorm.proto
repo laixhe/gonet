@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package cdb;
+package cgorm;
 
-option go_package = "github.com/laixhe/gonet/proto/gen/config/cdb;cdb";
+option go_package = "github.com/laixhe/gonet/proto/gen/config/cgorm;cgorm";
 
-// 数据库配置
-message DB {
+// 数据库 gorm 配置
+message Gorm {
   // 连接地址
   string dsn            = 1; // @gotags: mapstructure:"dsn"
   // 设置空闲连接池中连接的最大数量

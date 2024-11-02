@@ -12,16 +12,16 @@ import (
 	"github.com/laixhe/gonet/proto/gen/config/credis"
 )
 
-// Redisx 客户端
-type Redisx struct {
+// RedisClient 客户端
+type RedisClient struct {
 	client redis.Cmdable
 }
 
 // Ping 判断服务是否可用
-func (r *Redisx) Ping() error {
+func (rc *RedisClient) Ping() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	err := r.client.Ping(ctx).Err()
+	err := rc.client.Ping(ctx).Err()
 	if err != nil {
 		return err
 	}
@@ -29,25 +29,8 @@ func (r *Redisx) Ping() error {
 }
 
 // Client get redis client
-func (r *Redisx) Client() redis.Cmdable {
-	return r.client
-}
-
-var db *Redisx
-
-// DB get redisx
-func DB() *Redisx {
-	return db
-}
-
-// Client get redis client
-func Client() redis.Cmdable {
-	return db.client
-}
-
-// Ping 判断服务是否可用
-func Ping() error {
-	return db.Ping()
+func (rc *RedisClient) Client() redis.Cmdable {
+	return rc.client
 }
 
 // initSingle 单机
@@ -98,38 +81,38 @@ func initCluster(c *credis.Redis) redis.Cmdable {
 	return redis.NewClusterClient(options)
 }
 
-// Connect 连接数据库
-func Connect(c *credis.Redis) (*Redisx, error) {
-	r := &Redisx{}
+// connect 连接数据库
+func connect(c *credis.Redis) (*RedisClient, error) {
+	rc := &RedisClient{}
 
 	addrs := strings.Split(c.Addr, ",")
 	if len(addrs) == 1 {
-		r.client = initSingle(c) // 单机
+		rc.client = initSingle(c) // 单机
 	} else {
-		r.client = initCluster(c) // 分布式集群
+		rc.client = initCluster(c) // 分布式集群
 	}
-	err := r.Ping()
+	err := rc.Ping()
 	if err != nil {
 		return nil, err
 	}
-	return r, nil
+	return rc, nil
 }
 
-func Init(c *credis.Redis) {
+func Init(c *credis.Redis) (*RedisClient, error) {
 	if c == nil {
-		panic(errors.New("redis config is nil"))
+		return nil, errors.New("redis config as nil")
 	}
 	if c.Addr == "" {
-		panic(errors.New("redis config addr is nil"))
+		return nil, errors.New("redis config addr as empty")
 	}
 	logx.Debugf("redis config=%v", c)
 	logx.Debug("redis init...")
 
-	var err error
-	db, err = Connect(c)
+	rc, err := connect(c)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	logx.Debug("redis init ok...")
+	return rc, nil
 }
