@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package capp;
+
+option go_package = "github.com/laixhe/gonet/proto/gen/config/capp;capp";
+
+// 开发模式
+enum ModeType {
+  debug       = 0; // 开发
+  release     = 1; // 发布
+}
+
+// 项目配置
+message App {
+  // 版本号
+  string version = 1; // @gotags: mapstructure:"version"
+  // 开发模式 debug release
+  string mode    = 2; // @gotags: mapstructure:"mode"
+  // pid文件路径
+  string pid     = 3; // @gotags: mapstructure:"pid"
+}
