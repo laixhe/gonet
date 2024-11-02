@@ -16,7 +16,7 @@ const LanguageHeaderKey = "accept-language"
 type I18n struct {
 	httpHeaderKey string
 	i18n          *gi18n.Manager
-	zhCnCtx       context.Context
+	zhCtx         context.Context
 	enCtx         context.Context
 }
 
@@ -27,7 +27,7 @@ func NewI18n(httpHeaderKey string) *I18n {
 	return &I18n{
 		httpHeaderKey: httpHeaderKey,
 		i18n:          gi18n.New(),
-		zhCnCtx:       gi18n.WithLanguage(context.Background(), eapp.Language_zh_cn.String()),
+		zhCtx:         gi18n.WithLanguage(context.Background(), eapp.Language_zh.String()),
 		enCtx:         gi18n.WithLanguage(context.Background(), eapp.Language_en.String()),
 	}
 }
@@ -37,7 +37,7 @@ func (in *I18n) GinContext(c *gin.Context, s string) string {
 	if language == eapp.Language_en.String() {
 		return in.i18n.Translate(in.enCtx, s)
 	}
-	return in.i18n.Translate(in.zhCnCtx, s)
+	return in.i18n.Translate(in.zhCtx, s)
 }
 
 func (in *I18n) GinContextError(c *gin.Context, s string) error {

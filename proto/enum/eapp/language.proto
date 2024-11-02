@@ -6,7 +6,7 @@ option go_package = "github.com/laixhe/gonet/proto/gen/enum/eapp;eapp";
 
 enum language {
   // 中文
-  zh_cn = 0;
+  zh  = 0;
   // 英文
-  en    = 1;
+  en  = 1;
 }
