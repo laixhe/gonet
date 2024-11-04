@@ -1,6 +1,8 @@
 package errorx
 
 import (
+	"errors"
+
 	"github.com/laixhe/gonet/proto/gen/ecode"
 )
 
@@ -48,5 +50,19 @@ func AuthInvalidError(err error) *Error {
 	return &Error{
 		Code: ecode.ECode_AuthInvalid,
 		Err:  err,
+	}
+}
+
+func New(code int32, err error) *Error {
+	return &Error{
+		Code: ecode.ECode(code),
+		Err:  err,
+	}
+}
+
+func NewStr(code int32, err string) *Error {
+	return &Error{
+		Code: ecode.ECode(code),
+		Err:  errors.New(err),
 	}
 }
