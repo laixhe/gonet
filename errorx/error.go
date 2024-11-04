@@ -13,7 +13,7 @@ type Error struct {
 
 func (e *Error) Error() string {
 	if e.Err == nil {
-		return e.Code.String()
+		return ""
 	}
 	return e.Err.Error()
 }
@@ -32,10 +32,24 @@ func ServiceError(err error) *Error {
 	}
 }
 
+func ServiceErrorStr(err string) *Error {
+	return &Error{
+		Code: ecode.ECode_Service,
+		Err:  errors.New(err),
+	}
+}
+
 func ParamError(err error) *Error {
 	return &Error{
 		Code: ecode.ECode_Param,
 		Err:  err,
+	}
+}
+
+func ParamErrorStr(err string) *Error {
+	return &Error{
+		Code: ecode.ECode_Param,
+		Err:  errors.New(err),
 	}
 }
 
@@ -46,10 +60,24 @@ func TipMessageError(err error) *Error {
 	}
 }
 
+func TipMessageErrorStr(err string) *Error {
+	return &Error{
+		Code: ecode.ECode_TipMessage,
+		Err:  errors.New(err),
+	}
+}
+
 func AuthInvalidError(err error) *Error {
 	return &Error{
 		Code: ecode.ECode_AuthInvalid,
 		Err:  err,
+	}
+}
+
+func AuthInvalidErrorStr(err string) *Error {
+	return &Error{
+		Code: ecode.ECode_AuthInvalid,
+		Err:  errors.New(err),
 	}
 }
 
