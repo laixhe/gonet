@@ -67,6 +67,20 @@ func TipMessageErrorStr(err string) *Error {
 	}
 }
 
+func RepeatError(err error) *Error {
+	return &Error{
+		Code: ecode.ECode_Repeat,
+		Err:  err,
+	}
+}
+
+func RepeatErrorStr(err string) *Error {
+	return &Error{
+		Code: ecode.ECode_Repeat,
+		Err:  errors.New(err),
+	}
+}
+
 func AuthInvalidError(err error) *Error {
 	return &Error{
 		Code: ecode.ECode_AuthInvalid,
