@@ -53,16 +53,16 @@ func ParamErrorStr(err string) *Error {
 	}
 }
 
-func TipMessageError(err error) *Error {
+func TipError(err error) *Error {
 	return &Error{
-		Code: ecode.ECode_TipMessage,
+		Code: ecode.ECode_Tip,
 		Err:  err,
 	}
 }
 
-func TipMessageErrorStr(err string) *Error {
+func TipErrorStr(err string) *Error {
 	return &Error{
-		Code: ecode.ECode_TipMessage,
+		Code: ecode.ECode_Tip,
 		Err:  errors.New(err),
 	}
 }
