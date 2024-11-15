@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	validator "github.com/go-playground/validator/v10"
+
 	"github.com/laixhe/gonet/proto/gen/ecode"
 	"github.com/laixhe/gonet/xerror"
 	"github.com/laixhe/gonet/xgin/xvalidator"
