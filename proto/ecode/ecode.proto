@@ -8,11 +8,11 @@ option go_package = "github.com/laixhe/gonet/proto/gen/ecode;ecode";
 enum ECode {
     Success     = 0; // 成功
     Service     = 1; // 服务错误
-	Parse       = 2; // 解析错误
+    Parse       = 2; // 解析错误
     Encode      = 3; // 编码错误
-	Param       = 4; // 参数错误
+    Param       = 4; // 参数错误
     Tip         = 5; // 提示错误
-	Repeat      = 6; // 重复操作
+    Repeat      = 6; // 重复操作
     AuthInvalid = 7; // 授权无效
     AuthExpire  = 8; // 授权过期
 }

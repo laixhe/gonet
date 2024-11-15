@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net"
 
-	"github.com/laixhe/gonet/logx"
 	"github.com/laixhe/gonet/network"
+	"github.com/laixhe/gonet/xlog"
 )
 
 type server struct {
@@ -26,14 +26,14 @@ func (s *server) init(addr string) error {
 	// 获取一个 TCP 的 Addr
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
-		logx.Error(err.Error())
+		xlog.Error(err.Error())
 		return err
 	}
 
 	// 监听服务器地址
 	listener, err := net.ListenTCP(tcpAddr.Network(), tcpAddr)
 	if err != nil {
-		logx.Error(err.Error())
+		xlog.Error(err.Error())
 		return err
 	}
 
@@ -49,15 +49,15 @@ func (s *server) accept() error {
 		conn, err := s.listener.AcceptTCP()
 		if err != nil {
 			if errors.Is(err, net.ErrClosed) {
-				logx.Errorf("tcp listener accept closed error: %s", err)
+				xlog.Errorf("tcp listener accept closed error: %s", err)
 				continue
 			}
 			var e net.Error
 			if errors.As(err, &e) && e.Timeout() {
-				logx.Errorf("tcp listener accept timeout error: %s", err)
+				xlog.Errorf("tcp listener accept timeout error: %s", err)
 				continue
 			}
-			logx.Errorf("tcp listener accept error: %s", err)
+			xlog.Errorf("tcp listener accept error: %s", err)
 			continue
 		}
 		// 处理用户链接

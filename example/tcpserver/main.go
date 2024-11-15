@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/laixhe/gonet/configx"
-	"github.com/laixhe/gonet/logx"
 	"github.com/laixhe/gonet/network/tcp"
 	"github.com/laixhe/gonet/proto/gen/config/clog"
+	"github.com/laixhe/gonet/xconfig"
+	"github.com/laixhe/gonet/xlog"
 )
 
 var (
@@ -29,8 +29,8 @@ func main() {
 	config := struct {
 		Log *clog.Log `mapstructure:"log"`
 	}{}
-	configx.Init(flagConfigFile, false, &config)
-	logx.Init(config.Log)
+	xconfig.Init(flagConfigFile, false, &config)
+	xlog.Init(config.Log)
 	// server
 	if err := tcp.NewServer().Start(":5050"); err != nil {
 		panic(err)

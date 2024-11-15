@@ -7,10 +7,10 @@ import (
 	"net"
 	"time"
 
-	"github.com/laixhe/gonet/configx"
-	"github.com/laixhe/gonet/logx"
 	"github.com/laixhe/gonet/network/packet"
 	"github.com/laixhe/gonet/proto/gen/config/clog"
+	"github.com/laixhe/gonet/xconfig"
+	"github.com/laixhe/gonet/xlog"
 )
 
 var (
@@ -32,8 +32,8 @@ func main() {
 	config := struct {
 		Log *clog.Log `mapstructure:"log"`
 	}{}
-	configx.Init(flagConfigFile, false, &config)
-	logx.Init(config.Log)
+	xconfig.Init(flagConfigFile, false, &config)
+	xlog.Init(config.Log)
 	// 向服务端建立链接
 	conn, err := net.Dial("tcp", "127.0.0.1:5050")
 	if err != nil {
@@ -41,16 +41,16 @@ func main() {
 	}
 	defer conn.Close() //关闭链接
 
-	logx.Debug("链接建立成功！")
+	xlog.Debug("链接建立成功！")
 
 	go func() {
 		for {
 			data, err := packet.TcpRead(conn)
 			if err != nil {
-				logx.Errorf("接收服务端数据失败： %s", err)
+				xlog.Errorf("接收服务端数据失败： %s", err)
 				return
 			}
-			logx.Infof("%d %d %s", data.DataLen, data.ID, string(data.Data))
+			xlog.Infof("%d %d %s", data.DataLen, data.ID, string(data.Data))
 		}
 	}()
 
@@ -60,12 +60,12 @@ func main() {
 			wData := "是的! " + fmt.Sprintf("%v", time.Now().UnixMilli())
 			data, err := packet.Pack(packet.NewMessage(111, []byte(wData)))
 			if err != nil {
-				logx.Errorf("Pack data 失败： %s", err)
+				xlog.Errorf("Pack data 失败： %s", err)
 				return
 			}
 			_, err = conn.Write(data)
 			if err != nil {
-				logx.Errorf("向服务发送数据失败： %s", err)
+				xlog.Errorf("向服务发送数据失败： %s", err)
 				return
 			}
 
