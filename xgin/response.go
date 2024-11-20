@@ -12,7 +12,7 @@ import (
 // SuccessJSON 成功
 func SuccessJSON(c *gin.Context, data any) {
 	c.JSON(http.StatusOK, &xresponse.ResponseModel{
-		Code: ecode.ECode_Success,
+		Code: int32(ecode.ECode_Success),
 		Data: data,
 	})
 }
