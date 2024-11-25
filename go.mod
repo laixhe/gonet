@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.23.0
-	github.com/gogf/gf/v2 v2.8.0
+	github.com/gogf/gf/v2 v2.8.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/spf13/viper v1.19.0
