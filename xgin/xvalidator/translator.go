@@ -11,8 +11,6 @@ import (
 	validator "github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
-
-	"github.com/laixhe/gonet/xi18n"
 )
 
 // 全局翻译器
@@ -34,7 +32,7 @@ func ValidatorTranslator(language string) (err error) {
 		}
 		// 注册默认翻译器
 		switch language {
-		case xi18n.En:
+		case En:
 			err = enTranslations.RegisterDefaultTranslations(v, trans)
 		default:
 			err = zhTranslations.RegisterDefaultTranslations(v, trans)
