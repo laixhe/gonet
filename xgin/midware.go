@@ -19,7 +19,7 @@ import (
 // Cors 跨域
 func Cors() gin.HandlerFunc {
 	return cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},                                                         // 允许所有来源（包括子域和端口），生产环境中应替换为具体的允许域名
+		AllowOrigins:     []string{"*"},                                                         // 允许所有来源（包括子域和端口），生产环境中应替换为域名
 		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},                   // 允许的 HTTP 方法列表，如 GET、POST、PUT 等，默认为 ["*"]（全部允许）
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},                   // 允许的 HTTP 头部列表，默认为 ["*"]（全部允许），可以自定义字段
 		ExposeHeaders:    []string{"Origin", "Content-Type", "Content-Length", "Authorization"}, // 允许浏览器（客户端）可以解析的头部
