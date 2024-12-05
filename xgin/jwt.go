@@ -15,9 +15,10 @@ import (
 // 中间件
 
 // JwtAuth 鉴权
-func JwtAuth(cjwt *cauth.Jwt) gin.HandlerFunc {
+// cjwt 配置
+// parseTokenError 错误
+func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var parseTokenErr error
 		token := c.Request.Header.Get(xjwt.Authorization)
 		if len(token) > 0 {
 			if strings.HasPrefix(token, xjwt.Bearer) {
@@ -27,22 +28,21 @@ func JwtAuth(cjwt *cauth.Jwt) gin.HandlerFunc {
 					c.Next()
 					return
 				}
-				parseTokenErr = xerror.AuthInvalidError(err)
 			}
 		}
-		c.JSON(http.StatusOK, xresponse.ResponseError(parseTokenErr))
+		c.JSON(http.StatusOK, xresponse.Error(parseTokenError))
 		// 返回错误
 		c.Abort()
 	}
 }
 
-func ContextUid(c *gin.Context) (uint64, error) {
+func ContextUid(c *gin.Context) uint64 {
 	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
 	if exists {
 		customClaims, is := value.(*xjwt.CustomClaims)
 		if is {
-			return customClaims.Uid, nil
+			return customClaims.Uid
 		}
 	}
-	return 0, xerror.AuthInvalidError(nil)
+	return 0
 }

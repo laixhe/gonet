@@ -74,7 +74,7 @@ func (s *ServiceResolver) Scheme() string {
 
 // Close 解析器关闭时调用
 func (s *ServiceResolver) Close() {
-	s.cli.Close()
+	_ = s.cli.Close()
 }
 
 // watcher 监听前缀

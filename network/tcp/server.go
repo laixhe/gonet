@@ -61,7 +61,7 @@ func (s *server) accept() error {
 			continue
 		}
 		// 处理用户链接
-		s.manager.Add(conn)
+		_ = s.manager.Add(conn)
 	}
 }
 

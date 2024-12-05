@@ -1,110 +1,37 @@
 package xerror
 
-import (
-	"errors"
-
-	"github.com/laixhe/gonet/proto/gen/ecode"
-)
+type IError interface {
+	Code() int32
+	Error() string
+}
 
 type Error struct {
-	Code int32
-	Err  error
+	code int32
+	err  string
+}
+
+func (e *Error) Code() int32 {
+	return e.code
 }
 
 func (e *Error) Error() string {
-	if e.Err == nil {
-		return ""
-	}
-	return e.Err.Error()
+	return e.err
 }
 
-func NewError(code int32, err error) *Error {
-	return &Error{
-		Code: code,
-		Err:  err,
+func New(code int32, err error) Error {
+	errStr := ""
+	if err != nil {
+		errStr = err.Error()
 	}
-}
-
-func ServiceError(err error) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Service),
-		Err:  err,
+	return Error{
+		code: code,
+		err:  errStr,
 	}
 }
 
-func ServiceErrorStr(err string) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Service),
-		Err:  errors.New(err),
-	}
-}
-
-func ParamError(err error) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Param),
-		Err:  err,
-	}
-}
-
-func ParamErrorStr(err string) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Param),
-		Err:  errors.New(err),
-	}
-}
-
-func TipError(err error) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Tip),
-		Err:  err,
-	}
-}
-
-func TipErrorStr(err string) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Tip),
-		Err:  errors.New(err),
-	}
-}
-
-func RepeatError(err error) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Repeat),
-		Err:  err,
-	}
-}
-
-func RepeatErrorStr(err string) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_Repeat),
-		Err:  errors.New(err),
-	}
-}
-
-func AuthInvalidError(err error) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_AuthInvalid),
-		Err:  err,
-	}
-}
-
-func AuthInvalidErrorStr(err string) *Error {
-	return &Error{
-		Code: int32(ecode.ECode_AuthInvalid),
-		Err:  errors.New(err),
-	}
-}
-
-func New(code int32, err error) *Error {
-	return &Error{
-		Code: code,
-		Err:  err,
-	}
-}
-
-func NewStr(code int32, err string) *Error {
-	return &Error{
-		Code: code,
-		Err:  errors.New(err),
+func NewStr(code int32, errStr string) Error {
+	return Error{
+		code: code,
+		err:  errStr,
 	}
 }

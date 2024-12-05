@@ -13,5 +13,5 @@ proto:
 		$(PROTO_FILES)
 	mv ./github.com/laixhe/gonet/proto/gen ./proto
 	rm -rf ./github.com
-	protoc-go-inject-tag -input="./proto/gen/*/*.pb.go"
+	#protoc-go-inject-tag -input="./proto/gen/*/*.pb.go"
 	protoc-go-inject-tag -input="./proto/gen/*/*/*.pb.go"
