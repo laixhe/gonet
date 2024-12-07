@@ -2,8 +2,8 @@ package xgorm
 
 import "fmt"
 
-// PageOffset 分页
-func PageOffset(page, pageSize int) (size int, offset int) {
+// PageLimit 分页
+func PageLimit(page, pageSize int) (limit int, offset int) {
 	return pageSize, (page - 1) * pageSize
 }
 
