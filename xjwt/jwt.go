@@ -6,7 +6,7 @@ import (
 
 	jwt "github.com/golang-jwt/jwt/v5"
 
-	"github.com/laixhe/gonet/proto/gen/config/cauth"
+	"github.com/laixhe/gonet/protocol/gen/config/cauth"
 )
 
 var (

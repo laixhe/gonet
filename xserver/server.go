@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/laixhe/gonet/proto/gen/config/cserver"
+	"github.com/laixhe/gonet/protocol/gen/config/cserver"
 	"github.com/laixhe/gonet/xlog"
 )
 

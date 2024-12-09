@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/laixhe/gonet/network/packet"
-	"github.com/laixhe/gonet/proto/gen/config/clog"
+	"github.com/laixhe/gonet/protocol/gen/config/clog"
 	"github.com/laixhe/gonet/xconfig"
 	"github.com/laixhe/gonet/xlog"
 )

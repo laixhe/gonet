@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
-	"github.com/laixhe/gonet/proto/gen/config/cmongodb"
+	"github.com/laixhe/gonet/protocol/gen/config/cmongodb"
 	"github.com/laixhe/gonet/xlog"
 )
 

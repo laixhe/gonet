@@ -1,9 +1,9 @@
 package gonet
 
 import (
-	"github.com/laixhe/gonet/proto/gen/config/cgorm"
-	"github.com/laixhe/gonet/proto/gen/config/cmongodb"
-	"github.com/laixhe/gonet/proto/gen/config/credis"
+	"github.com/laixhe/gonet/protocol/gen/config/cgorm"
+	"github.com/laixhe/gonet/protocol/gen/config/cmongodb"
+	"github.com/laixhe/gonet/protocol/gen/config/credis"
 	"github.com/laixhe/gonet/xgorm"
 	"github.com/laixhe/gonet/xi18n"
 	"github.com/laixhe/gonet/xmongo"

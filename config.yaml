@@ -42,6 +42,7 @@ redis:
   min_idle_conn: 5
 
 jwt:
+  # 加密密钥
   secret_key: b9f07bfd4eaf7b8a63d9
   # 过期时长(单位秒)
   expire_time: 604800

@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm/logger"
 
-	"github.com/laixhe/gonet/proto/gen/config/clog"
+	"github.com/laixhe/gonet/protocol/gen/config/clog"
 	"github.com/laixhe/gonet/xlog"
 )
 

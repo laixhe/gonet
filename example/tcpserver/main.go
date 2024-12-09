@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/laixhe/gonet/network/tcp"
-	"github.com/laixhe/gonet/proto/gen/config/clog"
+	"github.com/laixhe/gonet/protocol/gen/config/clog"
 	"github.com/laixhe/gonet/xconfig"
 	"github.com/laixhe/gonet/xlog"
 )

@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/laixhe/gonet/proto/gen/config/clog"
+	"github.com/laixhe/gonet/protocol/gen/config/clog"
 )
 
 var (

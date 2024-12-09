@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
-	"github.com/laixhe/gonet/proto/gen/config/cgorm"
+	"github.com/laixhe/gonet/protocol/gen/config/cgorm"
 	"github.com/laixhe/gonet/xlog"
 )
 

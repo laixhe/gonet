@@ -3,7 +3,7 @@ package xapp
 import (
 	"errors"
 
-	"github.com/laixhe/gonet/proto/gen/config/capp"
+	"github.com/laixhe/gonet/protocol/gen/config/capp"
 	"github.com/laixhe/gonet/xlog"
 )
 

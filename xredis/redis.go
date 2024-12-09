@@ -8,7 +8,7 @@ import (
 
 	redis "github.com/redis/go-redis/v9"
 
-	"github.com/laixhe/gonet/proto/gen/config/credis"
+	"github.com/laixhe/gonet/protocol/gen/config/credis"
 	"github.com/laixhe/gonet/xlog"
 )
 

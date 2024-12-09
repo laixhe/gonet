@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/laixhe/gonet/proto/gen/config/cauth"
+	"github.com/laixhe/gonet/protocol/gen/config/cauth"
 	"github.com/laixhe/gonet/xerror"
 	"github.com/laixhe/gonet/xjwt"
 	"github.com/laixhe/gonet/xresponse"
