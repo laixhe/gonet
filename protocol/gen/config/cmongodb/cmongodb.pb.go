@@ -27,15 +27,15 @@ type MongoDB struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 连接地址
-	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"` // @gotags: mapstructure:"uri"
+	Uri string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty" mapstructure:"uri"` // @gotags: mapstructure:"uri"
 	// 指定数据库
-	Database string `protobuf:"bytes,2,opt,name=database,proto3" json:"database,omitempty"` // @gotags: mapstructure:"database"
+	Database string `protobuf:"bytes,2,opt,name=database,proto3" json:"database,omitempty" mapstructure:"database"` // @gotags: mapstructure:"database"
 	// 最大连接的数量
-	MaxPoolSize uint64 `protobuf:"varint,3,opt,name=max_pool_size,json=maxPoolSize,proto3" json:"max_pool_size,omitempty"` // @gotags: mapstructure:"max_pool_size"
+	MaxPoolSize uint64 `protobuf:"varint,3,opt,name=max_pool_size,json=maxPoolSize,proto3" json:"max_pool_size,omitempty" mapstructure:"max_pool_size"` // @gotags: mapstructure:"max_pool_size"
 	// 最小连接的数量
-	MinPoolSize uint64 `protobuf:"varint,4,opt,name=min_pool_size,json=minPoolSize,proto3" json:"min_pool_size,omitempty"` // @gotags: mapstructure:"min_pool_size"
+	MinPoolSize uint64 `protobuf:"varint,4,opt,name=min_pool_size,json=minPoolSize,proto3" json:"min_pool_size,omitempty" mapstructure:"min_pool_size"` // @gotags: mapstructure:"min_pool_size"
 	// 最大连接的空闲时间(设置了连接可复用的最大时间)(单位秒)
-	MaxConnIdleTime int64 `protobuf:"varint,5,opt,name=max_conn_idle_time,json=maxConnIdleTime,proto3" json:"max_conn_idle_time,omitempty"` // @gotags: mapstructure:"max_conn_idle_time"
+	MaxConnIdleTime int64 `protobuf:"varint,5,opt,name=max_conn_idle_time,json=maxConnIdleTime,proto3" json:"max_conn_idle_time,omitempty" mapstructure:"max_conn_idle_time"` // @gotags: mapstructure:"max_conn_idle_time"
 }
 
 func (x *MongoDB) Reset() {

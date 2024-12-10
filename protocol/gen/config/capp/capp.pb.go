@@ -74,11 +74,11 @@ type App struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 版本号
-	Version string `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"` // @gotags: mapstructure:"version"
+	Version string `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty" mapstructure:"version"` // @gotags: mapstructure:"version"
 	// 开发模式 debug release
-	Mode string `protobuf:"bytes,2,opt,name=mode,proto3" json:"mode,omitempty"` // @gotags: mapstructure:"mode"
+	Mode string `protobuf:"bytes,2,opt,name=mode,proto3" json:"mode,omitempty" mapstructure:"mode"` // @gotags: mapstructure:"mode"
 	// pid文件路径
-	Pid string `protobuf:"bytes,3,opt,name=pid,proto3" json:"pid,omitempty"` // @gotags: mapstructure:"pid"
+	Pid string `protobuf:"bytes,3,opt,name=pid,proto3" json:"pid,omitempty" mapstructure:"pid"` // @gotags: mapstructure:"pid"
 }
 
 func (x *App) Reset() {

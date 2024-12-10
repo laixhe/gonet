@@ -14,4 +14,4 @@ protocol:
 	mv ./github.com/laixhe/gonet/protocol/gen ./protocol
 	rm -rf ./github.com
 	#protoc-go-inject-tag -input="./protocol/gen/*/*.pb.go"
-	#protoc-go-inject-tag -input="./protocol/gen/*/*/*.pb.go"
+	protoc-go-inject-tag -input="./protocol/gen/*/*/*.pb.go"

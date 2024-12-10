@@ -27,13 +27,13 @@ type Gorm struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 连接地址
-	Dsn string `protobuf:"bytes,1,opt,name=dsn,proto3" json:"dsn,omitempty"` // @gotags: mapstructure:"dsn"
+	Dsn string `protobuf:"bytes,1,opt,name=dsn,proto3" json:"dsn,omitempty" mapstructure:"dsn"` // @gotags: mapstructure:"dsn"
 	// 设置空闲连接池中连接的最大数量
-	MaxIdleCount int32 `protobuf:"varint,2,opt,name=max_idle_count,json=maxIdleCount,proto3" json:"max_idle_count,omitempty"` // @gotags: mapstructure:"max_idle_count"
+	MaxIdleCount int32 `protobuf:"varint,2,opt,name=max_idle_count,json=maxIdleCount,proto3" json:"max_idle_count,omitempty" mapstructure:"max_idle_count"` // @gotags: mapstructure:"max_idle_count"
 	// 设置打开数据库连接的最大数量
-	MaxOpenCount int32 `protobuf:"varint,3,opt,name=max_open_count,json=maxOpenCount,proto3" json:"max_open_count,omitempty"` // @gotags: mapstructure:"max_open_count"
+	MaxOpenCount int32 `protobuf:"varint,3,opt,name=max_open_count,json=maxOpenCount,proto3" json:"max_open_count,omitempty" mapstructure:"max_open_count"` // @gotags: mapstructure:"max_open_count"
 	// 设置了连接可复用的最大时间(要比数据库设置连接超时时间少)(单位秒)
-	MaxLifeTime int64 `protobuf:"varint,4,opt,name=max_life_time,json=maxLifeTime,proto3" json:"max_life_time,omitempty"` // @gotags: mapstructure:"max_life_time"
+	MaxLifeTime int64 `protobuf:"varint,4,opt,name=max_life_time,json=maxLifeTime,proto3" json:"max_life_time,omitempty" mapstructure:"max_life_time"` // @gotags: mapstructure:"max_life_time"
 }
 
 func (x *Gorm) Reset() {

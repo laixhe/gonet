@@ -127,17 +127,17 @@ type Log struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 日志模式 console file
-	Run string `protobuf:"bytes,1,opt,name=run,proto3" json:"run,omitempty"` // @gotags: mapstructure:"run"
+	Run string `protobuf:"bytes,1,opt,name=run,proto3" json:"run,omitempty" mapstructure:"run"` // @gotags: mapstructure:"run"
 	// 日志文件路径
-	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"` // @gotags: mapstructure:"path"
+	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty" mapstructure:"path"` // @gotags: mapstructure:"path"
 	// 日志级别 debug  info  error
-	Level string `protobuf:"bytes,3,opt,name=level,proto3" json:"level,omitempty"` // @gotags: mapstructure:"level"
+	Level string `protobuf:"bytes,3,opt,name=level,proto3" json:"level,omitempty" mapstructure:"level"` // @gotags: mapstructure:"level"
 	// 每个日志文件保存大小 *M
-	MaxSize int32 `protobuf:"varint,4,opt,name=max_size,json=maxSize,proto3" json:"max_size,omitempty"` // @gotags: mapstructure:"max_size"
+	MaxSize int32 `protobuf:"varint,4,opt,name=max_size,json=maxSize,proto3" json:"max_size,omitempty" mapstructure:"max_size"` // @gotags: mapstructure:"max_size"
 	// 保留 N 个备份
-	MaxBackups int32 `protobuf:"varint,5,opt,name=max_backups,json=maxBackups,proto3" json:"max_backups,omitempty"` // @gotags: mapstructure:"max_backups"
+	MaxBackups int32 `protobuf:"varint,5,opt,name=max_backups,json=maxBackups,proto3" json:"max_backups,omitempty" mapstructure:"max_backups"` // @gotags: mapstructure:"max_backups"
 	// 保留 N 天
-	MaxAge int32 `protobuf:"varint,6,opt,name=max_age,json=maxAge,proto3" json:"max_age,omitempty"` // @gotags: mapstructure:"max_age"
+	MaxAge int32 `protobuf:"varint,6,opt,name=max_age,json=maxAge,proto3" json:"max_age,omitempty" mapstructure:"max_age"` // @gotags: mapstructure:"max_age"
 }
 
 func (x *Log) Reset() {

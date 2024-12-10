@@ -27,15 +27,15 @@ type Redis struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 连接地址
-	Addr string `protobuf:"bytes,1,opt,name=addr,proto3" json:"addr,omitempty"` // @gotags: mapstructure:"addr"
+	Addr string `protobuf:"bytes,1,opt,name=addr,proto3" json:"addr,omitempty" mapstructure:"addr"` // @gotags: mapstructure:"addr"
 	// 选择N号数据库
-	DbNum int32 `protobuf:"varint,2,opt,name=db_num,json=dbNum,proto3" json:"db_num,omitempty"` // @gotags: mapstructure:"db_num"
+	DbNum int32 `protobuf:"varint,2,opt,name=db_num,json=dbNum,proto3" json:"db_num,omitempty" mapstructure:"db_num"` // @gotags: mapstructure:"db_num"
 	// 设置打开数据库连接的最大数量
-	Password string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"` // @gotags: mapstructure:"password"
+	Password string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty" mapstructure:"password"` // @gotags: mapstructure:"password"
 	// 最大链接数
-	PoolSize int32 `protobuf:"varint,4,opt,name=pool_size,json=poolSize,proto3" json:"pool_size,omitempty"` // @gotags: mapstructure:"pool_size"
+	PoolSize int32 `protobuf:"varint,4,opt,name=pool_size,json=poolSize,proto3" json:"pool_size,omitempty" mapstructure:"pool_size"` // @gotags: mapstructure:"pool_size"
 	// 空闲链接数
-	MinIdleConn int32 `protobuf:"varint,5,opt,name=min_idle_conn,json=minIdleConn,proto3" json:"min_idle_conn,omitempty"` // @gotags: mapstructure:"min_idle_conn"
+	MinIdleConn int32 `protobuf:"varint,5,opt,name=min_idle_conn,json=minIdleConn,proto3" json:"min_idle_conn,omitempty" mapstructure:"min_idle_conn"` // @gotags: mapstructure:"min_idle_conn"
 }
 
 func (x *Redis) Reset() {

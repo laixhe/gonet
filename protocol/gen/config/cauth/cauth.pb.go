@@ -27,9 +27,9 @@ type Jwt struct {
 	unknownFields protoimpl.UnknownFields
 
 	// jwt secret key
-	SecretKey string `protobuf:"bytes,1,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"` // @gotags: mapstructure:"secret_key"
+	SecretKey string `protobuf:"bytes,1,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty" mapstructure:"secret_key"` // @gotags: mapstructure:"secret_key"
 	// 过期时长(单位秒)
-	ExpireTime int64 `protobuf:"varint,2,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // @gotags: mapstructure:"expire_time"
+	ExpireTime int64 `protobuf:"varint,2,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty" mapstructure:"expire_time"` // @gotags: mapstructure:"expire_time"
 }
 
 func (x *Jwt) Reset() {

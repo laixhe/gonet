@@ -27,11 +27,11 @@ type Server struct {
 	unknownFields protoimpl.UnknownFields
 
 	// 运行IP
-	Ip string `protobuf:"bytes,1,opt,name=ip,proto3" json:"ip,omitempty"` // @gotags: mapstructure:"ip"
+	Ip string `protobuf:"bytes,1,opt,name=ip,proto3" json:"ip,omitempty" mapstructure:"ip"` // @gotags: mapstructure:"ip"
 	// 运行端口
-	Port int32 `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"` // @gotags: mapstructure:"port"
+	Port int32 `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty" mapstructure:"port"` // @gotags: mapstructure:"port"
 	// 超时时间(单位秒)
-	Timeout int64 `protobuf:"varint,3,opt,name=timeout,proto3" json:"timeout,omitempty"` // @gotags: mapstructure:"timeout"
+	Timeout int64 `protobuf:"varint,3,opt,name=timeout,proto3" json:"timeout,omitempty" mapstructure:"timeout"` // @gotags: mapstructure:"timeout"
 }
 
 func (x *Server) Reset() {
@@ -91,7 +91,7 @@ type Servers struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Http *Server `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty"` // @gotags: mapstructure:"http"
+	Http *Server `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty" mapstructure:"http"` // @gotags: mapstructure:"http"
 }
 
 func (x *Servers) Reset() {
