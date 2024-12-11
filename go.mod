@@ -12,6 +12,7 @@ require (
 	github.com/gogf/gf/v2 v2.8.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/redis/go-redis/v9 v9.7.0
+	github.com/rs/xid v1.6.0
 	github.com/spf13/viper v1.19.0
 	go.etcd.io/etcd/api/v3 v3.5.17
 	go.etcd.io/etcd/client/v3 v3.5.17

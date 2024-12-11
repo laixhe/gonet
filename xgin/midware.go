@@ -8,6 +8,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 
 	"github.com/laixhe/gonet/protocol/gen/config/clog"
@@ -15,6 +16,22 @@ import (
 )
 
 // 中间件
+
+const (
+	HeaderRequestID = "X-Request-ID" // 请求ID
+)
+
+// SetRequestID 设置请求ID
+func SetRequestID() gin.HandlerFunc {
+	return requestid.New(requestid.WithGenerator(func() string {
+		return xid.New().String()
+	}))
+}
+
+// GetRequestID 获取请求ID
+func GetRequestID(c *gin.Context) string {
+	return requestid.Get(c)
+}
 
 // Cors 跨域
 func Cors() gin.HandlerFunc {
@@ -35,8 +52,8 @@ func Cors() gin.HandlerFunc {
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if xlog.GetLevel() == clog.LevelType_debug.String() {
-			xlog.Debug("gin",
-				zap.String("request_id", requestid.Get(c)),
+			xlog.Debug("",
+				zap.String(HeaderRequestID, requestid.Get(c)),
 				zap.Int("status", c.Writer.Status()),
 				zap.String("method", c.Request.Method),
 				zap.String("path", c.Request.URL.Path),
@@ -52,8 +69,8 @@ func Logger() gin.HandlerFunc {
 // Recovery 出现 panic 恢复正常
 func Recovery() gin.HandlerFunc {
 	return gin.CustomRecovery(func(c *gin.Context, err interface{}) {
-		xlog.Error("gin",
-			zap.String("request_id", requestid.Get(c)),
+		xlog.Error("",
+			zap.String(HeaderRequestID, requestid.Get(c)),
 			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
 			zap.String("path", c.Request.URL.Path),
