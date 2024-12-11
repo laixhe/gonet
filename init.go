@@ -23,7 +23,7 @@ func init() {
 	cc = &GoNet{}
 }
 
-func RedisInit(c *credis.Redis) error {
+func InitRedis(c *credis.Redis) error {
 	redis, err := xredis.Init(c)
 	if err != nil {
 		return err
@@ -32,11 +32,11 @@ func RedisInit(c *credis.Redis) error {
 	return nil
 }
 
-func RedisClient() *xredis.RedisClient {
+func Redis() *xredis.RedisClient {
 	return cc.redis
 }
 
-func MongoInit(c *cmongodb.MongoDB) error {
+func InitMongo(c *cmongodb.MongoDB) error {
 	mongo, err := xmongo.Init(c)
 	if err != nil {
 		return err
@@ -45,11 +45,11 @@ func MongoInit(c *cmongodb.MongoDB) error {
 	return nil
 }
 
-func MongoClient() *xmongo.MongoClient {
+func Mongo() *xmongo.MongoClient {
 	return cc.mongo
 }
 
-func GormInit(c *cgorm.Gorm) error {
+func InitGorm(c *cgorm.Gorm) error {
 	gorm, err := xgorm.Init(c)
 	if err != nil {
 		return err
@@ -58,11 +58,11 @@ func GormInit(c *cgorm.Gorm) error {
 	return nil
 }
 
-func GormClient() *xgorm.GormClient {
+func Gorm() *xgorm.GormClient {
 	return cc.gorm
 }
 
-func I18nInit(httpHeaderKey string) {
+func InitI18n(httpHeaderKey string) {
 	cc.i18n = xi18n.NewI18n(httpHeaderKey)
 }
 
