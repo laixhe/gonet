@@ -6,12 +6,14 @@ option go_package = "github.com/laixhe/gonet/protocol/gen/config/cgorm;cgorm";
 
 // 数据库 gorm 配置
 message Gorm {
+  // 驱动名称 mysql postgresql sqlite
+  string driver         = 1; // @gotags: mapstructure:"driver"
   // 连接地址
-  string dsn            = 1; // @gotags: mapstructure:"dsn"
+  string dsn            = 2; // @gotags: mapstructure:"dsn"
   // 设置空闲连接池中连接的最大数量
-  int32 max_idle_count  = 2; // @gotags: mapstructure:"max_idle_count"
+  int32 max_idle_count  = 3; // @gotags: mapstructure:"max_idle_count"
   // 设置打开数据库连接的最大数量
-  int32 max_open_count  = 3; // @gotags: mapstructure:"max_open_count"
+  int32 max_open_count  = 4; // @gotags: mapstructure:"max_open_count"
   // 设置了连接可复用的最大时间(要比数据库设置连接超时时间少)(单位秒)
-  int64 max_life_time   = 4; // @gotags: mapstructure:"max_life_time"
+  int64 max_life_time   = 5; // @gotags: mapstructure:"max_life_time"
 }

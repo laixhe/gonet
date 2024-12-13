@@ -6,7 +6,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/glebarez/sqlite"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -43,15 +45,45 @@ func connect(c *cgorm.Gorm) (*GormClient, error) {
 		Colorful:      true,
 	})
 
-	client, err := gorm.Open(mysql.Open(c.Dsn), &gorm.Config{
-		Logger: defaultLogger,
-		NamingStrategy: schema.NamingStrategy{
-			SingularTable: true, // 使用单数表名，启用该选项后，`User` 表将是`user`
-		},
-	})
-	if err != nil {
-		return nil, err
+	var client *gorm.DB
+	var err error
+	if c.Driver == "mysql" {
+		client, err = gorm.Open(mysql.Open(c.Dsn), &gorm.Config{
+			Logger: defaultLogger,
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: true, // 使用单数表名，启用该选项后，`User` 表将是`user`
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
+	if c.Driver == "postgresql" {
+		client, err = gorm.Open(postgres.Open(c.Dsn), &gorm.Config{
+			Logger: defaultLogger,
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: true, // 使用单数表名，启用该选项后，`User` 表将是`user`
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	if c.Driver == "sqlite" {
+		client, err = gorm.Open(sqlite.Open(c.Dsn), &gorm.Config{
+			Logger: defaultLogger,
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: true, // 使用单数表名，启用该选项后，`User` 表将是`user`
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	if client == nil {
+		return nil, errors.New("gorm config driver It can only be mysql postgresql sqlite")
+	}
+
 	sqlDB, err := client.DB()
 	if err != nil {
 		return nil, err
@@ -83,8 +115,14 @@ func Init(c *cgorm.Gorm) (*GormClient, error) {
 	if c == nil {
 		return nil, errors.New("gorm config as nil")
 	}
+	if c.Driver == "" {
+		return nil, errors.New("gorm config driver as nil")
+	}
 	if c.Dsn == "" {
 		return nil, errors.New("gorm config dsn as nil")
+	}
+	if !(c.Driver == "mysql" || c.Driver == "postgresql" || c.Driver == "sqlite") {
+		return nil, errors.New("gorm config driver It can only be mysql postgresql sqlite")
 	}
 	xlog.Debugf("gorm config=%v", c)
 	xlog.Debug("gorm init...")
