@@ -12,6 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/laixhe/gonet/protocol/gen/config/clog"
+	"github.com/laixhe/gonet/xjwt"
 	"github.com/laixhe/gonet/xlog"
 )
 
@@ -60,6 +61,7 @@ func Logger() gin.HandlerFunc {
 				zap.String("query", c.Request.URL.RawQuery),
 				zap.String("ip", c.ClientIP()),
 				zap.String("agent", c.Request.UserAgent()),
+				zap.String("Authorization", c.Request.Header.Get(xjwt.Authorization)),
 			)
 		}
 		c.Next()
@@ -77,6 +79,7 @@ func Recovery() gin.HandlerFunc {
 			zap.String("query", c.Request.URL.RawQuery),
 			zap.String("ip", c.ClientIP()),
 			zap.String("agent", c.Request.UserAgent()),
+			zap.String("Authorization", c.Request.Header.Get(xjwt.Authorization)),
 			zap.Any("error", err),
 			zap.String("stack", string(debug.Stack())),
 		)
