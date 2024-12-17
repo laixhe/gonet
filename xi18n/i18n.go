@@ -23,9 +23,11 @@ func NewI18n(httpHeaderKey string) *I18n {
 	if httpHeaderKey == "" {
 		httpHeaderKey = LanguageHeaderKey
 	}
+	i18n := gi18n.New()
+	i18n.SetLanguage(ZhCn)
 	return &I18n{
 		httpHeaderKey: httpHeaderKey,
-		i18n:          gi18n.New(),
+		i18n:          i18n,
 		zhCtx:         gi18n.WithLanguage(context.Background(), ZhCn),
 		enCtx:         gi18n.WithLanguage(context.Background(), En),
 	}
