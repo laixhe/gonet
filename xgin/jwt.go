@@ -36,6 +36,24 @@ func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 	}
 }
 
+// JwtAuthAuto 自动鉴权
+// cjwt 配置
+// parseTokenError 错误
+func JwtAuthAuto(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.Request.Header.Get(xjwt.Authorization)
+		if len(token) > 0 {
+			if strings.HasPrefix(token, xjwt.Bearer) {
+				claims, err := xjwt.ParseToken(cjwt, token[xjwt.BearerLen:])
+				if err == nil {
+					c.Set(xjwt.AuthorizationClaimsHeaderKey, claims)
+				}
+			}
+		}
+		c.Next()
+	}
+}
+
 func ContextUid(c *gin.Context) uint64 {
 	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
 	if exists {
