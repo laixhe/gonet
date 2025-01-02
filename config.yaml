@@ -17,6 +17,8 @@ gorm:
   driver: mysql
   # 连接地址
   dsn: root:123456@tcp(127.0.0.1:3306)/webapi?charset=utf8mb4&parseTime=True&loc=Local
+  # 模式(postgresql专用)
+  schema: public
   # 设置空闲连接池中连接的最大数量
   max_idle_count: 10
   # 设置打开数据库连接的最大数量

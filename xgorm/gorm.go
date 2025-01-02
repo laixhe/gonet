@@ -19,6 +19,7 @@ import (
 
 // GormClient 客户端
 type GormClient struct {
+	c      *cgorm.Gorm
 	client *gorm.DB
 }
 
@@ -35,6 +36,11 @@ func (gc *GormClient) Ping() error {
 // Client get gorm client
 func (gc *GormClient) Client() *gorm.DB {
 	return gc.client
+}
+
+// Schema 模式(postgresql专用)
+func (gc *GormClient) Schema() string {
+	return gc.c.Schema
 }
 
 // connect 连接数据库
@@ -106,6 +112,7 @@ func connect(c *cgorm.Gorm) (*GormClient, error) {
 		return nil, err
 	}
 	return &GormClient{
+		c:      c,
 		client: client,
 	}, nil
 }

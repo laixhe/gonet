@@ -14,6 +14,7 @@ import (
 
 // RedisClient 客户端
 type RedisClient struct {
+	c      *credis.Redis
 	client redis.Cmdable
 }
 
@@ -83,7 +84,9 @@ func initCluster(c *credis.Redis) redis.Cmdable {
 
 // connect 连接数据库
 func connect(c *credis.Redis) (*RedisClient, error) {
-	rc := &RedisClient{}
+	rc := &RedisClient{
+		c: c,
+	}
 
 	addrs := strings.Split(c.Addr, ",")
 	if len(addrs) == 1 {

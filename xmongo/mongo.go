@@ -16,6 +16,7 @@ import (
 
 // MongoClient 客户端
 type MongoClient struct {
+	c               *cmongodb.MongoDB
 	client          *mongo.Client
 	defaultDatabase *mongo.Database // 默认指定的数据库
 	databaseMap     *sync.Map       // 选择其他指定的数据库
@@ -77,6 +78,7 @@ func connect(c *cmongodb.MongoDB) (*MongoClient, error) {
 	}
 
 	return &MongoClient{
+		c:               c,
 		client:          client,
 		defaultDatabase: client.Database(c.Database),
 		databaseMap:     &sync.Map{},
