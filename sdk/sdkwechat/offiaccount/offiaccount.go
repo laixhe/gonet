@@ -31,7 +31,7 @@ func Init(c *cwechat.Offiaccount) error {
 		return errors.New("wechat offiaccount config secret as empty")
 	}
 	xlog.Debugf("wechat offiaccount config=%v", c)
-	//
+	// doc https://powerwechat.artisan-cloud.com/zh/official-account
 	client, err := officialAccount.NewOfficialAccount(&officialAccount.UserConfig{
 		AppID:  c.AppId,
 		Secret: c.Secret,

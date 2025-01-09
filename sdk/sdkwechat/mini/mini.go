@@ -48,7 +48,7 @@ func Init(c *cwechat.MiniProgram) error {
 		//return errors.New("wechat mini program config aeskey as empty")
 	}
 	xlog.Debugf("wechat mini program config=%v", c)
-	//
+	// doc https://powerwechat.artisan-cloud.com/zh/mini-program
 	client, err := miniProgram.NewMiniProgram(&miniProgram.UserConfig{
 		AppID:     c.AppId,
 		Secret:    c.Secret,

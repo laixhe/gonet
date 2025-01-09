@@ -44,7 +44,7 @@ func Init(c *coss.Oss) error {
 		c:      c,
 		client: nil,
 	}
-	//
+	// doc https://help.aliyun.com/zh/oss
 	cfg := oss.NewConfig().
 		WithCredentialsProvider(credentials.NewStaticCredentialsProvider(c.AccessKeyId, c.AccessKeySecret)).
 		WithRegion(c.Region).WithEndpoint(c.Endpoint)

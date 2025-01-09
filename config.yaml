@@ -1,5 +1,5 @@
 log:
-  # 日志文件路径
+  # 日志文件路径(日志模式为：file)
   path: logs.log
   # 日志模式 console file
   run_type: console
@@ -17,14 +17,14 @@ gorm:
   driver: mysql
   # 连接地址
   dsn: root:123456@tcp(127.0.0.1:3306)/webapi?charset=utf8mb4&parseTime=True&loc=Local
-  # 模式(postgresql专用)
-  schema: public
   # 设置空闲连接池中连接的最大数量
   max_idle_count: 10
   # 设置打开数据库连接的最大数量
   max_open_count: 100
   # 设置了连接可复用的最大时间(要比数据库设置连接超时时间少)(单位秒)
   max_life_time: 300
+  # 模式(postgresql专用)
+  #schema: public
 
 mongodb:
   uri: mongodb://127.0.0.1:27017
@@ -70,9 +70,9 @@ wechat_mini_program:
   appid: xxx
   # 密钥 App Secret
   secret: xxx
-  # 回调消息 Token
+  # (可选)回调消息 Token
   token:
-  # 回调消息密钥 AESKey
+  # (可选)回调消息密钥 AESKey
   aeskey:
 
 # 微信公众号
