@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package cwechat;
+
+option go_package = "github.com/laixhe/gonet/protocol/gen/config/cwechat;cwechat";
+
+// 微信公众号配置
+message Offiaccount {
+  // 唯一凭证 App ID
+  string app_id = 1; // @gotags: mapstructure:"appid" toml:"appid" yaml:"appid"
+  // 密钥 App Secret
+  string secret = 2; // @gotags: mapstructure:"secret" toml:"secret" yaml:"secret"
+}

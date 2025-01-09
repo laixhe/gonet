@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package coss;
+
+option go_package = "github.com/laixhe/gonet/protocol/gen/config/coss;coss";
+
+// 阿里云对象存储配置
+message Oss {
+  // 标识用户ID
+  string access_key_id     = 1; // @gotags: mapstructure:"access_key_id" toml:"access_key_id" yaml:"access_key_id"
+  // 密钥
+  string access_key_secret = 2; // @gotags: mapstructure:"access_key_secret" toml:"access_key_secret" yaml:"access_key_secret"
+  // 地域(如: cn-shenzhen)
+  string region            = 3; // @gotags: mapstructure:"region" toml:"region" yaml:"region"
+  // 访问域名(如: https://oss-cn-shenzhen.aliyuncs.com)
+  string endpoint          = 4; // @gotags: mapstructure:"endpoint" toml:"endpoint" yaml:"endpoint"
+  // 桶名(存储空间如: test)
+  string bucket            = 5; // @gotags: mapstructure:"bucket" toml:"bucket" yaml:"bucket"
+}

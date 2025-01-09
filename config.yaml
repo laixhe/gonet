@@ -49,4 +49,36 @@ jwt:
   # 加密密钥
   secret_key: b9f07bfd4eaf7b8a63d9
   # 过期时长(单位秒)
-  expire_time: 604800
+  expire_time: 2592000
+
+# 阿里云对象存储
+oss:
+  # 标识用户ID
+  access_key_id: xxx
+  # 密钥
+  access_key_secret: xxx
+  # 地域(如: cn-shenzhen)
+  region: cn-shenzhen
+  # 访问域名( 如: https://oss-cn-shenzhen.aliyuncs.com )
+  endpoint: https://oss-cn-shenzhen.aliyuncs.com
+  # 桶名( 存储空间如: test )
+  bucket: test
+
+# 微信小程序
+wechat_mini_program:
+  # 唯一凭证 App ID
+  appid: xxx
+  # 密钥 App Secret
+  secret: xxx
+  # 回调消息 Token
+  token:
+  # 回调消息密钥 AESKey
+  aeskey:
+
+# 微信公众号
+wechat_offiaccount:
+  # 唯一凭证 App ID
+  appid: xxx
+  # 密钥 App Secret
+  secret: xxx
+

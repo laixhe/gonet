@@ -7,13 +7,13 @@ option go_package = "github.com/laixhe/gonet/protocol/gen/config/cmongodb;cmongo
 // MongoDB数据库配置
 message MongoDB {
   // 连接地址
-  string uri               = 1; // @gotags: mapstructure:"uri"
+  string uri               = 1; // @gotags: mapstructure:"uri" toml:"uri" yaml:"uri"
   // 指定数据库
-  string database          = 2; // @gotags: mapstructure:"database"
+  string database          = 2; // @gotags: mapstructure:"database" toml:"database" yaml:"database"
   // 最大连接的数量
-  uint64 max_pool_size     = 3; // @gotags: mapstructure:"max_pool_size"
+  uint64 max_pool_size     = 3; // @gotags: mapstructure:"max_pool_size" toml:"max_pool_size" yaml:"max_pool_size"
   // 最小连接的数量
-  uint64 min_pool_size     = 4; // @gotags: mapstructure:"min_pool_size"
+  uint64 min_pool_size     = 4; // @gotags: mapstructure:"min_pool_size" toml:"min_pool_size" yaml:"min_pool_size"
   // 最大连接的空闲时间(设置了连接可复用的最大时间)(单位秒)
-  int64 max_conn_idle_time = 5; // @gotags: mapstructure:"max_conn_idle_time"
+  int64 max_conn_idle_time = 5; // @gotags: mapstructure:"max_conn_idle_time" toml:"max_conn_idle_time" yaml:"max_conn_idle_time"
 }
