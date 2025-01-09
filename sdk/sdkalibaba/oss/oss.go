@@ -1,25 +1,25 @@
-package sdkoss
+package oss
 
 import (
 	"errors"
 
-	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
+	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss/credentials"
-	"github.com/laixhe/gonet/xlog"
 
-	"github.com/laixhe/gonet/protocol/gen/config/coss"
+	"github.com/laixhe/gonet/protocol/gen/config/calibaba"
+	"github.com/laixhe/gonet/xlog"
 )
 
 // 阿里云对象存储
 
 type SdkOss struct {
-	c      *coss.Oss
-	client *oss.Client
+	c      *calibaba.Oss
+	client *ossv2.Client
 }
 
 var sdkOss *SdkOss
 
-func Init(c *coss.Oss) error {
+func Init(c *calibaba.Oss) error {
 	if c == nil {
 		return errors.New("oss config is nil")
 	}
@@ -45,10 +45,10 @@ func Init(c *coss.Oss) error {
 		client: nil,
 	}
 	// doc https://help.aliyun.com/zh/oss
-	cfg := oss.NewConfig().
+	cfg := ossv2.NewConfig().
 		WithCredentialsProvider(credentials.NewStaticCredentialsProvider(c.AccessKeyId, c.AccessKeySecret)).
 		WithRegion(c.Region).WithEndpoint(c.Endpoint)
-	client := oss.NewClient(cfg)
+	client := ossv2.NewClient(cfg)
 	// 检查存储空间是否存在
 	//isBucket, err := client.IsBucketExist(context.TODO(), c.Bucket)
 	//if err != nil {

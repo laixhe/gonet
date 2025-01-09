@@ -7,14 +7,12 @@ make protocol
 - vim config.yaml
 - vim core/config/config.go
 ```
-package config
-
 import (
+	"github.com/laixhe/gonet/protocol/gen/config/calibaba"
 	"github.com/laixhe/gonet/protocol/gen/config/capp"
 	"github.com/laixhe/gonet/protocol/gen/config/cauth"
 	"github.com/laixhe/gonet/protocol/gen/config/cgorm"
 	"github.com/laixhe/gonet/protocol/gen/config/clog"
-	"github.com/laixhe/gonet/protocol/gen/config/coss"
 	"github.com/laixhe/gonet/protocol/gen/config/credis"
 	"github.com/laixhe/gonet/protocol/gen/config/cserver"
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
@@ -24,17 +22,17 @@ import (
 )
 
 type Config struct {
-	App               *capp.App                 `mapstructure:"app"`
-	Http              *cserver.Server           `mapstructure:"http"`
-	Log               *clog.Log                 `mapstructure:"log"`
-	Gorm              *cgorm.Gorm               `mapstructure:"gorm"`
-	Redis             *credis.Redis             `mapstructure:"redis"`
-	Jwt               *cauth.Jwt                `mapstructure:"jwt"`
-	Oss               *coss.Oss                 `mapstructure:"oss"`
-	WechatMiniProgram *cwechat.MiniProgram      `mapstructure:"wechat_mini_program"`
-	WechatOffiaccount *cwechat.Offiaccount      `mapstructure:"wechat_offiaccount"`
+	App                *capp.App             `mapstructure:"app"`
+	Http               *cserver.Server       `mapstructure:"http"`
+	Log                *clog.Log             `mapstructure:"log"`
+	Gorm               *cgorm.Gorm           `mapstructure:"gorm"`
+	Redis              *credis.Redis         `mapstructure:"redis"`
+	Jwt                *cauth.Jwt            `mapstructure:"jwt"`
+	AlibabaOss         *calibaba.Oss         `mapstructure:"alibaba_oss"`
+	AlibabaImageSearch *calibaba.ImageSearch `mapstructure:"alibaba_imagesearch"`
+	WechatMiniProgram  *cwechat.MiniProgram  `mapstructure:"wechat_mini_program"`
+	WechatOffiaccount  *cwechat.Offiaccount  `mapstructure:"wechat_offiaccount"`
 }
-
 
 func Init(configFile string) *Config {
 	c := &Config{}

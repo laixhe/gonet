@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package calibaba;
+
+option go_package = "github.com/laixhe/gonet/protocol/gen/config/calibaba;calibaba";
+
+// 图像搜索配置
+message ImageSearch {
+  // 访问密钥方式
+  string access_key        = 1; // @gotags: mapstructure:"access_key" toml:"access_key" yaml:"access_key"
+  // 密钥ID
+  string access_key_id     = 2; // @gotags: mapstructure:"access_key_id" toml:"access_key_id" yaml:"access_key_id"
+  // 密钥
+  string access_key_secret = 3; // @gotags: mapstructure:"access_key_secret" toml:"access_key_secret" yaml:"access_key_secret"
+  // 地域(如: cn-shenzhen )
+  string region            = 4; // @gotags: mapstructure:"region" toml:"region" yaml:"region"
+  // 访问域名(如: imagesearch.cn-shenzhen.aliyuncs.com )
+  string endpoint          = 5; // @gotags: mapstructure:"endpoint" toml:"endpoint" yaml:"endpoint"
+  // 图像搜索实例名称(注意是实例名称不是实例ID)
+  string instance_name     = 6; // @gotags: mapstructure:"instance_name" toml:"instance_name" yaml:"instance_name"
+}

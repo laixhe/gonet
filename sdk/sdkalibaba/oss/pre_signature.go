@@ -1,4 +1,4 @@
-package sdkoss
+package oss
 
 import (
 	"context"
@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
-	"github.com/laixhe/gonet/xfile"
+	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 	"github.com/rs/xid"
+
+	"github.com/laixhe/gonet/xfile"
 )
 
 // FilePreSignatureURL 生成预签名文件上传url
@@ -35,11 +36,11 @@ func PreSignatureURL(fileNames []string) ([]FilePreSignatureURL, error) {
 		dst := dir + "/" + name + "." + ext
 		contentType := xfile.GetContentType(ext)
 		// 生成 PutObject 的预签名 URL
-		result, err := sdkOss.client.Presign(context.TODO(), &oss.PutObjectRequest{
-			Bucket:      oss.Ptr(sdkOss.c.Bucket),
-			Key:         oss.Ptr(dst),
-			ContentType: oss.Ptr(contentType),
-		}, oss.PresignExpires(10*time.Minute))
+		result, err := sdkOss.client.Presign(context.TODO(), &ossv2.PutObjectRequest{
+			Bucket:      ossv2.Ptr(sdkOss.c.Bucket),
+			Key:         ossv2.Ptr(dst),
+			ContentType: ossv2.Ptr(contentType),
+		}, ossv2.PresignExpires(10*time.Minute))
 		if err != nil {
 			return nil, err
 		}
@@ -61,10 +62,10 @@ func GetPreSignatureURL(objectName string) string {
 // SetObjectACL 设置文件的访问权限
 func SetObjectACL(objectName string) error {
 	// 创建设置对象 ACL 的请求
-	req := &oss.PutObjectAclRequest{
-		Bucket: oss.Ptr(sdkOss.c.Bucket), // 存储空间名称
-		Key:    oss.Ptr(objectName),      // 对象名称
-		Acl:    oss.ObjectACLPublicRead,  // 设置对象的访问权限为私有
+	req := &ossv2.PutObjectAclRequest{
+		Bucket: ossv2.Ptr(sdkOss.c.Bucket), // 存储空间名称
+		Key:    ossv2.Ptr(objectName),      // 对象名称
+		Acl:    ossv2.ObjectACLPublicRead,  // 设置对象的访问权限为私有
 	}
 	// 执行设置对象 ACL 的操作
 	_, err := sdkOss.client.PutObjectAcl(context.TODO(), req)

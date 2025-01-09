@@ -8,9 +8,9 @@ import (
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/miniProgram"
 	authResponse "github.com/ArtisanCloud/PowerWeChat/v3/src/miniProgram/auth/response"
 	phoneNumberResponse "github.com/ArtisanCloud/PowerWeChat/v3/src/miniProgram/phoneNumber/response"
-	"github.com/laixhe/gonet/xlog"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
+	"github.com/laixhe/gonet/xlog"
 )
 
 // 微信小程序

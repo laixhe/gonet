@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package coss;
+package calibaba;
 
-option go_package = "github.com/laixhe/gonet/protocol/gen/config/coss;coss";
+option go_package = "github.com/laixhe/gonet/protocol/gen/config/calibaba;calibaba";
 
 // 阿里云对象存储配置
 message Oss {

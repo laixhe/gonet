@@ -5,9 +5,9 @@ import (
 
 	"github.com/ArtisanCloud/PowerSocialite/v3/src/providers"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/officialAccount"
-	"github.com/laixhe/gonet/xlog"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
+	"github.com/laixhe/gonet/xlog"
 )
 
 // 微信公众号

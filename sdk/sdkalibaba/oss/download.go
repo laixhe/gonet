@@ -1,17 +1,17 @@
-package sdkoss
+package oss
 
 import (
 	"context"
 
-	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
+	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 )
 
 // Get 简单下载
-func Get(objectName string, fn func(*oss.GetObjectResult) error) error {
+func Get(objectName string, fn func(*ossv2.GetObjectResult) error) error {
 	// 创建获取对象的请求
-	request := &oss.GetObjectRequest{
-		Bucket: oss.Ptr(sdkOss.c.Bucket), // 存储空间名称
-		Key:    oss.Ptr(objectName),      // 对象名称
+	request := &ossv2.GetObjectRequest{
+		Bucket: ossv2.Ptr(sdkOss.c.Bucket), // 存储空间名称
+		Key:    ossv2.Ptr(objectName),      // 对象名称
 	}
 	// 执行获取对象的操作并处理结果
 	result, err := sdkOss.client.GetObject(context.TODO(), request)

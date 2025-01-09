@@ -27,9 +27,9 @@ type MiniProgram struct {
 	AppId string `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty" mapstructure:"appid" toml:"appid" yaml:"appid"` // @gotags: mapstructure:"appid" toml:"appid" yaml:"appid"
 	// 密钥 App Secret
 	Secret string `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty" mapstructure:"secret" toml:"secret" yaml:"secret"` // @gotags: mapstructure:"secret" toml:"secret" yaml:"secret"
-	// 回调消息 Token
+	// (可选)回调消息 Token
 	Token string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty" mapstructure:"token" toml:"token" yaml:"token"` // @gotags: mapstructure:"token" toml:"token" yaml:"token"
-	// 回调消息密钥 AESKey
+	// (可选)回调消息密钥 AESKey
 	Aeskey        string `protobuf:"bytes,4,opt,name=aeskey,proto3" json:"aeskey,omitempty" mapstructure:"aeskey" toml:"aeskey" yaml:"aeskey"` // @gotags: mapstructure:"aeskey" toml:"aeskey" yaml:"aeskey"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
