@@ -8,7 +8,7 @@ require (
 	github.com/alibabacloud-go/darabonba-openapi/v2 v2.0.10
 	github.com/alibabacloud-go/imagesearch-20201214/v4 v4.0.2
 	github.com/alibabacloud-go/tea v1.2.2
-	github.com/alibabacloud-go/tea-utils/v2 v2.0.6
+	github.com/alibabacloud-go/tea-utils/v2 v2.0.7
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.2.0
 	github.com/gin-contrib/cors v1.7.3
 	github.com/gin-contrib/requestid v1.0.4
