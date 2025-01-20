@@ -4,11 +4,14 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cauth"
 	"github.com/laixhe/gonet/xerror"
 	"github.com/laixhe/gonet/xjwt"
+	"github.com/laixhe/gonet/xlog"
 	"github.com/laixhe/gonet/xresponse"
 )
 
@@ -24,6 +27,9 @@ func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 			if strings.HasPrefix(token, xjwt.Bearer) {
 				claims, err := xjwt.ParseToken(cjwt, token[xjwt.BearerLen:])
 				if err == nil {
+					xlog.Debug("jwt",
+						zap.String(HeaderRequestID, requestid.Get(c)),
+						zap.Any("jwt_claims", claims))
 					c.Set(xjwt.AuthorizationClaimsHeaderKey, claims)
 					c.Next()
 					return
@@ -46,6 +52,9 @@ func JwtAuthAuto(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc
 			if strings.HasPrefix(token, xjwt.Bearer) {
 				claims, err := xjwt.ParseToken(cjwt, token[xjwt.BearerLen:])
 				if err == nil {
+					xlog.Debug("jwt",
+						zap.String(HeaderRequestID, requestid.Get(c)),
+						zap.Any("jwt_claims", claims))
 					c.Set(xjwt.AuthorizationClaimsHeaderKey, claims)
 				}
 			}
