@@ -53,7 +53,7 @@ func Cors() gin.HandlerFunc {
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if xlog.GetLevel() == clog.LevelType_debug.String() {
-			xlog.Debug("",
+			xlog.Debug("gin",
 				zap.String(HeaderRequestID, requestid.Get(c)),
 				zap.Int("status", c.Writer.Status()),
 				zap.String("method", c.Request.Method),
@@ -71,7 +71,7 @@ func Logger() gin.HandlerFunc {
 // Recovery 出现 panic 恢复正常
 func Recovery() gin.HandlerFunc {
 	return gin.CustomRecovery(func(c *gin.Context, err interface{}) {
-		xlog.Error("",
+		xlog.Error("panic",
 			zap.String(HeaderRequestID, requestid.Get(c)),
 			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),

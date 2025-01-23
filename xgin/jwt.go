@@ -29,6 +29,9 @@ func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 				if err == nil {
 					xlog.Debug("jwt",
 						zap.String(HeaderRequestID, requestid.Get(c)),
+						zap.String("method", c.Request.Method),
+						zap.String("path", c.Request.URL.Path),
+						zap.String("query", c.Request.URL.RawQuery),
 						zap.Any("jwt_claims", claims))
 					c.Set(xjwt.AuthorizationClaimsHeaderKey, claims)
 					c.Next()
@@ -54,6 +57,9 @@ func JwtAuthAuto(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc
 				if err == nil {
 					xlog.Debug("jwt",
 						zap.String(HeaderRequestID, requestid.Get(c)),
+						zap.String("method", c.Request.Method),
+						zap.String("path", c.Request.URL.Path),
+						zap.String("query", c.Request.URL.RawQuery),
 						zap.Any("jwt_claims", claims))
 					c.Set(xjwt.AuthorizationClaimsHeaderKey, claims)
 				}
@@ -63,6 +69,7 @@ func JwtAuthAuto(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc
 	}
 }
 
+// ContextUid 获取用户ID
 func ContextUid(c *gin.Context) uint64 {
 	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
 	if exists {
@@ -72,4 +79,18 @@ func ContextUid(c *gin.Context) uint64 {
 		}
 	}
 	return 0
+}
+
+// IsLogin 是否登录
+func IsLogin(err xerror.IError) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		uid := ContextUid(c)
+		if uid > 0 {
+			c.Next()
+			return
+		}
+		c.JSON(http.StatusOK, xresponse.Error(err))
+		// 返回错误
+		c.Abort()
+	}
 }
