@@ -14,12 +14,31 @@ import (
 	"github.com/laixhe/gonet/protocol/gen/config/clog"
 )
 
-var (
-	once        sync.Once
-	zapLogger   *zap.Logger
+type zapClient struct {
+	once        *sync.Once
+	logger      *zap.Logger
 	sugarLogger *zap.SugaredLogger
 	config      *clog.Log
-)
+}
+
+var client = &zapClient{
+	once:        &sync.Once{},
+	logger:      nil,
+	sugarLogger: nil,
+	config:      nil,
+}
+
+func GetLogger() *zap.Logger {
+	return client.logger
+}
+
+func GetSugaredLogger() *zap.SugaredLogger {
+	return client.sugarLogger
+}
+
+func GetLevel() string {
+	return client.config.Level
+}
 
 // Init 初始日志
 func Init(c *clog.Log) {
@@ -34,13 +53,13 @@ func Init(c *clog.Log) {
 
 	fmt.Println("log config=", c)
 
-	once.Do(func() {
+	client.once.Do(func() {
 		if c.Run == clog.RunType_file.String() {
 			initSizeFile(c)
 		} else {
 			initConsole(c)
 		}
-		config = c
+		client.config = c
 	})
 }
 
@@ -118,13 +137,9 @@ func zapInit(write zapcore.WriteSyncer, logLevel string, callerSkip int) {
 	// 添加字段-服务器名称
 	//filed := zap.Fields(zap.String("service", serviceName))
 	// 构造日志
-	//zapLogger = zap.New(core, caller, addCallerSkip, development, filed)
-	zapLogger = zap.New(core, caller, addCallerSkip, development)
-	sugarLogger = zapLogger.Sugar()
-}
-
-func GetLevel() string {
-	return config.Level
+	//logger = zap.New(core, caller, addCallerSkip, development, filed)
+	client.logger = zap.New(core, caller, addCallerSkip, development)
+	client.sugarLogger = client.logger.Sugar()
 }
 
 // zapTimeEncoder 日志时间格式
@@ -134,40 +149,40 @@ func zapTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 
 // Debug 调试
 func Debug(msg string, args ...zap.Field) {
-	zapLogger.Debug(msg, args...)
+	client.logger.Debug(msg, args...)
 }
 
 // Debugf 调试
 func Debugf(template string, args ...interface{}) {
-	sugarLogger.Debugf(template, args...)
+	client.sugarLogger.Debugf(template, args...)
 }
 
 // Info 信息
 func Info(msg string, args ...zap.Field) {
-	zapLogger.Info(msg, args...)
+	client.logger.Info(msg, args...)
 }
 
 // Infof 信息
 func Infof(template string, args ...interface{}) {
-	sugarLogger.Infof(template, args...)
+	client.sugarLogger.Infof(template, args...)
 }
 
 // Warn 警告
 func Warn(msg string, args ...zap.Field) {
-	zapLogger.Warn(msg, args...)
+	client.logger.Warn(msg, args...)
 }
 
 // Warnf 警告
 func Warnf(template string, args ...interface{}) {
-	sugarLogger.Warnf(template, args...)
+	client.sugarLogger.Warnf(template, args...)
 }
 
 // Error 错误
 func Error(msg string, args ...zap.Field) {
-	zapLogger.Error(msg, args...)
+	client.logger.Error(msg, args...)
 }
 
 // Errorf 错误
 func Errorf(template string, args ...interface{}) {
-	sugarLogger.Errorf(template, args...)
+	client.sugarLogger.Errorf(template, args...)
 }
