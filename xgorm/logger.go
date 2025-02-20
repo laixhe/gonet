@@ -21,6 +21,6 @@ func newWriter(w logger.Writer) *Writer {
 // Printf 格式化打印日志
 func (w *Writer) Printf(message string, data ...interface{}) {
 	if xlog.GetLevel() == clog.LevelType_debug.String() {
-		xlog.GetLogger().Debug(fmt.Sprintf(message, data...))
+		xlog.Debug(fmt.Sprintf(message, data...))
 	}
 }

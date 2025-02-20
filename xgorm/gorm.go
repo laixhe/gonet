@@ -43,6 +43,11 @@ func (gc *GormClient) Schema() string {
 	return gc.c.Schema
 }
 
+// SchemaTableName 模式表名(postgresql专用)
+func (gc *GormClient) SchemaTableName(name string) string {
+	return gc.c.Schema + "." + name
+}
+
 // connect 连接数据库
 func connect(c *cgorm.Gorm) (*GormClient, error) {
 	defaultLogger := logger.New(newWriter(log.New(os.Stdout, " ", log.LstdFlags)), logger.Config{
