@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package cwechat;
+
+option go_package = "github.com/laixhe/gonet/protocol/gen/config/cwechat;cwechat";
+
+// 微信支付配置
+message WeChatPay {
+  // 应用唯一标识
+  string app_id               = 1; // @gotags: mapstructure:"app_id"
+  // 应用密钥
+  string secret               = 2; // @gotags: mapstructure:"secret"
+  // 商户号
+  string mch_id               = 3; // @gotags: mapstructure:"mch_id"
+  // 商户证书序列号
+  string mch_serial_no        = 4; // @gotags: mapstructure:"mch_serial_no"
+  // 商户 ApiV3 密钥
+  string mch_api_v3_key       = 5; // @gotags: mapstructure:"mch_api_v3_key"
+  // 商户 API 私钥路径
+  string mch_private_key_path = 6; // @gotags: mapstructure:"mch_private_key_path"
+  // 异步通知 Url
+  string notify_url           = 7; // @gotags: mapstructure:"notify_url"
+}

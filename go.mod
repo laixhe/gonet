@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet
 
-go 1.23
+go 1.24
 
 require (
 	github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7
@@ -14,19 +14,20 @@ require (
 	github.com/gin-contrib/requestid v1.0.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/glebarez/sqlite v1.11.0
+	github.com/go-pay/gopay v1.5.109
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/gogf/gf/v2 v2.8.3
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.7.1
 	github.com/rs/xid v1.6.0
 	github.com/spf13/viper v1.19.0
 	go.etcd.io/etcd/api/v3 v3.5.18
 	go.etcd.io/etcd/client/v3 v3.5.18
 	go.mongodb.org/mongo-driver v1.17.2
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.34.0
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -66,6 +67,12 @@ require (
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-pay/crypto v0.0.1 // indirect
+	github.com/go-pay/errgroup v0.0.3 // indirect
+	github.com/go-pay/smap v0.0.2 // indirect
+	github.com/go-pay/util v0.0.4 // indirect
+	github.com/go-pay/xlog v0.0.3 // indirect
+	github.com/go-pay/xtime v0.0.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
