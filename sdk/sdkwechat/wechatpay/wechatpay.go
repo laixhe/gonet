@@ -3,13 +3,16 @@ package wechatpay
 import (
 	"context"
 	"errors"
+	"net/http"
 	"os"
 
 	"github.com/go-pay/gopay"
 	wechatV3 "github.com/go-pay/gopay/wechat/v3"
 	"github.com/laixhe/gonet/xlog"
+	"go.uber.org/zap"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
+	xginConstant "github.com/laixhe/gonet/xgin/constant"
 )
 
 type SdkWechatPay struct {
@@ -82,10 +85,11 @@ func Init(c *cwechat.WeChatPay, isDebugLog bool) error {
 }
 
 // AppPay APP支付(预支付交易会话标识)
+// requestID   请求唯一值
 // title       订单标题
 // orderNumber 订单号
 // money       订单总金额，单位为分
-func AppPay(ctx context.Context, title, orderNumber string, money uint64) (string, error) {
+func AppPay(ctx context.Context, requestID string, title, orderNumber string, money uint64) (string, error) {
 	bm := make(gopay.BodyMap)
 	bm.Set("appid", sdkWechatPay.c.AppId)
 	bm.Set("mchid", sdkWechatPay.c.MchId)
@@ -99,10 +103,36 @@ func AppPay(ctx context.Context, title, orderNumber string, money uint64) (strin
 	//
 	resp, err := sdkWechatPay.client.V3TransactionApp(ctx, bm)
 	if err != nil {
+		xlog.Error(err.Error(), zap.String(xginConstant.HeaderRequestID, requestID))
 		return "", err
 	}
 	if resp.Code != wechatV3.Success {
 		return "", errors.New(resp.Error)
 	}
 	return resp.Response.PrepayId, nil
+}
+
+// PayNotify 支付异步回调
+func PayNotify(req *http.Request, requestID string) (*wechatV3.V3DecryptPayResult, error) {
+	// 解析
+	notifyReq, err := wechatV3.V3ParseNotify(req)
+	if err != nil {
+		xlog.Error(err.Error(), zap.String(xginConstant.HeaderRequestID, requestID))
+		return nil, err
+	}
+	// 获取微信平台证书
+	certMap := sdkWechatPay.client.WxPublicKeyMap()
+	// 验证异步通知的签名
+	err = notifyReq.VerifySignByPKMap(certMap)
+	if err != nil {
+		xlog.Error(err.Error(), zap.String(xginConstant.HeaderRequestID, requestID))
+		return nil, err
+	}
+	// 支付通知解密
+	result, err := notifyReq.DecryptPayCipherText(sdkWechatPay.c.MchApiV3Key)
+	if err != nil {
+		xlog.Error(err.Error(), zap.String(xginConstant.HeaderRequestID, requestID))
+		return nil, err
+	}
+	return result, nil
 }

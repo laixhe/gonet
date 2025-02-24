@@ -10,6 +10,7 @@ import (
 
 	"github.com/laixhe/gonet/protocol/gen/config/cauth"
 	"github.com/laixhe/gonet/xerror"
+	xginConstant "github.com/laixhe/gonet/xgin/constant"
 	"github.com/laixhe/gonet/xjwt"
 	"github.com/laixhe/gonet/xlog"
 	"github.com/laixhe/gonet/xresponse"
@@ -28,7 +29,7 @@ func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 				claims, err := xjwt.ParseToken(cjwt, token[xjwt.BearerLen:])
 				if err == nil {
 					xlog.Debug("jwt",
-						zap.String(HeaderRequestID, requestid.Get(c)),
+						zap.String(xginConstant.HeaderRequestID, requestid.Get(c)),
 						zap.String("method", c.Request.Method),
 						zap.String("path", c.Request.URL.Path),
 						zap.String("query", c.Request.URL.RawQuery),
@@ -56,7 +57,7 @@ func JwtAuthAuto(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc
 				claims, err := xjwt.ParseToken(cjwt, token[xjwt.BearerLen:])
 				if err == nil {
 					xlog.Debug("jwt",
-						zap.String(HeaderRequestID, requestid.Get(c)),
+						zap.String(xginConstant.HeaderRequestID, requestid.Get(c)),
 						zap.String("method", c.Request.Method),
 						zap.String("path", c.Request.URL.Path),
 						zap.String("query", c.Request.URL.RawQuery),

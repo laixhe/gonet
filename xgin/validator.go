@@ -1,4 +1,4 @@
-package xvalidator
+package xgin
 
 import (
 	"fmt"
@@ -11,7 +11,38 @@ import (
 	validator "github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
+
+	"github.com/laixhe/gonet/xi18n"
 )
+
+// 语言
+
+const (
+	Zh = "zh" // 中文(简体)
+	En = "en" // 英文
+)
+
+var mapLanguage = map[string]string{
+	Zh: Zh,
+	En: En,
+}
+
+func LanguageText(language string) string {
+	return mapLanguage[language]
+}
+
+func I18nToLanguage(language string) string {
+	switch language {
+	case xi18n.ZhCn:
+		return Zh
+	case xi18n.En:
+		return En
+	default:
+		return Zh
+	}
+}
+
+// 表单验证
 
 // 全局翻译器
 var trans translator.Translator
