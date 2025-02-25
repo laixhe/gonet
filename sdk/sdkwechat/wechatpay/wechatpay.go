@@ -8,11 +8,11 @@ import (
 
 	"github.com/go-pay/gopay"
 	wechatV3 "github.com/go-pay/gopay/wechat/v3"
-	"github.com/laixhe/gonet/xlog"
 	"go.uber.org/zap"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
 	xginConstant "github.com/laixhe/gonet/xgin/constant"
+	"github.com/laixhe/gonet/xlog"
 )
 
 type SdkWechatPay struct {
@@ -114,7 +114,7 @@ func AppPay(ctx context.Context, requestID string, title, orderNumber string, mo
 
 // PayNotify 支付异步回调
 func PayNotify(req *http.Request, requestID string) (*wechatV3.V3DecryptPayResult, error) {
-	// 解析
+	// 解析异步通知的参数
 	notifyReq, err := wechatV3.V3ParseNotify(req)
 	if err != nil {
 		xlog.Error(err.Error(), zap.String(xginConstant.HeaderRequestID, requestID))
