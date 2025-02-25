@@ -11,15 +11,18 @@ const (
 	PNG  = "png"
 	JPG  = "jpg"
 	JPEG = "jpeg"
-	WEBP = "webp"
-	BMP  = "bmp"
 	GIF  = "gif"
+	BMP  = "bmp"
+	WEBP = "webp"
 
 	// 视频
 
 	MP4  = "mp4"
 	MOV  = "mov"
 	AVI  = "avi"
+	FLV  = "flv"
+	WMV  = "wmv"
+	MKV  = "mkv"
 	WEBM = "webm"
 
 	// 音频
@@ -28,48 +31,57 @@ const (
 	WAV = "wav"
 	OGG = "ogg"
 	AAC = "aac"
+	M4A = "m4a"
 )
 
 var fileTypeArray = []string{
-	PNG, JPG, JPEG, WEBP, BMP, GIF,
-	MP4, MOV, AVI, WEBM,
-	MP3, WAV, OGG, AAC,
+	PNG, JPG, JPEG, GIF, BMP, WEBP,
+	MP4, MOV, AVI, FLV, WMV, MKV, WEBM,
+	MP3, WAV, OGG, AAC, M4A,
 }
 var fileTypeMap = map[string]string{
 	PNG:  PNG,
 	JPG:  JPG,
 	JPEG: JPEG,
-	WEBP: WEBP,
-	BMP:  BMP,
 	GIF:  GIF,
+	BMP:  BMP,
+	WEBP: WEBP,
 
 	MP4:  MP4,
 	MOV:  MOV,
 	AVI:  AVI,
+	FLV:  FLV,
+	WMV:  WMV,
+	MKV:  MKV,
 	WEBM: WEBM,
 
 	MP3: MP3,
 	WAV: WAV,
 	OGG: OGG,
 	AAC: AAC,
+	M4A: M4A,
 }
 var contentTypeMap = map[string]string{
 	PNG:  "image/png",
 	JPG:  "image/jpeg",
 	JPEG: "image/jpeg",
-	WEBP: "image/webp",
-	BMP:  "image/bmp",
 	GIF:  "image/gif",
+	BMP:  "image/bmp",
+	WEBP: "image/webp",
 
 	MP4:  "video/mp4",
 	MOV:  "video/quicktime",
 	AVI:  "video/x-msvideo",
+	FLV:  "video/x-flv",
+	WMV:  "video/x-ms-wmv",
+	MKV:  "video/x-matroska",
 	WEBM: "video/webm",
 
 	MP3: "audio/mpeg",
 	WAV: "audio/x-wav",
 	OGG: "audio/ogg",
 	AAC: "audio/aac",
+	M4A: "audio/mp4",
 }
 
 // GetTypes 所有类型
