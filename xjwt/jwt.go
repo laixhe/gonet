@@ -40,19 +40,20 @@ func Checking(cjwt *cauth.Jwt) error {
 // jwt 包自带的 jwt.RegisteredClaims 只包含了官方字段
 type CustomClaims struct {
 	// 可根据需要自行添加字段
-	Uid uint64 `json:"uid"`
+	Uid int `json:"uid"`
 	jwt.RegisteredClaims
 }
 
-// GenToken 生成JWT
-func GenToken(cjwt *cauth.Jwt, uid uint64, id string) (string, error) {
-	claims := CustomClaims{
-		Uid: uid,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ID: id,
-		},
-	}
+func (c CustomClaims) GetUid() int {
+	return c.Uid
+}
 
+func (c CustomClaims) GetUid64() int64 {
+	return int64(c.Uid)
+}
+
+// GenToken 生成JWT
+func GenToken(cjwt *cauth.Jwt, claims *CustomClaims) (string, error) {
 	nowTime := time.Now()
 	// 过期时间
 	if cjwt.GetExpireTime() > 0 {
