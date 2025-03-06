@@ -4,10 +4,10 @@ go 1.24
 
 require (
 	github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7
-	github.com/ArtisanCloud/PowerWeChat/v3 v3.3.6
-	github.com/alibabacloud-go/darabonba-openapi/v2 v2.0.10
+	github.com/ArtisanCloud/PowerWeChat/v3 v3.3.9
+	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.2
 	github.com/alibabacloud-go/imagesearch-20201214/v4 v4.1.0
-	github.com/alibabacloud-go/tea v1.3.1
+	github.com/alibabacloud-go/tea v1.3.2
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.7
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.2.0
 	github.com/gin-contrib/cors v1.7.3
@@ -23,12 +23,12 @@ require (
 	github.com/redis/go-redis/v9 v9.7.1
 	github.com/rs/xid v1.6.0
 	github.com/spf13/viper v1.19.0
-	go.etcd.io/etcd/api/v3 v3.5.18
-	go.etcd.io/etcd/client/v3 v3.5.18
+	go.etcd.io/etcd/api/v3 v3.5.19
+	go.etcd.io/etcd/client/v3 v3.5.19
 	go.mongodb.org/mongo-driver v1.17.3
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.35.0
-	google.golang.org/grpc v1.70.0
+	golang.org/x/crypto v0.36.0
+	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.7
@@ -37,7 +37,7 @@ require (
 )
 
 require (
-	github.com/ArtisanCloud/PowerLibs/v3 v3.3.1 // indirect
+	github.com/ArtisanCloud/PowerLibs/v3 v3.3.2 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5 // indirect
 	github.com/alibabacloud-go/debug v1.0.1 // indirect
@@ -114,22 +114,24 @@ require (
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.18 // indirect
-	go.opentelemetry.io/otel v1.32.0 // indirect
-	go.opentelemetry.io/otel/metric v1.32.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
-	go.opentelemetry.io/otel/trace v1.32.0 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.19 // indirect
+	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	go.opentelemetry.io/otel v1.34.0 // indirect
+	go.opentelemetry.io/otel/metric v1.34.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.34.0 // indirect
+	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.12.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20241202173237-19429a94021a // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250106144421-5f5ef82da422 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.22.5 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
