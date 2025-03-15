@@ -4,12 +4,12 @@ go 1.24
 
 require (
 	github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7
-	github.com/ArtisanCloud/PowerWeChat/v3 v3.3.9
-	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.2
+	github.com/ArtisanCloud/PowerWeChat/v3 v3.4.1
+	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.4
 	github.com/alibabacloud-go/imagesearch-20201214/v4 v4.1.0
-	github.com/alibabacloud-go/tea v1.3.2
+	github.com/alibabacloud-go/tea v1.3.4
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.7
-	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.2.0
+	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.2.1
 	github.com/gin-contrib/cors v1.7.3
 	github.com/gin-contrib/requestid v1.0.4
 	github.com/gin-gonic/gin v1.10.0
