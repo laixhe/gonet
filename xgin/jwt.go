@@ -82,6 +82,42 @@ func ContextUid(c *gin.Context) uint64 {
 	return 0
 }
 
+// ContextID 获取ID
+func ContextID(c *gin.Context) string {
+	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
+	if exists {
+		customClaims, is := value.(*xjwt.CustomClaims)
+		if is {
+			return customClaims.ID
+		}
+	}
+	return ""
+}
+
+// ContextSubject 获取Subject
+func ContextSubject(c *gin.Context) string {
+	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
+	if exists {
+		customClaims, is := value.(*xjwt.CustomClaims)
+		if is {
+			return customClaims.Subject
+		}
+	}
+	return ""
+}
+
+// ContextClaims 获取自定义声明类型
+func ContextClaims(c *gin.Context) *xjwt.CustomClaims {
+	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
+	if exists {
+		customClaims, is := value.(*xjwt.CustomClaims)
+		if is {
+			return customClaims
+		}
+	}
+	return nil
+}
+
 // IsLogin 是否登录
 func IsLogin(err xerror.IError) gin.HandlerFunc {
 	return func(c *gin.Context) {
