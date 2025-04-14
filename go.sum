@@ -3,8 +3,8 @@ github.com/ArtisanCloud/PowerLibs/v3 v3.3.2 h1:IInr1YWwkhwOykxDqux1Goym0uFhrYwBj
 github.com/ArtisanCloud/PowerLibs/v3 v3.3.2/go.mod h1:xFGsskCnzAu+6rFEJbGVAlwhrwZPXAny6m7j71S/B5k=
 github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7 h1:P+erNlErr+X2v7Et+yTWaTfIRhw+HfpAPdvNIEwk9Gw=
 github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7/go.mod h1:VZQNCvcK/rldF3QaExiSl1gJEAkyc5/I8RLOd3WFZq4=
-github.com/ArtisanCloud/PowerWeChat/v3 v3.4.6 h1:IOGdt8Lt8EDRl9qBTnX2TxU0Bjx7gdK9Qy+IegyHltY=
-github.com/ArtisanCloud/PowerWeChat/v3 v3.4.6/go.mod h1:ybM3u4Lhso0X+ZsgoRCF4e5W1KT2fBc6plpjPZ2fop4=
+github.com/ArtisanCloud/PowerWeChat/v3 v3.4.7 h1:oDQcU8+/CYvvuJ1nIrCc1j4sg1IfzjkscMoeo4nLIDA=
+github.com/ArtisanCloud/PowerWeChat/v3 v3.4.7/go.mod h1:ybM3u4Lhso0X+ZsgoRCF4e5W1KT2fBc6plpjPZ2fop4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.4.0 h1:kuoIxZQy2WRRk1pttg9asf+WVv6tWQuBNVmK8+nqPr0=
 github.com/BurntSushi/toml v1.4.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=

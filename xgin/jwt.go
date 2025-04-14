@@ -82,6 +82,18 @@ func ContextUid(c *gin.Context) int {
 	return 0
 }
 
+// ContextUid64 获取用户ID
+func ContextUid64(c *gin.Context) int64 {
+	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
+	if exists {
+		customClaims, is := value.(*xjwt.CustomClaims)
+		if is {
+			return int64(customClaims.Uid)
+		}
+	}
+	return 0
+}
+
 // ContextID 获取ID
 func ContextID(c *gin.Context) string {
 	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
@@ -89,18 +101,6 @@ func ContextID(c *gin.Context) string {
 		customClaims, is := value.(*xjwt.CustomClaims)
 		if is {
 			return customClaims.ID
-		}
-	}
-	return ""
-}
-
-// ContextSubject 获取Subject
-func ContextSubject(c *gin.Context) string {
-	value, exists := c.Get(xjwt.AuthorizationClaimsHeaderKey)
-	if exists {
-		customClaims, is := value.(*xjwt.CustomClaims)
-		if is {
-			return customClaims.Subject
 		}
 	}
 	return ""
@@ -115,7 +115,7 @@ func ContextClaims(c *gin.Context) *xjwt.CustomClaims {
 			return customClaims
 		}
 	}
-	return nil
+	return &xjwt.CustomClaims{}
 }
 
 // IsLogin 是否登录
