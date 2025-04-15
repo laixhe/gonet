@@ -1,7 +1,6 @@
 package xutil
 
 import (
-	"fmt"
 	"net"
 )
 
@@ -20,6 +19,12 @@ func IPStringToInt(ipaddr string) uint32 {
 }
 
 // IPIntToString 把数值转为 ip 字符串
-func IPIntToString(ip uint32) string {
-	return fmt.Sprintf("%d.%d.%d.%d", byte(ip>>24), byte(ip>>16), byte(ip>>8), byte(ip))
+func IPIntToString(ipInt uint32) string {
+	return net.IPv4(
+		byte(ipInt>>24),
+		byte(ipInt>>16&0xFF),
+		byte(ipInt>>8&0xFF),
+		byte(ipInt&0xFF),
+	).String()
+	//return fmt.Sprintf("%d.%d.%d.%d", byte(ip>>24), byte(ip>>16), byte(ip>>8), byte(ip))
 }

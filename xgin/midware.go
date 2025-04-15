@@ -1,8 +1,11 @@
 package xgin
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -37,6 +40,23 @@ func Cors() gin.HandlerFunc {
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if xlog.GetLevel() == clog.LevelType_debug.String() {
+			var body []byte
+			var err error
+			if c.Request.Method != http.MethodGet {
+				// 如果不是文件上传类型，则读取body
+				if !strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data") {
+					// 读取body数据
+					body, err = c.GetRawData()
+					if err != nil {
+						xlog.Error("get body error", zap.Error(err))
+					} else {
+						// 重置 body 指针，以便后续处理
+						if len(body) > 0 {
+							c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+						}
+					}
+				}
+			}
 			xlog.Debug("gin",
 				zap.String(xginConstant.HeaderRequestID, requestid.Get(c)),
 				zap.Int("status", c.Writer.Status()),
@@ -46,6 +66,7 @@ func Logger() gin.HandlerFunc {
 				zap.String("ip", c.ClientIP()),
 				zap.String("agent", c.Request.UserAgent()),
 				zap.String("Authorization", c.Request.Header.Get(xjwt.Authorization)),
+				zap.ByteString("body", body),
 			)
 		}
 		c.Next()

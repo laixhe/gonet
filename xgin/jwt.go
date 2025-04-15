@@ -9,6 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cauth"
+	"github.com/laixhe/gonet/protocol/gen/config/clog"
 	"github.com/laixhe/gonet/xerror"
 	xginConstant "github.com/laixhe/gonet/xgin/constant"
 	"github.com/laixhe/gonet/xjwt"
@@ -28,12 +29,14 @@ func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 			if strings.HasPrefix(token, xjwt.Bearer) {
 				claims, err := xjwt.ParseToken(cjwt, token[xjwt.BearerLen:])
 				if err == nil {
-					xlog.Debug("jwt",
-						zap.String(xginConstant.HeaderRequestID, requestid.Get(c)),
-						zap.String("method", c.Request.Method),
-						zap.String("path", c.Request.URL.Path),
-						zap.String("query", c.Request.URL.RawQuery),
-						zap.Any("jwt_claims", claims))
+					if xlog.GetLevel() == clog.LevelType_debug.String() {
+						xlog.Debug("jwt",
+							zap.String(xginConstant.HeaderRequestID, requestid.Get(c)),
+							zap.String("method", c.Request.Method),
+							zap.String("path", c.Request.URL.Path),
+							zap.String("query", c.Request.URL.RawQuery),
+							zap.Any("jwt_claims", claims))
+					}
 					c.Set(xjwt.AuthorizationClaimsHeaderKey, claims)
 					c.Next()
 					return
@@ -56,12 +59,14 @@ func JwtAuthAuto(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc
 			if strings.HasPrefix(token, xjwt.Bearer) {
 				claims, err := xjwt.ParseToken(cjwt, token[xjwt.BearerLen:])
 				if err == nil {
-					xlog.Debug("jwt",
-						zap.String(xginConstant.HeaderRequestID, requestid.Get(c)),
-						zap.String("method", c.Request.Method),
-						zap.String("path", c.Request.URL.Path),
-						zap.String("query", c.Request.URL.RawQuery),
-						zap.Any("jwt_claims", claims))
+					if xlog.GetLevel() == clog.LevelType_debug.String() {
+						xlog.Debug("jwt",
+							zap.String(xginConstant.HeaderRequestID, requestid.Get(c)),
+							zap.String("method", c.Request.Method),
+							zap.String("path", c.Request.URL.Path),
+							zap.String("query", c.Request.URL.RawQuery),
+							zap.Any("jwt_claims", claims))
+					}
 					c.Set(xjwt.AuthorizationClaimsHeaderKey, claims)
 				}
 			}
