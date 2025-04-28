@@ -16,7 +16,7 @@ import (
 
 // MongoClient 客户端
 type MongoClient struct {
-	c               *cmongodb.MongoDB
+	config          *cmongodb.MongoDB
 	client          *mongo.Client
 	defaultDatabase *mongo.Database // 默认指定的数据库
 	databaseMap     *sync.Map       // 选择其他指定的数据库
@@ -49,20 +49,20 @@ func (mc *MongoClient) Collection(name string, opts ...*options.CollectionOption
 }
 
 // connect 连接数据库
-func connect(c *cmongodb.MongoDB) (*MongoClient, error) {
+func connect(config *cmongodb.MongoDB) (*MongoClient, error) {
 	opts := options.Client()
-	opts.ApplyURI(c.Uri)
+	opts.ApplyURI(config.Uri)
 
 	// 进行配置
-	if c.MaxPoolSize > 0 {
-		opts.SetMaxPoolSize(c.MaxPoolSize)
+	if config.MaxPoolSize > 0 {
+		opts.SetMaxPoolSize(config.MaxPoolSize)
 	}
-	if c.MinPoolSize > 0 {
-		opts.SetMinPoolSize(c.MinPoolSize)
+	if config.MinPoolSize > 0 {
+		opts.SetMinPoolSize(config.MinPoolSize)
 	}
-	if c.MaxConnIdleTime > 0 {
+	if config.MaxConnIdleTime > 0 {
 		// 最大连接的空闲时间(设置了连接可复用的最大时间)(单位秒)
-		opts.SetMaxConnIdleTime(time.Duration(c.MaxConnIdleTime) * time.Second)
+		opts.SetMaxConnIdleTime(time.Duration(config.MaxConnIdleTime) * time.Second)
 	}
 
 	// 链接 mongo 服务
@@ -78,25 +78,25 @@ func connect(c *cmongodb.MongoDB) (*MongoClient, error) {
 	}
 
 	return &MongoClient{
-		c:               c,
+		config:          config,
 		client:          client,
-		defaultDatabase: client.Database(c.Database),
+		defaultDatabase: client.Database(config.Database),
 		databaseMap:     &sync.Map{},
 	}, nil
 }
 
 // Init 初始化数据库
-func Init(c *cmongodb.MongoDB) (*MongoClient, error) {
-	if c == nil {
+func Init(config *cmongodb.MongoDB) (*MongoClient, error) {
+	if config == nil {
 		return nil, errors.New("mongo config as nil")
 	}
-	if c.Uri == "" {
+	if config.Uri == "" {
 		return nil, errors.New("mongo config uri as empty")
 	}
-	xlog.Debugf("mongo config=%v", c)
+	xlog.Debugf("mongo config=%v", config)
 	xlog.Debug("mongo init...")
 
-	mc, err := connect(c)
+	mc, err := connect(config)
 	if err != nil {
 		return nil, err
 	}

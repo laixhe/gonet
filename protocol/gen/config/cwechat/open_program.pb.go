@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v6.31.0
-// source: config/cwechat/mini_program.proto
+// source: config/cwechat/open_program.proto
 
 package cwechat
 
@@ -21,8 +21,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 微信小程序配置
-type MiniProgram struct {
+// 微信开放平台配置
+type OpenProgram struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// 唯一凭证 App ID
 	AppId string `protobuf:"bytes,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty" mapstructure:"appid" toml:"appid" yaml:"appid"` // @gotags: mapstructure:"appid" toml:"appid" yaml:"appid"
@@ -36,21 +36,21 @@ type MiniProgram struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *MiniProgram) Reset() {
-	*x = MiniProgram{}
-	mi := &file_config_cwechat_mini_program_proto_msgTypes[0]
+func (x *OpenProgram) Reset() {
+	*x = OpenProgram{}
+	mi := &file_config_cwechat_open_program_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *MiniProgram) String() string {
+func (x *OpenProgram) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MiniProgram) ProtoMessage() {}
+func (*OpenProgram) ProtoMessage() {}
 
-func (x *MiniProgram) ProtoReflect() protoreflect.Message {
-	mi := &file_config_cwechat_mini_program_proto_msgTypes[0]
+func (x *OpenProgram) ProtoReflect() protoreflect.Message {
+	mi := &file_config_cwechat_open_program_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,67 +61,67 @@ func (x *MiniProgram) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MiniProgram.ProtoReflect.Descriptor instead.
-func (*MiniProgram) Descriptor() ([]byte, []int) {
-	return file_config_cwechat_mini_program_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use OpenProgram.ProtoReflect.Descriptor instead.
+func (*OpenProgram) Descriptor() ([]byte, []int) {
+	return file_config_cwechat_open_program_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *MiniProgram) GetAppId() string {
+func (x *OpenProgram) GetAppId() string {
 	if x != nil {
 		return x.AppId
 	}
 	return ""
 }
 
-func (x *MiniProgram) GetSecret() string {
+func (x *OpenProgram) GetSecret() string {
 	if x != nil {
 		return x.Secret
 	}
 	return ""
 }
 
-func (x *MiniProgram) GetToken() string {
+func (x *OpenProgram) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
 	return ""
 }
 
-func (x *MiniProgram) GetAeskey() string {
+func (x *OpenProgram) GetAeskey() string {
 	if x != nil {
 		return x.Aeskey
 	}
 	return ""
 }
 
-var File_config_cwechat_mini_program_proto protoreflect.FileDescriptor
+var File_config_cwechat_open_program_proto protoreflect.FileDescriptor
 
-const file_config_cwechat_mini_program_proto_rawDesc = "" +
+const file_config_cwechat_open_program_proto_rawDesc = "" +
 	"\n" +
-	"!config/cwechat/mini_program.proto\x12\acwechat\"j\n" +
-	"\vMiniProgram\x12\x15\n" +
+	"!config/cwechat/open_program.proto\x12\acwechat\"j\n" +
+	"\vOpenProgram\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x16\n" +
 	"\x06secret\x18\x02 \x01(\tR\x06secret\x12\x14\n" +
 	"\x05token\x18\x03 \x01(\tR\x05token\x12\x16\n" +
 	"\x06aeskey\x18\x04 \x01(\tR\x06aeskeyB=Z;github.com/laixhe/gonet/protocol/gen/config/cwechat;cwechatb\x06proto3"
 
 var (
-	file_config_cwechat_mini_program_proto_rawDescOnce sync.Once
-	file_config_cwechat_mini_program_proto_rawDescData []byte
+	file_config_cwechat_open_program_proto_rawDescOnce sync.Once
+	file_config_cwechat_open_program_proto_rawDescData []byte
 )
 
-func file_config_cwechat_mini_program_proto_rawDescGZIP() []byte {
-	file_config_cwechat_mini_program_proto_rawDescOnce.Do(func() {
-		file_config_cwechat_mini_program_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_config_cwechat_mini_program_proto_rawDesc), len(file_config_cwechat_mini_program_proto_rawDesc)))
+func file_config_cwechat_open_program_proto_rawDescGZIP() []byte {
+	file_config_cwechat_open_program_proto_rawDescOnce.Do(func() {
+		file_config_cwechat_open_program_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_config_cwechat_open_program_proto_rawDesc), len(file_config_cwechat_open_program_proto_rawDesc)))
 	})
-	return file_config_cwechat_mini_program_proto_rawDescData
+	return file_config_cwechat_open_program_proto_rawDescData
 }
 
-var file_config_cwechat_mini_program_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_config_cwechat_mini_program_proto_goTypes = []any{
-	(*MiniProgram)(nil), // 0: cwechat.MiniProgram
+var file_config_cwechat_open_program_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_config_cwechat_open_program_proto_goTypes = []any{
+	(*OpenProgram)(nil), // 0: cwechat.OpenProgram
 }
-var file_config_cwechat_mini_program_proto_depIdxs = []int32{
+var file_config_cwechat_open_program_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -129,26 +129,26 @@ var file_config_cwechat_mini_program_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_config_cwechat_mini_program_proto_init() }
-func file_config_cwechat_mini_program_proto_init() {
-	if File_config_cwechat_mini_program_proto != nil {
+func init() { file_config_cwechat_open_program_proto_init() }
+func file_config_cwechat_open_program_proto_init() {
+	if File_config_cwechat_open_program_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_config_cwechat_mini_program_proto_rawDesc), len(file_config_cwechat_mini_program_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_config_cwechat_open_program_proto_rawDesc), len(file_config_cwechat_open_program_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_config_cwechat_mini_program_proto_goTypes,
-		DependencyIndexes: file_config_cwechat_mini_program_proto_depIdxs,
-		MessageInfos:      file_config_cwechat_mini_program_proto_msgTypes,
+		GoTypes:           file_config_cwechat_open_program_proto_goTypes,
+		DependencyIndexes: file_config_cwechat_open_program_proto_depIdxs,
+		MessageInfos:      file_config_cwechat_open_program_proto_msgTypes,
 	}.Build()
-	File_config_cwechat_mini_program_proto = out.File
-	file_config_cwechat_mini_program_proto_goTypes = nil
-	file_config_cwechat_mini_program_proto_depIdxs = nil
+	File_config_cwechat_open_program_proto = out.File
+	file_config_cwechat_open_program_proto_goTypes = nil
+	file_config_cwechat_open_program_proto_depIdxs = nil
 }

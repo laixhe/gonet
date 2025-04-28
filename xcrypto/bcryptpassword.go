@@ -1,4 +1,4 @@
-package xutil
+package xcrypto
 
 import "golang.org/x/crypto/bcrypt"
 
