@@ -1,6 +1,7 @@
 package xgin
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -50,7 +51,7 @@ var trans translator.Translator
 // ValidatorTranslator 表单验证多语言提示文本
 func ValidatorTranslator(language string) (err error) {
 	// 修改 gin 框架中 Validator 引擎属性，实现自定制
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+	if validate, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		zhT := zh.New() // 中文
 		enT := en.New() // 英文
 		// 第一个参数是备用语言，后面参数是应该支持多个语言
@@ -64,9 +65,9 @@ func ValidatorTranslator(language string) (err error) {
 		// 注册默认翻译器
 		switch language {
 		case En:
-			err = enTranslations.RegisterDefaultTranslations(v, trans)
+			err = enTranslations.RegisterDefaultTranslations(validate, trans)
 		default:
-			err = zhTranslations.RegisterDefaultTranslations(v, trans)
+			err = zhTranslations.RegisterDefaultTranslations(validate, trans)
 		}
 	}
 	return
@@ -86,5 +87,15 @@ func TranslatorErrorString(err validator.ValidationErrors) string {
 	for _, v := range s {
 		str += v + ","
 	}
-	return str
+	if str == "" {
+		return ""
+	}
+	return str[:len(str)-1]
+}
+
+func TranslatorError(err error) error {
+	if err1, is1 := err.(validator.ValidationErrors); is1 {
+		return errors.New(TranslatorErrorString(err1))
+	}
+	return err
 }
