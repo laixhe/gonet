@@ -16,72 +16,16 @@ import (
 )
 
 type SdkWechatPay struct {
-	c      *cwechat.WeChatPay
+	config *cwechat.WeChatPay
 	client *wechatV3.ClientV3
 }
 
-var sdkWechatPay *SdkWechatPay
-
-func Client() *wechatV3.ClientV3 {
-	return sdkWechatPay.client
+func (s *SdkWechatPay) Config() *cwechat.WeChatPay {
+	return s.config
 }
 
-func Config() *cwechat.WeChatPay {
-	return sdkWechatPay.c
-}
-
-func Init(c *cwechat.WeChatPay, isDebugLog bool) error {
-	if c == nil {
-		return errors.New("wechat pay config is nil")
-	}
-	if c.AppId == "" {
-		panic("wechat pay config app_id is empty")
-	}
-	if c.Secret == "" {
-		panic("wechat pay config secret is empty")
-	}
-	if c.MchId == "" {
-		return errors.New("wechat pay config mch_id is empty")
-	}
-	if c.MchSerialNo == "" {
-		return errors.New("wechat pay config mch_serial_no is empty")
-	}
-	if c.MchApiV3Key == "" {
-		return errors.New("wechat pay config mch_api_v3_key is empty")
-	}
-	if c.MchPrivateKeyPath == "" {
-		return errors.New("wechat pay config mch_private_key_path is empty")
-	}
-	if c.NotifyUrl == "" {
-		return errors.New("wechat pay config notify_url is empty")
-	}
-	xlog.Debugf("wechat pay config=%v", c)
-	//
-	var err error
-	var privateKey []byte
-	privateKey, err = os.ReadFile(c.MchPrivateKeyPath)
-	if err != nil {
-		return errors.New("wechat pay private key error: " + err.Error())
-	}
-	client, err := wechatV3.NewClientV3(c.MchId, c.MchSerialNo, c.MchApiV3Key, string(privateKey))
-	if err != nil {
-		return errors.New("wechat pay new client error: " + err.Error())
-	}
-	// 启用自动同步返回验签，并定时更新微信平台API证书
-	err = client.AutoVerifySign()
-	if err != nil {
-		return errors.New("wechat pay auto verify sign error: " + err.Error())
-	}
-	// 打开 Debug 开关，输出日志，默认是关闭的
-	if isDebugLog {
-		client.DebugSwitch = gopay.DebugOn
-	}
-	//
-	sdkWechatPay = &SdkWechatPay{
-		c:      c,
-		client: client,
-	}
-	return nil
+func (s *SdkWechatPay) Client() *wechatV3.ClientV3 {
+	return s.client
 }
 
 // AppPay APP支付(预支付交易会话标识)
@@ -89,19 +33,19 @@ func Init(c *cwechat.WeChatPay, isDebugLog bool) error {
 // title       订单标题
 // orderNumber 订单号
 // money       订单总金额，单位为分
-func AppPay(ctx context.Context, requestID string, title, orderNumber string, money uint64) (string, error) {
+func (s *SdkWechatPay) AppPay(ctx context.Context, requestID string, title, orderNumber string, money uint64) (string, error) {
 	bm := make(gopay.BodyMap)
-	bm.Set("appid", sdkWechatPay.c.AppId)
-	bm.Set("mchid", sdkWechatPay.c.MchId)
+	bm.Set("appid", s.config.AppId)
+	bm.Set("mchid", s.config.MchId)
 	bm.Set("description", title)
 	bm.Set("out_trade_no", orderNumber)
-	bm.Set("notify_url", sdkWechatPay.c.NotifyUrl)
+	bm.Set("notify_url", s.config.NotifyUrl)
 	bm.SetBodyMap("amount", func(bm gopay.BodyMap) {
 		bm.Set("total", money)
 		bm.Set("currency", "CNY")
 	})
 	//
-	resp, err := sdkWechatPay.client.V3TransactionApp(ctx, bm)
+	resp, err := s.client.V3TransactionApp(ctx, bm)
 	if err != nil {
 		xlog.Error(err.Error(), zap.String(xginConstant.HeaderRequestID, requestID))
 		return "", err
@@ -113,7 +57,7 @@ func AppPay(ctx context.Context, requestID string, title, orderNumber string, mo
 }
 
 // PayNotify 支付异步回调
-func PayNotify(req *http.Request, requestID string) (*wechatV3.V3DecryptPayResult, error) {
+func (s *SdkWechatPay) PayNotify(req *http.Request, requestID string) (*wechatV3.V3DecryptPayResult, error) {
 	// 解析异步通知的参数
 	notifyReq, err := wechatV3.V3ParseNotify(req)
 	if err != nil {
@@ -121,7 +65,7 @@ func PayNotify(req *http.Request, requestID string) (*wechatV3.V3DecryptPayResul
 		return nil, err
 	}
 	// 获取微信平台证书
-	certMap := sdkWechatPay.client.WxPublicKeyMap()
+	certMap := s.client.WxPublicKeyMap()
 	// 验证异步通知的签名
 	err = notifyReq.VerifySignByPKMap(certMap)
 	if err != nil {
@@ -129,10 +73,62 @@ func PayNotify(req *http.Request, requestID string) (*wechatV3.V3DecryptPayResul
 		return nil, err
 	}
 	// 支付通知解密
-	result, err := notifyReq.DecryptPayCipherText(sdkWechatPay.c.MchApiV3Key)
+	result, err := notifyReq.DecryptPayCipherText(s.config.MchApiV3Key)
 	if err != nil {
 		xlog.Error(err.Error(), zap.String(xginConstant.HeaderRequestID, requestID))
 		return nil, err
 	}
 	return result, nil
+}
+
+func Init(config *cwechat.WeChatPay, isDebugLog bool) (*SdkWechatPay, error) {
+	if config == nil {
+		return nil, errors.New("wechat pay config is nil")
+	}
+	if config.AppId == "" {
+		return nil, errors.New("wechat pay config app_id is empty")
+	}
+	if config.Secret == "" {
+		return nil, errors.New("wechat pay config secret is empty")
+	}
+	if config.MchId == "" {
+		return nil, errors.New("wechat pay config mch_id is empty")
+	}
+	if config.MchSerialNo == "" {
+		return nil, errors.New("wechat pay config mch_serial_no is empty")
+	}
+	if config.MchApiV3Key == "" {
+		return nil, errors.New("wechat pay config mch_api_v3_key is empty")
+	}
+	if config.MchPrivateKeyPath == "" {
+		return nil, errors.New("wechat pay config mch_private_key_path is empty")
+	}
+	if config.NotifyUrl == "" {
+		return nil, errors.New("wechat pay config notify_url is empty")
+	}
+	xlog.Debugf("wechat pay config=%v", config)
+	//
+	var err error
+	var privateKey []byte
+	privateKey, err = os.ReadFile(config.MchPrivateKeyPath)
+	if err != nil {
+		return nil, errors.New("wechat pay private key error: " + err.Error())
+	}
+	client, err := wechatV3.NewClientV3(config.MchId, config.MchSerialNo, config.MchApiV3Key, string(privateKey))
+	if err != nil {
+		return nil, errors.New("wechat pay new client error: " + err.Error())
+	}
+	// 启用自动同步返回验签，并定时更新微信平台API证书
+	err = client.AutoVerifySign()
+	if err != nil {
+		return nil, errors.New("wechat pay auto verify sign error: " + err.Error())
+	}
+	// 打开 Debug 开关，输出日志，默认是关闭的
+	if isDebugLog {
+		client.DebugSwitch = gopay.DebugOn
+	}
+	return &SdkWechatPay{
+		config: config,
+		client: client,
+	}, nil
 }

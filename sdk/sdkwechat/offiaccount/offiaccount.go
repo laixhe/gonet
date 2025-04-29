@@ -10,31 +10,46 @@ import (
 	"github.com/laixhe/gonet/xlog"
 )
 
-// 微信公众号
-
+// SdkWeChatOffiaccount 微信公众号
 type SdkWeChatOffiaccount struct {
-	c      *cwechat.Offiaccount
+	config *cwechat.Offiaccount
 	client *officialAccount.OfficialAccount
 }
 
-var sdkOffiaccount *SdkWeChatOffiaccount
+func (s *SdkWeChatOffiaccount) Config() *cwechat.Offiaccount {
+	return s.config
+}
+
+func (s *SdkWeChatOffiaccount) Client() *officialAccount.OfficialAccount {
+	return s.client
+}
+
+// AccessToken APP微信登录(通过 code 获取用户 access_token)
+func (s *SdkWeChatOffiaccount) AccessToken(code string) (*providers.User, error) {
+	return s.client.OAuth.UserFromCode(code)
+}
+
+// UserInfo 获取用户基本信息
+func (s *SdkWeChatOffiaccount) UserInfo(openId, accessToken string) (*providers.User, error) {
+	return s.client.OAuth.UserFromToken(accessToken, openId)
+}
 
 // Init 初始化公众号
-func Init(c *cwechat.Offiaccount) error {
-	if c == nil {
-		return errors.New("wechat offiaccount config as nil")
+func Init(config *cwechat.Offiaccount) (*SdkWeChatOffiaccount, error) {
+	if config == nil {
+		return nil, errors.New("wechat offiaccount config as nil")
 	}
-	if c.AppId == "" {
-		return errors.New("wechat offiaccount config appid as empty")
+	if config.AppId == "" {
+		return nil, errors.New("wechat offiaccount config appid as empty")
 	}
-	if c.Secret == "" {
-		return errors.New("wechat offiaccount config secret as empty")
+	if config.Secret == "" {
+		return nil, errors.New("wechat offiaccount config secret as empty")
 	}
-	xlog.Debugf("wechat offiaccount config=%v", c)
+	xlog.Debugf("wechat offiaccount config=%v", config)
 	// doc https://powerwechat.artisan-cloud.com/zh/official-account
 	client, err := officialAccount.NewOfficialAccount(&officialAccount.UserConfig{
-		AppID:  c.AppId,
-		Secret: c.Secret,
+		AppID:  config.AppId,
+		Secret: config.Secret,
 		OAuth: officialAccount.OAuth{
 			Scopes: []string{"snsapi_userinfo"},
 		},
@@ -43,22 +58,10 @@ func Init(c *cwechat.Offiaccount) error {
 		Log:       officialAccount.Log{Stdout: true},
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	//
-	sdkOffiaccount = &SdkWeChatOffiaccount{
-		c:      c,
+	return &SdkWeChatOffiaccount{
+		config: config,
 		client: client,
-	}
-	return nil
-}
-
-// AccessToken APP微信登录(通过 code 获取用户 access_token)
-func AccessToken(code string) (*providers.User, error) {
-	return sdkOffiaccount.client.OAuth.UserFromCode(code)
-}
-
-// UserInfo 获取用户基本信息
-func UserInfo(openId, accessToken string) (*providers.User, error) {
-	return sdkOffiaccount.client.OAuth.UserFromToken(accessToken, openId)
+	}, nil
 }

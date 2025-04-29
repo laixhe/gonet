@@ -14,7 +14,7 @@ import (
 
 // RedisClient 客户端
 type RedisClient struct {
-	c      *credis.Redis
+	config *credis.Redis
 	client redis.Cmdable
 }
 
@@ -35,64 +35,63 @@ func (rc *RedisClient) Client() redis.Cmdable {
 }
 
 // initSingle 单机
-func initSingle(c *credis.Redis) redis.Cmdable {
+func initSingle(config *credis.Redis) redis.Cmdable {
 	options := &redis.Options{
-		Addr:     c.Addr,
-		Password: c.Password,
-		DB:       int(c.DbNum),
+		Addr:     config.Addr,
+		Password: config.Password,
+		DB:       int(config.DbNum),
 	}
-	if c.PoolSize > 0 {
-		options.PoolSize = int(c.PoolSize)
+	if config.PoolSize > 0 {
+		options.PoolSize = int(config.PoolSize)
 	}
-	if c.MinIdleConn > 0 {
-		options.MinIdleConns = int(c.MinIdleConn)
+	if config.MinIdleConn > 0 {
+		options.MinIdleConns = int(config.MinIdleConn)
 	}
 	return redis.NewClient(options)
 }
 
 // initSentinel 哨兵主从
-//func initSentinel(c *credis.Redis) redis.Cmdable {
-//	options := &redis.FailoverOptions{
-//		MasterName:    c.Master,
-//		SentinelAddrs: strings.Split(c.Addr, ","),
-//		DB:            int(c.DbNum),
-//		Password:      c.Password,
-//	}
-//	if c.PoolSize > 0 {
-//		options.PoolSize = int(c.PoolSize)
-//	}
-//	if c.MinIdleConn > 0 {
-//		options.MinIdleConns = int(c.MinIdleConn)
-//	}
-//	return redis.NewFailoverClient(options)
-//}
+// func initSentinel(config *credis.Redis) redis.Cmdable {
+// 	options := &redis.FailoverOptions{
+// 		MasterName:    config.Master,
+// 		SentinelAddrs: strings.Split(config.Addr, ","),
+// 		DB:            int(config.DbNum),
+// 		Password:      config.Password,
+// 	}
+// 	if config.PoolSize > 0 {
+// 		options.PoolSize = int(config.PoolSize)
+// 	}
+// 	if config.MinIdleConn > 0 {
+// 		options.MinIdleConns = int(config.MinIdleConn)
+// 	}
+// 	return redis.NewFailoverClient(options)
+// }
 
 // initCluster 分布式集群
-func initCluster(c *credis.Redis) redis.Cmdable {
+func initCluster(config *credis.Redis) redis.Cmdable {
 	options := &redis.ClusterOptions{
-		Addrs:    strings.Split(c.Addr, ","),
-		Password: c.Password,
+		Addrs:    strings.Split(config.Addr, ","),
+		Password: config.Password,
 	}
-	if c.PoolSize > 0 {
-		options.PoolSize = int(c.PoolSize)
+	if config.PoolSize > 0 {
+		options.PoolSize = int(config.PoolSize)
 	}
-	if c.MinIdleConn > 0 {
-		options.MinIdleConns = int(c.MinIdleConn)
+	if config.MinIdleConn > 0 {
+		options.MinIdleConns = int(config.MinIdleConn)
 	}
 	return redis.NewClusterClient(options)
 }
 
 // connect 连接数据库
-func connect(c *credis.Redis) (*RedisClient, error) {
+func connect(config *credis.Redis) (*RedisClient, error) {
 	rc := &RedisClient{
-		c: c,
+		config: config,
 	}
-
-	addrs := strings.Split(c.Addr, ",")
+	addrs := strings.Split(config.Addr, ",")
 	if len(addrs) == 1 {
-		rc.client = initSingle(c) // 单机
+		rc.client = initSingle(config) // 单机
 	} else {
-		rc.client = initCluster(c) // 分布式集群
+		rc.client = initCluster(config) // 分布式集群
 	}
 	err := rc.Ping()
 	if err != nil {
@@ -101,17 +100,17 @@ func connect(c *credis.Redis) (*RedisClient, error) {
 	return rc, nil
 }
 
-func Init(c *credis.Redis) (*RedisClient, error) {
-	if c == nil {
+func Init(config *credis.Redis) (*RedisClient, error) {
+	if config == nil {
 		return nil, errors.New("redis config as nil")
 	}
-	if c.Addr == "" {
+	if config.Addr == "" {
 		return nil, errors.New("redis config addr as empty")
 	}
-	xlog.Debugf("redis config=%v", c)
+	xlog.Debugf("redis config=%v", config)
 	xlog.Debug("redis init...")
 
-	rc, err := connect(c)
+	rc, err := connect(config)
 	if err != nil {
 		return nil, err
 	}
