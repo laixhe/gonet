@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/ArtisanCloud/PowerSocialite/v3/src/providers"
+	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/officialAccount"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
@@ -12,8 +13,9 @@ import (
 
 // SdkWeChatOffiaccount 微信公众号
 type SdkWeChatOffiaccount struct {
-	config *cwechat.Offiaccount
-	client *officialAccount.OfficialAccount
+	config     *cwechat.Offiaccount
+	client     *officialAccount.OfficialAccount
+	baseClient *kernel.BaseClient
 }
 
 func (s *SdkWeChatOffiaccount) Config() *cwechat.Offiaccount {
@@ -22,6 +24,10 @@ func (s *SdkWeChatOffiaccount) Config() *cwechat.Offiaccount {
 
 func (s *SdkWeChatOffiaccount) Client() *officialAccount.OfficialAccount {
 	return s.client
+}
+
+func (s *SdkWeChatOffiaccount) BaseClient() *kernel.BaseClient {
+	return s.baseClient
 }
 
 // AccessToken APP微信登录(通过 code 获取用户 access_token)
@@ -35,7 +41,7 @@ func (s *SdkWeChatOffiaccount) UserInfo(openId, accessToken string) (*providers.
 }
 
 // Init 初始化公众号
-func Init(config *cwechat.Offiaccount) (*SdkWeChatOffiaccount, error) {
+func Init(config *cwechat.Offiaccount, isDebug bool) (*SdkWeChatOffiaccount, error) {
 	if config == nil {
 		return nil, errors.New("wechat offiaccount config as nil")
 	}
@@ -53,15 +59,21 @@ func Init(config *cwechat.Offiaccount) (*SdkWeChatOffiaccount, error) {
 		OAuth: officialAccount.OAuth{
 			Scopes: []string{"snsapi_userinfo"},
 		},
-		HttpDebug: true,
-		Debug:     true,
+		HttpDebug: isDebug,
+		Debug:     isDebug,
 		Log:       officialAccount.Log{Stdout: true},
 	})
 	if err != nil {
 		return nil, err
 	}
+	// 基础客户端
+	baseClient, err := kernel.NewBaseClient(client, nil)
+	if err != nil {
+		return nil, err
+	}
 	return &SdkWeChatOffiaccount{
-		config: config,
-		client: client,
+		config:     config,
+		client:     client,
+		baseClient: baseClient,
 	}, nil
 }

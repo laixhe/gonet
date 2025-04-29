@@ -6,6 +6,8 @@ import (
 	"github.com/laixhe/gonet/protocol/gen/config/credis"
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
 	"github.com/laixhe/gonet/sdk/sdkwechat/mini"
+	"github.com/laixhe/gonet/sdk/sdkwechat/offiaccount"
+	"github.com/laixhe/gonet/sdk/sdkwechat/openplatform"
 	"github.com/laixhe/gonet/xgorm"
 	"github.com/laixhe/gonet/xi18n"
 	"github.com/laixhe/gonet/xmongo"
@@ -20,16 +22,20 @@ type GoNet struct {
 	gorm              map[string]*xgorm.GormClient
 	mongo             map[string]*xmongo.MongoClient
 	weChatMiniProgram map[string]*mini.SdkWeChatMiniProgram
+	weChatOpenProgram map[string]*openplatform.SdkWeChatOpenProgram
+	weChatOffiaccount map[string]*offiaccount.SdkWeChatOffiaccount
 }
 
 var xgonet *GoNet
 
 func init() {
 	xgonet = &GoNet{
-		redis:             make(map[string]*xredis.RedisClient),
-		gorm:              make(map[string]*xgorm.GormClient),
-		mongo:             make(map[string]*xmongo.MongoClient),
-		weChatMiniProgram: make(map[string]*mini.SdkWeChatMiniProgram),
+		redis:             make(map[string]*xredis.RedisClient),                // Redis 客户端
+		gorm:              make(map[string]*xgorm.GormClient),                  // Gorm 客户端
+		mongo:             make(map[string]*xmongo.MongoClient),                // Mongo 客户端
+		weChatMiniProgram: make(map[string]*mini.SdkWeChatMiniProgram),         // 微信小程序客户端
+		weChatOpenProgram: make(map[string]*openplatform.SdkWeChatOpenProgram), // 微信开放平台客户端
+		weChatOffiaccount: make(map[string]*offiaccount.SdkWeChatOffiaccount),  // 微信公众号客户端
 	}
 }
 
@@ -122,5 +128,47 @@ func WeChatMiniProgram(key ...string) *mini.SdkWeChatMiniProgram {
 		return xgonet.weChatMiniProgram[key[0]]
 	} else {
 		return xgonet.weChatMiniProgram[DEFAULT]
+	}
+}
+
+func InitWeChatOpenProgram(config *cwechat.OpenProgram, isDebug bool, key ...string) error {
+	weChatOpenProgram, err := openplatform.Init(config, isDebug)
+	if err != nil {
+		return err
+	}
+	if len(key) > 0 {
+		xgonet.weChatOpenProgram[key[0]] = weChatOpenProgram
+	} else {
+		xgonet.weChatOpenProgram[DEFAULT] = weChatOpenProgram
+	}
+	return nil
+}
+
+func WeChatOpenProgram(key ...string) *openplatform.SdkWeChatOpenProgram {
+	if len(key) > 0 {
+		return xgonet.weChatOpenProgram[key[0]]
+	} else {
+		return xgonet.weChatOpenProgram[DEFAULT]
+	}
+}
+
+func InitWeChatOffiaccount(config *cwechat.Offiaccount, isDebug bool, key ...string) error {
+	weChatOffiaccount, err := offiaccount.Init(config, isDebug)
+	if err != nil {
+		return err
+	}
+	if len(key) > 0 {
+		xgonet.weChatOffiaccount[key[0]] = weChatOffiaccount
+	} else {
+		xgonet.weChatOffiaccount[DEFAULT] = weChatOffiaccount
+	}
+	return nil
+}
+
+func WeChatOffiaccount(key ...string) *offiaccount.SdkWeChatOffiaccount {
+	if len(key) > 0 {
+		return xgonet.weChatOffiaccount[key[0]]
+	} else {
+		return xgonet.weChatOffiaccount[DEFAULT]
 	}
 }
