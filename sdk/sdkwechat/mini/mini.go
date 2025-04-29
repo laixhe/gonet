@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ArtisanCloud/PowerWeChat/v3/src/kernel"
 	"github.com/ArtisanCloud/PowerWeChat/v3/src/miniProgram"
 	authResponse "github.com/ArtisanCloud/PowerWeChat/v3/src/miniProgram/auth/response"
 	phoneNumberResponse "github.com/ArtisanCloud/PowerWeChat/v3/src/miniProgram/phoneNumber/response"
@@ -15,8 +16,9 @@ import (
 
 // SdkWeChatMiniProgram 微信小程序
 type SdkWeChatMiniProgram struct {
-	config *cwechat.MiniProgram
-	client *miniProgram.MiniProgram
+	config     *cwechat.MiniProgram     // 小程序配置
+	client     *miniProgram.MiniProgram // 小程序客户端
+	baseClient *kernel.BaseClient       // 小程序基础客户端
 }
 
 func (s *SdkWeChatMiniProgram) Config() *cwechat.MiniProgram {
@@ -25,6 +27,10 @@ func (s *SdkWeChatMiniProgram) Config() *cwechat.MiniProgram {
 
 func (s *SdkWeChatMiniProgram) Client() *miniProgram.MiniProgram {
 	return s.client
+}
+
+func (s *SdkWeChatMiniProgram) BaseClient() *kernel.BaseClient {
+	return s.baseClient
 }
 
 // AuthSession 小程序登录
@@ -85,8 +91,14 @@ func Init(config *cwechat.MiniProgram, isDebug bool) (*SdkWeChatMiniProgram, err
 	if err != nil {
 		return nil, err
 	}
+	// 基础客户端
+	baseClient, err := kernel.NewBaseClient(client, nil)
+	if err != nil {
+		return nil, err
+	}
 	return &SdkWeChatMiniProgram{
-		config: config,
-		client: client,
+		config:     config,
+		client:     client,
+		baseClient: baseClient,
 	}, nil
 }
