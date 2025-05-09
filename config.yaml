@@ -90,6 +90,17 @@ wechat_mini_program:
   # (可选)回调消息密钥 AESKey
   aeskey:
 
+# 微信开发平台
+wechat_open_program:
+  # 唯一凭证 App ID
+  appid: xxx
+  # 密钥 App Secret
+  secret: xxx
+  # 回调消息 Token
+  token:
+  # 回调消息密钥 AESKey
+  aeskey: 
+
 # 微信公众号
 wechat_offiaccount:
   # 唯一凭证 App ID

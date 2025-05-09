@@ -40,11 +40,12 @@ func Cors() gin.HandlerFunc {
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if xlog.GetLevel() == clog.LevelType_debug.String() {
+			contentType := c.Request.Header.Get("Content-Type")
 			var body []byte
 			var err error
 			if c.Request.Method != http.MethodGet {
 				// 如果不是文件上传类型，则读取body
-				if !strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data") {
+				if !strings.Contains(contentType, "multipart/form-data") {
 					// 读取body数据
 					body, err = c.GetRawData()
 					if err != nil {
@@ -65,7 +66,8 @@ func Logger() gin.HandlerFunc {
 				zap.String("query", c.Request.URL.RawQuery),
 				zap.String("ip", c.ClientIP()),
 				zap.String("agent", c.Request.UserAgent()),
-				zap.String("Authorization", c.Request.Header.Get(xjwt.Authorization)),
+				zap.String("authorization", c.Request.Header.Get(xjwt.Authorization)),
+				zap.String("content-type", contentType),
 				zap.ByteString("body", body),
 			)
 		}
@@ -84,7 +86,7 @@ func Recovery() gin.HandlerFunc {
 			zap.String("query", c.Request.URL.RawQuery),
 			zap.String("ip", c.ClientIP()),
 			zap.String("agent", c.Request.UserAgent()),
-			zap.String("Authorization", c.Request.Header.Get(xjwt.Authorization)),
+			zap.String("authorization", c.Request.Header.Get(xjwt.Authorization)),
 			zap.Any("error", err),
 			zap.String("stack", string(debug.Stack())),
 		)
