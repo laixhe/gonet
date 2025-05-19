@@ -13,6 +13,7 @@ import (
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
 
+	"github.com/laixhe/gonet/xerror"
 	"github.com/laixhe/gonet/xi18n"
 )
 
@@ -93,9 +94,9 @@ func TranslatorErrorString(err validator.ValidationErrors) string {
 	return str[:len(str)-1]
 }
 
-func TranslatorError(err error) error {
+func TranslatorError(err error) xerror.IError {
 	if err1, is1 := err.(validator.ValidationErrors); is1 {
-		return errors.New(TranslatorErrorString(err1))
+		return IErrorParse(errors.New(TranslatorErrorString(err1)))
 	}
-	return err
+	return IErrorParse(err)
 }

@@ -1,37 +1,56 @@
 package xerror
 
+import (
+	"errors"
+)
+
 type IError interface {
-	Code() int32
+	HttpStatus() int
+	Code() int
+	Msg() string
 	Error() string
 }
 
 type Error struct {
-	code int32
-	err  string
+	httpStatus int
+	code       int
+	msg        string
+	err        error
 }
 
-func (e *Error) Code() int32 {
+func (e *Error) HttpStatus() int {
+	return e.httpStatus
+}
+
+func (e *Error) Code() int {
 	return e.code
 }
 
+func (e *Error) Msg() string {
+	return e.msg
+}
+
 func (e *Error) Error() string {
-	return e.err
+	if e.err == nil {
+		return ""
+	}
+	return e.err.Error()
 }
 
-func New(code int32, err error) *Error {
-	errStr := ""
-	if err != nil {
-		errStr = err.Error()
-	}
+func NewError(httpStatus int, code int, msg string, err error) *Error {
 	return &Error{
-		code: code,
-		err:  errStr,
+		httpStatus: httpStatus,
+		code:       code,
+		msg:        msg,
+		err:        err,
 	}
 }
 
-func NewStr(code int32, errStr string) *Error {
+func NewErrorStr(httpStatus int, code int, msg string, errStr string) *Error {
 	return &Error{
-		code: code,
-		err:  errStr,
+		httpStatus: httpStatus,
+		code:       code,
+		msg:        msg,
+		err:        errors.New(errStr),
 	}
 }

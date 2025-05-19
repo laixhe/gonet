@@ -1,7 +1,6 @@
 package xgin
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/gin-contrib/requestid"
@@ -14,7 +13,6 @@ import (
 	xginConstant "github.com/laixhe/gonet/xgin/constant"
 	"github.com/laixhe/gonet/xjwt"
 	"github.com/laixhe/gonet/xlog"
-	"github.com/laixhe/gonet/xresponse"
 )
 
 // 中间件
@@ -43,7 +41,7 @@ func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 				}
 			}
 		}
-		c.JSON(http.StatusOK, xresponse.Error(parseTokenError))
+		ErrorResponse(c, parseTokenError)
 		// 返回错误
 		c.Abort()
 	}
@@ -52,7 +50,7 @@ func JwtAuth(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
 // JwtAuthAuto 自动鉴权
 // cjwt 配置
 // parseTokenError 错误
-func JwtAuthAuto(cjwt *cauth.Jwt, parseTokenError xerror.IError) gin.HandlerFunc {
+func JwtAuthAuto(cjwt *cauth.Jwt) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get(xjwt.Authorization)
 		if len(token) > 0 {
@@ -131,8 +129,7 @@ func IsLogin(err xerror.IError) gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		c.JSON(http.StatusOK, xresponse.Error(err))
-		// 返回错误
+		ErrorResponse(c, IErrorAuthInvalid(nil))
 		c.Abort()
 	}
 }
