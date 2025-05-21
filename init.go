@@ -1,10 +1,13 @@
 package gonet
 
 import (
+	"github.com/laixhe/gonet/protocol/gen/config/calibaba"
 	"github.com/laixhe/gonet/protocol/gen/config/cgorm"
 	"github.com/laixhe/gonet/protocol/gen/config/cmongodb"
 	"github.com/laixhe/gonet/protocol/gen/config/credis"
 	"github.com/laixhe/gonet/protocol/gen/config/cwechat"
+	"github.com/laixhe/gonet/sdk/sdkaliyun/imagesearch"
+	"github.com/laixhe/gonet/sdk/sdkaliyun/oss"
 	"github.com/laixhe/gonet/sdk/sdkwechat/mini"
 	"github.com/laixhe/gonet/sdk/sdkwechat/offiaccount"
 	"github.com/laixhe/gonet/sdk/sdkwechat/openplatform"
@@ -24,6 +27,8 @@ type GoNet struct {
 	weChatMiniProgram map[string]*mini.SdkWeChatMiniProgram
 	weChatOpenProgram map[string]*openplatform.SdkWeChatOpenProgram
 	weChatOffiaccount map[string]*offiaccount.SdkWeChatOffiaccount
+	aliyunOss         map[string]*oss.SdkAliyunOss
+	aliyunImageSearch map[string]*imagesearch.SdkAliyunImageSearch
 }
 
 var xgonet *GoNet
@@ -36,6 +41,8 @@ func init() {
 		weChatMiniProgram: make(map[string]*mini.SdkWeChatMiniProgram),         // 微信小程序客户端
 		weChatOpenProgram: make(map[string]*openplatform.SdkWeChatOpenProgram), // 微信开放平台客户端
 		weChatOffiaccount: make(map[string]*offiaccount.SdkWeChatOffiaccount),  // 微信公众号客户端
+		aliyunOss:         make(map[string]*oss.SdkAliyunOss),                  // 阿里云对象存储
+		aliyunImageSearch: make(map[string]*imagesearch.SdkAliyunImageSearch),  // 阿里云图像搜索
 	}
 }
 
@@ -170,5 +177,48 @@ func WeChatOffiaccount(key ...string) *offiaccount.SdkWeChatOffiaccount {
 		return xgonet.weChatOffiaccount[key[0]]
 	} else {
 		return xgonet.weChatOffiaccount[DEFAULT]
+	}
+}
+
+// aliyunOss         map[string]*oss.SdkAliyunOss
+// aliyunImageSearch map[string]*imagesearch.SdkAliyunImageSearch
+func InitAliyunOss(config *calibaba.Oss, key ...string) error {
+	aliyunOss, err := oss.Init(config)
+	if err != nil {
+		return err
+	}
+	if len(key) > 0 {
+		xgonet.aliyunOss[key[0]] = aliyunOss
+	} else {
+		xgonet.aliyunOss[DEFAULT] = aliyunOss
+	}
+	return nil
+}
+
+func AliyunOss(key ...string) *oss.SdkAliyunOss {
+	if len(key) > 0 {
+		return xgonet.aliyunOss[key[0]]
+	} else {
+		return xgonet.aliyunOss[DEFAULT]
+	}
+}
+func InitAliyunImageSearch(config *calibaba.ImageSearch, key ...string) error {
+	aliyunImageSearch, err := imagesearch.Init(config)
+	if err != nil {
+		return err
+	}
+	if len(key) > 0 {
+		xgonet.aliyunImageSearch[key[0]] = aliyunImageSearch
+	} else {
+		xgonet.aliyunImageSearch[DEFAULT] = aliyunImageSearch
+	}
+	return nil
+}
+
+func AliyunImageSearch(key ...string) *imagesearch.SdkAliyunImageSearch {
+	if len(key) > 0 {
+		return xgonet.aliyunImageSearch[key[0]]
+	} else {
+		return xgonet.aliyunImageSearch[DEFAULT]
 	}
 }

@@ -24,7 +24,7 @@ type FilePreSignatureURL struct {
 }
 
 // PreSignatureURL 生成预签名文件上传url
-func PreSignatureURL(fileNames []string) ([]FilePreSignatureURL, error) {
+func (s *SdkAliyunOss) PreSignatureURL(dirName string, fileNames []string) ([]FilePreSignatureURL, error) {
 	list := make([]FilePreSignatureURL, 0, len(fileNames))
 	for _, fileName := range fileNames {
 		ext := strings.ToLower(strings.TrimLeft(filepath.Ext(fileName), "."))
@@ -34,10 +34,13 @@ func PreSignatureURL(fileNames []string) ([]FilePreSignatureURL, error) {
 		dir := time.Now().Format("2006/01/02")
 		name := xid.New().String()
 		dst := dir + "/" + name + "." + ext
+		if dirName != "" {
+			dst = dirName + "/" + dst
+		}
 		contentType := xfile.GetContentType(ext)
 		// 生成 PutObject 的预签名 URL
-		result, err := sdkOss.client.Presign(context.TODO(), &ossv2.PutObjectRequest{
-			Bucket:      ossv2.Ptr(sdkOss.c.Bucket),
+		result, err := s.client.Presign(context.TODO(), &ossv2.PutObjectRequest{
+			Bucket:      ossv2.Ptr(s.config.Bucket),
 			Key:         ossv2.Ptr(dst),
 			ContentType: ossv2.Ptr(contentType),
 		}, ossv2.PresignExpires(10*time.Minute))
@@ -55,20 +58,20 @@ func PreSignatureURL(fileNames []string) ([]FilePreSignatureURL, error) {
 }
 
 // GetPreSignatureURL 获取预签名文件上传url
-func GetPreSignatureURL(objectName string) string {
-	return "https://" + sdkOss.c.Bucket + ".oss-" + sdkOss.c.Region + ".aliyuncs.com/" + objectName
+func (s *SdkAliyunOss) GetPreSignatureURL(objectName string) string {
+	return "https://" + s.config.Bucket + ".oss-" + s.config.Region + ".aliyuncs.com/" + objectName
 }
 
 // SetObjectACL 设置文件的访问权限
-func SetObjectACL(objectName string) error {
+func (s *SdkAliyunOss) SetObjectACL(objectName string) error {
 	// 创建设置对象 ACL 的请求
 	req := &ossv2.PutObjectAclRequest{
-		Bucket: ossv2.Ptr(sdkOss.c.Bucket), // 存储空间名称
+		Bucket: ossv2.Ptr(s.config.Bucket), // 存储空间名称
 		Key:    ossv2.Ptr(objectName),      // 对象名称
 		Acl:    ossv2.ObjectACLPublicRead,  // 设置对象的访问权限为私有
 	}
 	// 执行设置对象 ACL 的操作
-	_, err := sdkOss.client.PutObjectAcl(context.TODO(), req)
+	_, err := s.client.PutObjectAcl(context.TODO(), req)
 	if err != nil {
 		return err
 	}

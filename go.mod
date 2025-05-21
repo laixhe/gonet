@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7
-	github.com/ArtisanCloud/PowerWeChat/v3 v3.4.12
+	github.com/ArtisanCloud/PowerWeChat/v3 v3.4.13
 	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.7
 	github.com/alibabacloud-go/imagesearch-20201214/v4 v4.2.2
 	github.com/alibabacloud-go/tea v1.3.9
@@ -12,7 +12,7 @@ require (
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.2.2
 	github.com/gin-contrib/cors v1.7.5
 	github.com/gin-contrib/requestid v1.0.5
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-pay/gopay v1.5.113
 	github.com/go-playground/locales v0.14.1

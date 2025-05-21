@@ -3,8 +3,8 @@ github.com/ArtisanCloud/PowerLibs/v3 v3.3.2 h1:IInr1YWwkhwOykxDqux1Goym0uFhrYwBj
 github.com/ArtisanCloud/PowerLibs/v3 v3.3.2/go.mod h1:xFGsskCnzAu+6rFEJbGVAlwhrwZPXAny6m7j71S/B5k=
 github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7 h1:P+erNlErr+X2v7Et+yTWaTfIRhw+HfpAPdvNIEwk9Gw=
 github.com/ArtisanCloud/PowerSocialite/v3 v3.0.7/go.mod h1:VZQNCvcK/rldF3QaExiSl1gJEAkyc5/I8RLOd3WFZq4=
-github.com/ArtisanCloud/PowerWeChat/v3 v3.4.12 h1:QYIBNrRFF/xz1dZ+ggr3u1XxXzm2dsuLw01aDKH+lXQ=
-github.com/ArtisanCloud/PowerWeChat/v3 v3.4.12/go.mod h1:CUw4Jp354qwgiXp7EjDu0Tmssjf3Kq/rWpQyrspcsxI=
+github.com/ArtisanCloud/PowerWeChat/v3 v3.4.13 h1:nCuR8+kCfd54eftzxUGilD0QNnti+bQXvS/lBLeo9c8=
+github.com/ArtisanCloud/PowerWeChat/v3 v3.4.13/go.mod h1:CUw4Jp354qwgiXp7EjDu0Tmssjf3Kq/rWpQyrspcsxI=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.4.0 h1:kuoIxZQy2WRRk1pttg9asf+WVv6tWQuBNVmK8+nqPr0=
 github.com/BurntSushi/toml v1.4.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
@@ -130,8 +130,8 @@ github.com/gin-contrib/requestid v1.0.5 h1:oye4jWPpTmJHLepQWzb36lFZkKzl+gf8R0K/B
 github.com/gin-contrib/requestid v1.0.5/go.mod h1:vkfMTJPx8IBXnavnuQSM9j5isaQfNja1f1hTB516ilU=
 github.com/gin-contrib/sse v1.0.0 h1:y3bT1mUWUxDpW4JLQg/HnTqV4rozuW4tC9eFKTxYI9E=
 github.com/gin-contrib/sse v1.0.0/go.mod h1:zNuFdwarAygJBht0NTKiSi3jRf6RbqeILZ9Sp6Slhe0=
-github.com/gin-gonic/gin v1.10.0 h1:nTuyha1TYqgedzytsKYqna+DfLos46nTv2ygFy86HFU=
-github.com/gin-gonic/gin v1.10.0/go.mod h1:4PMNQiOhvDRa013RKVbsiNwoyezlm2rm0uX/T7kzp5Y=
+github.com/gin-gonic/gin v1.10.1 h1:T0ujvqyCSqRopADpgPgiTT63DUQVSfojyME59Ei63pQ=
+github.com/gin-gonic/gin v1.10.1/go.mod h1:4PMNQiOhvDRa013RKVbsiNwoyezlm2rm0uX/T7kzp5Y=
 github.com/glebarez/go-sqlite v1.21.2 h1:3a6LFC4sKahUunAmynQKLZceZCOzUthkRkEAl9gAXWo=
 github.com/glebarez/go-sqlite v1.21.2/go.mod h1:sfxdZyhQjTM2Wry3gVYWaW072Ri1WMdWJi0k6+3382k=
 github.com/glebarez/sqlite v1.11.0 h1:wSG0irqzP6VurnMEpFGer5Li19RpIRi2qvQz++w0GMw=
