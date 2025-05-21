@@ -10,22 +10,22 @@ import (
 )
 
 // Add 添加图片
-func Add(body io.Reader, fileID, fileName string) error {
+func (s *SdkAliyunImageSearch) Add(body io.Reader, fileID, fileName string) error {
 	var runtimeObject = new(utilService.RuntimeOptions)
 	request := new(imageSearchClient.AddImageAdvanceRequest).
-		SetInstanceName(sdkImageSearch.c.InstanceName).
+		SetInstanceName(s.config.InstanceName).
 		SetProductId(fileID).
 		SetPicName(fileName).
 		SetPicContentObject(body)
-	resp, err := sdkImageSearch.client.AddImageAdvance(request, runtimeObject)
+	resp, err := s.client.AddImageAdvance(request, runtimeObject)
 	if err != nil {
 		return err
 	}
 	if resp.Body == nil || resp.Body.Success == nil || !tea.BoolValue(resp.Body.Success) || resp.Body.Code == nil || tea.Int32Value(resp.Body.Code) != 0 {
 		if resp.Body.Message != nil && tea.StringValue(resp.Body.Message) != "" {
-			return errors.New("image search add fail: " + tea.StringValue(resp.Body.Message))
+			return errors.New("aliyun image search add fail: " + tea.StringValue(resp.Body.Message))
 		}
-		return errors.New("image search add fail")
+		return errors.New("aliyun image search add fail")
 	}
 	return nil
 }

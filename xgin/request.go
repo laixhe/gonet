@@ -8,6 +8,12 @@ import (
 	"github.com/laixhe/gonet/xgin/constant"
 )
 
+const ContentTypeJson = "application/json"
+const ContentTypeXml = "application/xml"
+const ContentTypeXmlText = "text/xml; charset=utf-8"
+const ContentTypeFormData = "multipart/form-data"
+const ContentTypeFormUrlencoded = "application/x-www-form-urlencoded"
+
 // SetRequestID 设置请求ID
 func SetRequestID() gin.HandlerFunc {
 	return requestid.New(requestid.WithGenerator(func() string {

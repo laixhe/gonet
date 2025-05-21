@@ -63,14 +63,32 @@ func ErrorResponse(c *gin.Context, errorAny any) {
 	}
 }
 
-func IErrorServer(err error) xerror.IError {
-	return xerror.NewError(http.StatusInternalServerError, http.StatusInternalServerError, "服务器异常", err)
+func IErrorServer(errorAny any) xerror.IError {
+	switch errorAny.(type) {
+	case error:
+		return xerror.NewError(http.StatusInternalServerError, http.StatusInternalServerError, "服务器异常", errorAny.(error))
+	case string:
+		return xerror.NewError(http.StatusInternalServerError, http.StatusInternalServerError, errorAny.(string), nil)
+	}
+	return xerror.NewError(http.StatusInternalServerError, http.StatusInternalServerError, "服务器异常", nil)
 }
 
-func IErrorAuthInvalid(err error) xerror.IError {
-	return xerror.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "未授权", err)
+func IErrorAuthInvalid(errorAny any) xerror.IError {
+	switch errorAny.(type) {
+	case error:
+		return xerror.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "未授权", errorAny.(error))
+	case string:
+		return xerror.NewError(http.StatusUnauthorized, http.StatusUnauthorized, errorAny.(string), nil)
+	}
+	return xerror.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "未授权", nil)
 }
 
-func IErrorParse(err error) xerror.IError {
-	return xerror.NewError(http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, "参数错误", err)
+func IErrorParse(errorAny any) xerror.IError {
+	switch errorAny.(type) {
+	case error:
+		return xerror.NewError(http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, "参数错误", errorAny.(error))
+	case string:
+		return xerror.NewError(http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, errorAny.(string), nil)
+	}
+	return xerror.NewError(http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, "参数错误", nil)
 }
