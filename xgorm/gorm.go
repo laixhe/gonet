@@ -1,11 +1,11 @@
 package xgorm
 
 import (
+	"context"
 	"errors"
-	"log"
-	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -14,6 +14,9 @@ import (
 	"gorm.io/gorm/schema"
 
 	"github.com/laixhe/gonet/protocol/gen/config/cgorm"
+	"github.com/laixhe/gonet/protocol/gen/config/clog"
+	"github.com/laixhe/gonet/xgin"
+	"github.com/laixhe/gonet/xgin/constant"
 	"github.com/laixhe/gonet/xlog"
 )
 
@@ -38,6 +41,11 @@ func (gc *GormClient) Client() *gorm.DB {
 	return gc.client
 }
 
+func (gc *GormClient) WithGinContext(c *gin.Context) *gorm.DB {
+	ctx := context.WithValue(c.Request.Context(), constant.HeaderRequestID, xgin.GetRequestID(c))
+	return gc.client.WithContext(ctx)
+}
+
 // Schema 模式(postgresql专用)
 func (gc *GormClient) Schema() string {
 	return gc.config.Schema
@@ -50,9 +58,16 @@ func (gc *GormClient) SchemaTableName(name string) string {
 
 // connect 连接数据库
 func connect(config *cgorm.Gorm) (*GormClient, error) {
-	defaultLogger := logger.New(newWriter(log.New(os.Stdout, " ", log.LstdFlags)), logger.Config{
+	logLevel := logger.Info
+	if xlog.GetLevel() == clog.LevelType_warn.String() {
+		logLevel = logger.Warn
+	}
+	if xlog.GetLevel() == clog.LevelType_error.String() {
+		logLevel = logger.Error
+	}
+	defaultLogger := NewDBlogger(NewDBWriter(), logger.Config{
 		SlowThreshold: 200 * time.Millisecond,
-		LogLevel:      logger.Info,
+		LogLevel:      logLevel,
 		Colorful:      true,
 	})
 
