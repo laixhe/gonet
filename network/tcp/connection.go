@@ -3,6 +3,7 @@ package tcp
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/laixhe/gonet/network"
 	"github.com/laixhe/gonet/network/packet"
-	"github.com/laixhe/gonet/xlog"
 )
 
 // Connection 用户链接
@@ -92,7 +92,7 @@ func (c *Connection) init(conn net.Conn, manager network.IManager, id int64) {
 	go c.read()
 	go c.write()
 
-	xlog.Infof("tcp accept init %d %s", c.id, c.remoteAddr)
+	log.Printf("tcp accept init %d %s", c.id, c.remoteAddr)
 }
 
 // Stop 停止连接，结束当前连接
@@ -120,14 +120,14 @@ func (c *Connection) read() {
 	for {
 		select {
 		case <-c.close:
-			xlog.Debugf("tcp read chan close %d %s", c.id, c.remoteAddr)
+			log.Printf("tcp read chan close %d %s", c.id, c.remoteAddr)
 			return
 		default:
 			packMessage, err := packet.TcpBufRead(c.connReader)
 			if err != nil {
-				xlog.Errorf("tcp read error %d %s %s", c.id, c.remoteAddr, err)
+				log.Printf("tcp read error %d %s %s", c.id, c.remoteAddr, err)
 				if err1 := c.Stop(); err1 != nil {
-					xlog.Errorf("tcp read stop error %d %s %s", c.id, c.remoteAddr, err1)
+					log.Printf("tcp read stop error %d %s %s", c.id, c.remoteAddr, err1)
 				}
 				return
 			}
@@ -136,7 +136,7 @@ func (c *Connection) read() {
 
 			// 发送消息
 			c.chWrite <- []byte(string(packMessage.Data) + fmt.Sprintf("--%v", time.Now().UnixMilli()))
-			xlog.Info(string(packMessage.Data))
+			log.Println(string(packMessage.Data))
 		}
 	}
 }
@@ -145,32 +145,32 @@ func (c *Connection) read() {
 func (c *Connection) write() {
 	defer func() {
 		if err := c.Stop(); err != nil {
-			xlog.Errorf("tcp write stop error %d %s %s", c.id, c.remoteAddr, err)
+			log.Printf("tcp write stop error %d %s %s", c.id, c.remoteAddr, err)
 		}
 	}()
 
 	for {
 		select {
 		case <-c.close:
-			xlog.Debugf("tcp write chan close %d %s", c.id, c.remoteAddr)
+			log.Printf("tcp write chan close %d %s", c.id, c.remoteAddr)
 			return
 		case data, ok := <-c.chWrite:
 			if !ok {
-				xlog.Debugf("tcp write chan %d %s", c.id, c.remoteAddr)
+				log.Printf("tcp write chan %d %s", c.id, c.remoteAddr)
 				return
 			}
 			if c.IsClosed() {
-				xlog.Debugf("tcp write closed error %d %s", c.id, c.remoteAddr)
+				log.Printf("tcp write closed error %d %s", c.id, c.remoteAddr)
 				return
 			}
 			packData, err := packet.Pack(packet.NewMessage(100, data))
 			if err != nil {
-				xlog.Debugf("tcp write packet message error %d %s %s", c.id, c.remoteAddr, err)
+				log.Printf("tcp write packet message error %d %s %s", c.id, c.remoteAddr, err)
 				continue
 			}
 			_, err = c.conn.Write(packData)
 			if err != nil {
-				xlog.Debugf("tcp write message error %d %s %s", c.id, c.remoteAddr, err)
+				log.Printf("tcp write message error %d %s %s", c.id, c.remoteAddr, err)
 				continue
 			}
 		}

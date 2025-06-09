@@ -1,0 +1,13 @@
+go 1.24
+
+use (
+	./config
+	./discovery
+	./jwt
+	./mongo
+	./network
+	./orm
+	./redis
+	./utils
+	./xlog
+)

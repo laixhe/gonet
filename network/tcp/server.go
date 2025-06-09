@@ -2,10 +2,10 @@ package tcp
 
 import (
 	"errors"
+	"log"
 	"net"
 
 	"github.com/laixhe/gonet/network"
-	"github.com/laixhe/gonet/xlog"
 )
 
 type server struct {
@@ -26,14 +26,14 @@ func (s *server) init(addr string) error {
 	// 获取一个 TCP 的 Addr
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
-		xlog.Error(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
 	// 监听服务器地址
 	listener, err := net.ListenTCP(tcpAddr.Network(), tcpAddr)
 	if err != nil {
-		xlog.Error(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
@@ -49,15 +49,15 @@ func (s *server) accept() error {
 		conn, err := s.listener.AcceptTCP()
 		if err != nil {
 			if errors.Is(err, net.ErrClosed) {
-				xlog.Errorf("tcp listener accept closed error: %s", err)
+				log.Printf("tcp listener accept closed error: %s", err)
 				continue
 			}
 			var e net.Error
 			if errors.As(err, &e) && e.Timeout() {
-				xlog.Errorf("tcp listener accept timeout error: %s", err)
+				log.Printf("tcp listener accept timeout error: %s", err)
 				continue
 			}
-			xlog.Errorf("tcp listener accept error: %s", err)
+			log.Printf("tcp listener accept error: %s", err)
 			continue
 		}
 		// 处理用户链接

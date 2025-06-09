@@ -1,6 +1,3 @@
 /.fleet
 /.idea
 /.vscode
-
-*.exe
-*.pid
