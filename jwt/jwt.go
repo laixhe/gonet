@@ -35,6 +35,21 @@ type Config struct {
 	SigningMethod string `json:"signing_method" mapstructure:"signing_method" toml:"signing_method" yaml:"signing_method"`
 }
 
+// JwtSigningMethod 获取JWT签名方法
+func (config *Config) JwtSigningMethod() *jwtv5.SigningMethodHMAC {
+	switch config.SigningMethod {
+	case SigningMethodHS256:
+		return jwtv5.SigningMethodHS256
+	case SigningMethodHS384:
+		return jwtv5.SigningMethodHS384
+	case SigningMethodHS512:
+		return jwtv5.SigningMethodHS512
+	default:
+		config.SigningMethod = SigningMethodHS256
+		return jwtv5.SigningMethodHS256
+	}
+}
+
 /*
 jwt:
   # 密钥
@@ -52,6 +67,12 @@ func CheckConfig(config *Config) error {
 	}
 	if config.SecretKey == "" {
 		return errors.New("没有JWT密钥配置")
+	}
+	switch config.SigningMethod {
+	case SigningMethodHS256, SigningMethodHS384, SigningMethodHS512:
+		break
+	default:
+		config.SigningMethod = SigningMethodHS256
 	}
 	return nil
 }
@@ -71,15 +92,8 @@ func (c CustomClaims) GetUid() int {
 
 // GenToken 生成JWT
 func GenToken(config *Config, claims jwtv5.Claims) (string, error) {
-	method := jwtv5.SigningMethodHS256
-	switch config.SigningMethod {
-	case SigningMethodHS384:
-		method = jwtv5.SigningMethodHS384
-	case SigningMethodHS512:
-		method = jwtv5.SigningMethodHS512
-	}
 	// 使用指定的签名方法创建签名对象（使用签名算法）
-	token := jwtv5.NewWithClaims(method, claims)
+	token := jwtv5.NewWithClaims(config.JwtSigningMethod(), claims)
 	// 使用指定的 secret 签名并获得完整的编码后的字符串 token
 	return token.SignedString([]byte(config.SecretKey))
 }
