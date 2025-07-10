@@ -46,7 +46,7 @@ func (c *Client) SchemaTableName(name string) string {
 }
 
 // Init 初始化数据库
-func Init(config *orm.Config, writer logger.Writer, requestid string) (orm.OrmClient, error) {
+func Init(config *orm.Config, writer logger.Writer, requestid string) (orm.Client, error) {
 	if err := config.Check(); err != nil {
 		return nil, err
 	}

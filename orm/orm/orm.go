@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type OrmClient interface {
+type Client interface {
 	// Ping 判断服务是否可用
 	Ping() error
 	// Client 获取gorm客户端
