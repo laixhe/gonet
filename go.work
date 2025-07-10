@@ -6,7 +6,10 @@ use (
 	./jwt
 	./mongo
 	./network
-	./orm
+	./orm/orm
+	./orm/mysql
+	./orm/postgres
+	./orm/sqlite
 	./redis
 	./utils
 	./xlog
