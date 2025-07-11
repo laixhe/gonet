@@ -11,6 +11,22 @@ import (
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
+/*
+log:
+  # 日志模式 console file
+  run: console
+  # 日志文件路径
+  path: logs.log
+  # 日志级别 debug info warn error
+  level: debug
+  # 每个日志文件保存大小 20M
+  max_size: 20
+  # 保留 N 个备份
+  max_backups: 20
+  # 保留 N 天
+  max_age: 7
+*/
+
 const (
 	RunTypeConsole = "console" // 终端
 	RunTypeFile    = "file"    // 文件
@@ -41,21 +57,27 @@ type Config struct {
 	CallerSkip int `json:"caller_skip,omitempty" mapstructure:"caller_skip" toml:"caller_skip" yaml:"caller_skip"`
 }
 
-/*
-log:
-  # 日志模式 console file
-  run: console
-  # 日志文件路径
-  path: logs.log
-  # 日志级别 debug info warn error
-  level: debug
-  # 每个日志文件保存大小 20M
-  max_size: 20
-  # 保留 N 个备份
-  max_backups: 20
-  # 保留 N 天
-  max_age: 7
-*/
+// Checking 检查
+func (c *Config) Check() error {
+	if c == nil {
+		return errors.New("没有日志配置")
+	}
+	if c.Run == "" {
+		c.Run = RunTypeConsole
+	}
+	if c.Run == RunTypeFile {
+		if c.Path == "" {
+			c.Path = "logs.log"
+		}
+	}
+	if !(c.Level == LevelTypeDebug ||
+		c.Level == LevelTypeInfo ||
+		c.Level == LevelTypeWarn ||
+		c.Level == LevelTypeError) {
+		c.Level = LevelTypeDebug
+	}
+	return nil
+}
 
 type ZapClient struct {
 	config      *Config
@@ -77,19 +99,8 @@ func (zc *ZapClient) Level() string {
 
 // Init 初始日志
 func Init(config *Config) (*ZapClient, error) {
-	if config == nil {
-		return nil, errors.New("没有日志配置")
-	}
-	if config.Run == RunTypeFile {
-		if config.Path == "" {
-			config.Path = "logs.log"
-		}
-	}
-	if !(config.Level == LevelTypeDebug ||
-		config.Level == LevelTypeInfo ||
-		config.Level == LevelTypeWarn ||
-		config.Level == LevelTypeError) {
-		config.Level = LevelTypeDebug
+	if err := config.Check(); err != nil {
+		return nil, err
 	}
 	client := &ZapClient{
 		config: config,

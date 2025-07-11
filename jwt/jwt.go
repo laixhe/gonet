@@ -6,6 +6,16 @@ import (
 	jwtv5 "github.com/golang-jwt/jwt/v5"
 )
 
+/*
+jwt:
+  # 密钥
+  secret_key: 6Kbj0VFeXYMp60lEyiFoVq4UzqX8Z0GSSfnvTh2VuAQn0oHgQNYexU6yYVTk4xf9
+  # 过期时长(单位秒)
+  expire_time: 604800
+  # 签名方法(签名算法) HS256 HS384 HS512
+  signing_method: HS256
+*/
+
 var (
 	ErrTokenExpired = errors.New("token is expired") // 令牌已过期
 	ErrTokenInvalid = errors.New("token invalid")    // 令牌无效
@@ -36,8 +46,8 @@ type Config struct {
 }
 
 // JwtSigningMethod 获取JWT签名方法
-func (config *Config) JwtSigningMethod() *jwtv5.SigningMethodHMAC {
-	switch config.SigningMethod {
+func (c *Config) JwtSigningMethod() *jwtv5.SigningMethodHMAC {
+	switch c.SigningMethod {
 	case SigningMethodHS256:
 		return jwtv5.SigningMethodHS256
 	case SigningMethodHS384:
@@ -45,34 +55,24 @@ func (config *Config) JwtSigningMethod() *jwtv5.SigningMethodHMAC {
 	case SigningMethodHS512:
 		return jwtv5.SigningMethodHS512
 	default:
-		config.SigningMethod = SigningMethodHS256
+		c.SigningMethod = SigningMethodHS256
 		return jwtv5.SigningMethodHS256
 	}
 }
 
-/*
-jwt:
-  # 密钥
-  secret_key: 6Kbj0VFeXYMp60lEyiFoVq4UzqX8Z0GSSfnvTh2VuAQn0oHgQNYexU6yYVTk4xf9
-  # 过期时长(单位秒)
-  expire_time: 604800
-  # 签名方法(签名算法) HS256 HS384 HS512
-  signing_method: HS256
-*/
-
 // Checking 检查
-func CheckConfig(config *Config) error {
-	if config == nil {
+func (c *Config) Check() error {
+	if c == nil {
 		return errors.New("没有JWT配置")
 	}
-	if config.SecretKey == "" {
+	if c.SecretKey == "" {
 		return errors.New("没有JWT密钥配置")
 	}
-	switch config.SigningMethod {
+	switch c.SigningMethod {
 	case SigningMethodHS256, SigningMethodHS384, SigningMethodHS512:
 		break
 	default:
-		config.SigningMethod = SigningMethodHS256
+		c.SigningMethod = SigningMethodHS256
 	}
 	return nil
 }

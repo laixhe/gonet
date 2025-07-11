@@ -10,6 +10,20 @@ import (
 	readprefv2 "go.mongodb.org/mongo-driver/v2/mongo/readpref"
 )
 
+/*
+mongodb:
+  # 连接地址
+  uri: mongodb://127.0.0.1:27017
+  # 指定数据库
+  database: "test"
+  # 最大连接的数量
+  max_pool_size: 100
+  # 最小连接的数量
+  min_pool_size: 5
+  # 最大连接的空闲时间(设置了连接可复用的最大时间)(单位秒)
+  max_conn_idle_time: 300
+*/
+
 // 数据库配置
 type Config struct {
 	// 连接地址
@@ -24,19 +38,19 @@ type Config struct {
 	MaxConnIdleTime int64 `json:"max_conn_idle_time,omitempty" mapstructure:"max_conn_idle_time" toml:"max_conn_idle_time" yaml:"max_conn_idle_time"`
 }
 
-/*
-mongodb:
-  # 连接地址
-  uri: mongodb://127.0.0.1:27017
-  # 指定数据库
-  database: "test"
-  # 最大连接的数量
-  max_pool_size: 100
-  # 最小连接的数量
-  min_pool_size: 5
-  # 最大连接的空闲时间(设置了连接可复用的最大时间)(单位秒)
-  max_conn_idle_time: 300
-*/
+// Checking 检查
+func (c *Config) Check() error {
+	if c == nil {
+		return errors.New("没有Mongo配置")
+	}
+	if c.Uri == "" {
+		return errors.New("没有Mongo连接地址配置")
+	}
+	if c.Database == "" {
+		return errors.New("没有Mongo指定数据库配置")
+	}
+	return nil
+}
 
 // MongoClient 客户端
 type MongoClient struct {
@@ -107,11 +121,8 @@ func connect(config *Config) (*MongoClient, error) {
 
 // Init 初始化数据库
 func Init(config *Config) (*MongoClient, error) {
-	if config == nil {
-		return nil, errors.New("没有Mongo配置")
-	}
-	if config.Uri == "" {
-		return nil, errors.New("没有Mongo连接地址配置")
+	if err := config.Check(); err != nil {
+		return nil, err
 	}
 	mc, err := connect(config)
 	if err != nil {

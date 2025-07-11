@@ -9,6 +9,20 @@ import (
 	redisv9 "github.com/redis/go-redis/v9"
 )
 
+/*
+redis:
+  # 连接地址(多个地址是以 , 分割)
+  addr: 127.0.0.1:6379
+  # 选择N号数据库
+  db_num: 0
+  # 密码
+  password:
+  # 最大链接数
+  pool_size: 100
+  # 空闲链接数
+  min_idle_conn: 5
+*/
+
 // Redis配置
 type Config struct {
 	// 连接地址(多个地址是以 , 分割)
@@ -23,19 +37,25 @@ type Config struct {
 	MinIdleConn int `json:"min_idle_conn,omitempty" mapstructure:"min_idle_conn" toml:"min_idle_conn" yaml:"min_idle_conn"`
 }
 
-/*
-redis:
-  # 连接地址(多个地址是以 , 分割)
-  addr: 127.0.0.1:6379
-  # 选择N号数据库
-  db_num: 0
-  # 密码
-  password:
-  # 最大链接数
-  pool_size: 100
-  # 空闲链接数
-  min_idle_conn: 5
-*/
+// Checking 检查
+func (c *Config) Check() error {
+	if c == nil {
+		return errors.New("没有Redis配置")
+	}
+	if c.Addr == "" {
+		return errors.New("没有Redis连接地址配置")
+	}
+	if c.DbNum < 0 {
+		c.DbNum = 0
+	}
+	if c.PoolSize < 0 {
+		c.PoolSize = 0
+	}
+	if c.MinIdleConn < 0 {
+		c.MinIdleConn = 0
+	}
+	return nil
+}
 
 // RedisClient 客户端
 type RedisClient struct {
@@ -126,11 +146,8 @@ func connect(config *Config) (*RedisClient, error) {
 }
 
 func Init(config *Config) (*RedisClient, error) {
-	if config == nil {
-		return nil, errors.New("没有Redis配置")
-	}
-	if config.Addr == "" {
-		return nil, errors.New("没有Redis连接地址配置")
+	if err := config.Check(); err != nil {
+		return nil, err
 	}
 	rc, err := connect(config)
 	if err != nil {
