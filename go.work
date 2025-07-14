@@ -3,7 +3,7 @@ go 1.24
 use (
 	./config
 	./crypto
-	./discovery
+	./grpc
 	./jwt
 	./log
 	./mongo
