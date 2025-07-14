@@ -50,6 +50,9 @@ type Config struct {
 }
 
 func (c *Config) Check() error {
+	if c == nil {
+		return errors.New("数据库配置不能为空")
+	}
 	if c.Driver == "" {
 		return errors.New("没有数据库驱动名称配置")
 	}

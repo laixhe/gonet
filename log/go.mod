@@ -1,4 +1,4 @@
-module github.com/laixhe/gonet/xlog
+module github.com/laixhe/gonet/log
 
 go 1.24
 

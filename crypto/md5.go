@@ -1,4 +1,4 @@
-package xcrypto
+package crypto
 
 import (
 	"crypto/hmac"

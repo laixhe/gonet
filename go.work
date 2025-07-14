@@ -2,8 +2,10 @@ go 1.24
 
 use (
 	./config
+	./crypto
 	./discovery
 	./jwt
+	./log
 	./mongo
 	./network
 	./orm/orm
@@ -12,5 +14,4 @@ use (
 	./orm/sqlite
 	./redis
 	./utils
-	./xlog
 )
