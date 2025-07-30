@@ -87,12 +87,12 @@ type SmsClient struct {
 // phone 手机号
 // params 短信模板参数
 // 返回值：短信发送ID，错误信息
-func (s *SmsClient) Send(key string, phone string, params map[string]string) (string, error) {
+func (s *SmsClient) Send(key string, phone string, params map[string]string) (*dysmsapi.SendSmsResponseBody, error) {
 	templateParam := ""
 	if len(params) > 0 {
 		paramsJson, err := json.Marshal(params)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		templateParam = string(paramsJson)
 	}
@@ -107,18 +107,18 @@ func (s *SmsClient) Send(key string, phone string, params map[string]string) (st
 			}
 			response, err := s.client.SendSms(request)
 			if err != nil {
-				return "", err
+				return nil, err
 			}
 			if response.Body == nil {
-				return "", errors.New("短信发送失败")
+				return nil, errors.New("短信发送失败")
 			}
 			if response.Body.Code != nil && *response.Body.Code != "OK" {
-				return "", errors.New("短信发送失败：" + tea.StringValue(response.Body.Message))
+				return nil, errors.New("短信发送失败：" + tea.StringValue(response.Body.Message))
 			}
-			return tea.StringValue(response.Body.BizId), nil
+			return response.Body, nil
 		}
 	}
-	return "", errors.New("没有短信发送配置：" + key)
+	return nil, errors.New("没有短信发送配置：" + key)
 }
 
 func Init(config *Config) (*SmsClient, error) {
