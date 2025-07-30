@@ -40,7 +40,7 @@ type Config struct {
 	// 密钥
 	SecretKey string `json:"secret_key" mapstructure:"secret_key" toml:"secret_key" yaml:"secret_key"`
 	// 过期时长(单位秒)
-	ExpireTime int `json:"expire_time" mapstructure:"expire_time" toml:"expire_time" yaml:"expire_time"`
+	ExpireTime int64 `json:"expire_time" mapstructure:"expire_time" toml:"expire_time" yaml:"expire_time"`
 	// 签名方法(签名算法) HS256 HS384 HS512
 	SigningMethod string `json:"signing_method" mapstructure:"signing_method" toml:"signing_method" yaml:"signing_method"`
 }
