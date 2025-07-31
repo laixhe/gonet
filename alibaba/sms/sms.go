@@ -125,6 +125,7 @@ func Init(config *Config) (*SmsClient, error) {
 	if err := config.Check(); err != nil {
 		return nil, err
 	}
+	// doc https://help.aliyun.com/zh/sms
 	openapiConfig := &openapi.Config{
 		AccessKeyId:     tea.String(config.AccessKeyId),
 		AccessKeySecret: tea.String(config.AccessKeySecret),
