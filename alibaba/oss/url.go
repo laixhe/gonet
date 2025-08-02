@@ -32,7 +32,7 @@ func (oc *OssClient) SetPreSignatureURL(ctx context.Context, fileDir string, fil
 		name := xid.New().String()
 		dst := fileDir + "/" + name
 		if ext != "" {
-			dst = dst + "." + ext
+			dst = dst + ext
 		}
 		req := &ossv2.PutObjectRequest{
 			Bucket: ossv2.Ptr(oc.config.Bucket),
