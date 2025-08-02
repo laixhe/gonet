@@ -87,7 +87,7 @@ type SmsClient struct {
 // phone 手机号
 // params 短信模板参数
 // 返回值：短信发送ID，错误信息
-func (s *SmsClient) Send(key string, phone string, params map[string]string) (*dysmsapi.SendSmsResponseBody, error) {
+func (sc *SmsClient) Send(key string, phone string, params map[string]string) (*dysmsapi.SendSmsResponseBody, error) {
 	templateParam := ""
 	if len(params) > 0 {
 		paramsJson, err := json.Marshal(params)
@@ -96,7 +96,7 @@ func (s *SmsClient) Send(key string, phone string, params map[string]string) (*d
 		}
 		templateParam = string(paramsJson)
 	}
-	for _, v := range s.config.Sends {
+	for _, v := range sc.config.Sends {
 		if v.Key == key {
 			request := &dysmsapi.SendSmsRequest{}
 			request.SetPhoneNumbers(phone)
@@ -105,7 +105,7 @@ func (s *SmsClient) Send(key string, phone string, params map[string]string) (*d
 			if len(templateParam) > 0 {
 				request.SetTemplateParam(templateParam)
 			}
-			response, err := s.client.SendSms(request)
+			response, err := sc.client.SendSms(request)
 			if err != nil {
 				return nil, err
 			}
