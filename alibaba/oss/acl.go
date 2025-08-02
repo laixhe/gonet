@@ -9,7 +9,7 @@ import (
 // SetObjectACL 设置文件的访问权限
 func (oc *OssClient) SetObjectACL(ctx context.Context, objectName string, acls ...ossv2.ObjectACLType) error {
 	acl := ossv2.ObjectACLPublicRead // 设置对象的访问权限为：公共读
-	if len(acls) == 0 {
+	if len(acls) > 0 {
 		acl = acls[0]
 	}
 	req := &ossv2.PutObjectAclRequest{
