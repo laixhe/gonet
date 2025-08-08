@@ -2,7 +2,7 @@ module github.com/laixhe/gonet/mongo
 
 go 1.24
 
-require go.mongodb.org/mongo-driver/v2 v2.2.2
+require go.mongodb.org/mongo-driver/v2 v2.2.3
 
 require (
 	github.com/golang/snappy v1.0.0 // indirect
