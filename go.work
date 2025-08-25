@@ -5,6 +5,7 @@ use (
 	./alibaba/sms
 	./config
 	./crypto
+	./douyin
 	./grpc
 	./jwt
 	./log
@@ -16,4 +17,5 @@ use (
 	./orm/sqlite
 	./redis
 	./utils
+	./wechat/oplatform
 )
