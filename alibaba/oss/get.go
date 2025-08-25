@@ -2,7 +2,10 @@ package oss
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"io"
+	"net/http"
 
 	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 )
@@ -22,4 +25,37 @@ func (oc *OssClient) Get(ctx context.Context, objectName string) ([]byte, error)
 	// 确保在函数结束时关闭响应体
 	defer result.Body.Close()
 	return io.ReadAll(result.Body)
+}
+
+type GetInfoValue struct {
+	Value string `json:"value"`
+}
+
+type GetInfoResponse struct {
+	FileSize    GetInfoValue `json:"FileSize"`
+	Format      GetInfoValue `json:"Format"`
+	ImageHeight GetInfoValue `json:"ImageHeight"`
+	ImageWidth  GetInfoValue `json:"ImageWidth"`
+}
+
+// GetInfo 获取公共读或者公共读写图片的信息
+func (oc *OssClient) GetInfo(ctx context.Context, objectName string) (*GetInfoResponse, error) {
+	resp, err := http.Get(oc.GetUrl(objectName) + "?x-oss-process=image/info")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var respBody GetInfoResponse
+	err = json.Unmarshal(body, &respBody)
+	if err != nil {
+		return nil, err
+	}
+	return &respBody, nil
 }

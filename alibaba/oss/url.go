@@ -4,6 +4,7 @@ import (
 	"context"
 	"mime"
 	"path/filepath"
+	"strings"
 	"time"
 
 	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
@@ -21,7 +22,7 @@ type FilePreSignatureURL struct {
 }
 
 // SetPreSignatureURL 生成预签名文件上传url
-func (oc *OssClient) SetPreSignatureURL(ctx context.Context, fileDir string, fileNames []string) ([]FilePreSignatureURL, error) {
+func (oc *OssClient) SetPreSignatureURL(ctx context.Context, fileDir string, fileNames []string, isNotInternal ...bool) ([]FilePreSignatureURL, error) {
 	list := make([]FilePreSignatureURL, 0, len(fileNames))
 	for _, fileName := range fileNames {
 		ext := filepath.Ext(fileName)
@@ -46,6 +47,9 @@ func (oc *OssClient) SetPreSignatureURL(ctx context.Context, fileDir string, fil
 		if err != nil {
 			return nil, err
 		}
+		if len(isNotInternal) > 0 && isNotInternal[0] {
+			result.URL = strings.Replace(result.URL, "-internal", "", -1)
+		}
 		list = append(list, FilePreSignatureURL{
 			Url:         dst,
 			SignUrl:     result.URL,
@@ -56,6 +60,6 @@ func (oc *OssClient) SetPreSignatureURL(ctx context.Context, fileDir string, fil
 }
 
 // GetUrl 获取对象存储URL
-func (oc *OssClient) GetUrl(objectName string) string {
+func (oc *OssClient) GetUrl(objectName string, isInternal ...bool) string {
 	return "https://" + oc.config.Bucket + ".oss-" + oc.config.Region + ".aliyuncs.com/" + objectName
 }
