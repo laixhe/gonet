@@ -61,5 +61,8 @@ func (oc *OssClient) SetPreSignatureURL(ctx context.Context, fileDir string, fil
 
 // GetUrl 获取对象存储URL
 func (oc *OssClient) GetUrl(objectName string, isInternal ...bool) string {
+	if len(isInternal) > 0 && isInternal[0] {
+		return "https://" + oc.config.Bucket + ".oss-" + oc.config.Region + "-internal.aliyuncs.com/" + objectName
+	}
 	return "https://" + oc.config.Bucket + ".oss-" + oc.config.Region + ".aliyuncs.com/" + objectName
 }

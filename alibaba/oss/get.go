@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 
 	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 )
@@ -27,6 +28,8 @@ func (oc *OssClient) Get(ctx context.Context, objectName string) ([]byte, error)
 	return io.ReadAll(result.Body)
 }
 
+// 公共读或者公共读写图片的信息
+
 type GetInfoValue struct {
 	Value string `json:"value"`
 }
@@ -40,7 +43,12 @@ type GetInfoResponse struct {
 
 // GetInfo 获取公共读或者公共读写图片的信息
 func (oc *OssClient) GetInfo(ctx context.Context, objectName string) (*GetInfoResponse, error) {
-	resp, err := http.Get(oc.GetUrl(objectName) + "?x-oss-process=image/info")
+	if strings.HasPrefix(objectName, "http") {
+		objectName = strings.Split(objectName, "?")[0]
+	} else {
+		objectName = oc.GetUrl(objectName)
+	}
+	resp, err := http.Get(objectName + "?x-oss-process=image/info")
 	if err != nil {
 		return nil, err
 	}
