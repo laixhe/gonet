@@ -31,6 +31,7 @@ func AccessToken(httpClient *resty.Client, appid, secret, code string) (*AccessT
 		}).
 		SetResult(&AccessTokenResponse{}).
 		SetError(&AccessTokenResponse{}).
+		SetForceResponseContentType("application/json").
 		Get("/sns/oauth2/access_token")
 	if err != nil {
 		return nil, err
