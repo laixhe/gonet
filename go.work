@@ -17,5 +17,6 @@ use (
 	./orm/sqlite
 	./redis
 	./utils
+	./wechat/miniprogram
 	./wechat/oplatform
 )
