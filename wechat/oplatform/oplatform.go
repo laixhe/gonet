@@ -29,7 +29,8 @@ func (o *Oplatform) Config() *Config {
 	return o.config
 }
 
-// AccessToken 通过 code 获取 access_token
+// AccessToken 微信登录
+// 通过 code 获取 access_token
 func (o *Oplatform) AccessToken(code string) (*oauth2.AccessTokenResponse, error) {
 	return oauth2.AccessToken(o.httpClient, o.config.AppId, o.config.Secret, code)
 }

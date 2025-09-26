@@ -3,16 +3,14 @@ module github.com/laixhe/gonet/alibaba/sms
 go 1.24
 
 require (
-	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.11
-	github.com/alibabacloud-go/dysmsapi-20170525/v5 v5.1.2
-	github.com/alibabacloud-go/tea v1.3.11
+	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.12
+	github.com/alibabacloud-go/dysmsapi-20170525/v5 v5.2.0
+	github.com/alibabacloud-go/tea v1.3.12
 )
 
 require (
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5 // indirect
 	github.com/alibabacloud-go/debug v1.0.1 // indirect
-	github.com/alibabacloud-go/endpoint-util v1.1.0 // indirect
-	github.com/alibabacloud-go/openapi-util v0.1.1 // indirect
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.7 // indirect
 	github.com/aliyun/credentials-go v1.4.5 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect

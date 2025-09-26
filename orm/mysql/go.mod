@@ -7,7 +7,7 @@ replace github.com/laixhe/gonet/orm/orm => ../orm
 require (
 	github.com/laixhe/gonet/orm/orm v0.0.0-00010101000000-000000000000
 	gorm.io/driver/mysql v1.6.0
-	gorm.io/gorm v1.30.5
+	gorm.io/gorm v1.31.0
 )
 
 require (

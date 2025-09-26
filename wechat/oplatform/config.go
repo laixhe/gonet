@@ -8,10 +8,6 @@ type Config struct {
 	AppId string `json:"app_id" mapstructure:"appid" toml:"appid" yaml:"appid"`
 	// 密钥 App Secret
 	Secret string `json:"secret" mapstructure:"secret" toml:"secret" yaml:"secret"`
-	// (可选)回调消息 Token
-	Token string `json:"token" mapstructure:"token" toml:"token" yaml:"token"`
-	// (可选)回调消息密钥 AESKey
-	Aeskey string `json:"aeskey" mapstructure:"aeskey" toml:"aeskey" yaml:"aeskey"`
 }
 
 // Check 检查
