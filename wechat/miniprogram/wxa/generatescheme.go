@@ -2,13 +2,14 @@ package wxa
 
 import (
 	"errors"
+	"fmt"
 
 	"resty.dev/v3"
 )
 
 type GenerateSchemeJumpWxa struct {
 	Path       string `json:"path,omitempty"`        // 通过 scheme 码进入的小程序页面路径，必须是已经发布的小程序存在的页面，不可携带 query，path 为空时会跳转小程序主页
-	Query      string `json:"query,omitempty"`       // 通过 scheme 码进入小程序时的 query，最大1024个字符，只支持数字，大小写英文以及部分特殊字 =&
+	Query      string `json:"query,omitempty"`       // 通过 scheme 码进入小程序时的 query，最大1024个字符，只支持数字，大小写英文以及部分特殊字 = &（格式遵循URL标准，即k1=v1&k2=v2）
 	EnvVersion string `json:"env_version,omitempty"` // 默认值 release 要打开的小程序版本。正式版为release，体验版为trial，开发版为develop，仅在微信外打开时生效
 }
 type GenerateSchemeRequest struct {
@@ -40,7 +41,7 @@ func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateS
 		Post("/wxa/generatescheme")
 	if err != nil {
 		return &GenerateSchemeResponse{
-			Errcode: -2,
+			Errcode: res.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
@@ -48,13 +49,13 @@ func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateS
 		generateSchemeResponse, is := res.Result().(*GenerateSchemeResponse)
 		if is {
 			if generateSchemeResponse.Errcode != 0 {
-				return generateSchemeResponse, errors.New(generateSchemeResponse.Errmsg)
+				return generateSchemeResponse, fmt.Errorf("%d %s", generateSchemeResponse.Errcode, generateSchemeResponse.Errmsg)
 			}
 			return generateSchemeResponse, nil
 		}
 	}
 	return &GenerateSchemeResponse{
-		Errcode: -2,
+		Errcode: res.StatusCode(),
 		Errmsg:  res.String(),
 	}, errors.New(res.String())
 }

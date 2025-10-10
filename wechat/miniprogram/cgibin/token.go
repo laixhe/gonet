@@ -2,6 +2,7 @@ package cgibin
 
 import (
 	"errors"
+	"fmt"
 
 	"resty.dev/v3"
 )
@@ -28,7 +29,7 @@ func Token(httpClient *resty.Client, appid, secret string) (*TokenResponse, erro
 		Get("/cgi-bin/token")
 	if err != nil {
 		return &TokenResponse{
-			Errcode: -2,
+			Errcode: res.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
@@ -36,13 +37,13 @@ func Token(httpClient *resty.Client, appid, secret string) (*TokenResponse, erro
 		tokenResponse, is := res.Result().(*TokenResponse)
 		if is {
 			if tokenResponse.Errcode != 0 {
-				return tokenResponse, errors.New(tokenResponse.Errmsg)
+				return tokenResponse, fmt.Errorf("%d %s", tokenResponse.Errcode, tokenResponse.Errmsg)
 			}
 			return tokenResponse, nil
 		}
 	}
 	return &TokenResponse{
-		Errcode: -2,
+		Errcode: res.StatusCode(),
 		Errmsg:  res.String(),
 	}, errors.New(res.String())
 }

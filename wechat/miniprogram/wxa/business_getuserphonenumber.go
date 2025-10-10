@@ -2,6 +2,7 @@ package wxa
 
 import (
 	"errors"
+	"fmt"
 
 	"resty.dev/v3"
 )
@@ -41,7 +42,7 @@ func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*Ge
 		Post("/wxa/business/getuserphonenumber")
 	if err != nil {
 		return &GetUserPhoneNumberResponse{
-			Errcode: -2,
+			Errcode: res.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
@@ -49,13 +50,13 @@ func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*Ge
 		getUserPhoneNumberResponse, is := res.Result().(*GetUserPhoneNumberResponse)
 		if is {
 			if getUserPhoneNumberResponse.Errcode != 0 {
-				return getUserPhoneNumberResponse, errors.New(getUserPhoneNumberResponse.Errmsg)
+				return getUserPhoneNumberResponse, fmt.Errorf("%d %s", getUserPhoneNumberResponse.Errcode, getUserPhoneNumberResponse.Errmsg)
 			}
 			return getUserPhoneNumberResponse, nil
 		}
 	}
 	return &GetUserPhoneNumberResponse{
-		Errcode: -2,
+		Errcode: res.StatusCode(),
 		Errmsg:  res.String(),
 	}, errors.New(res.String())
 }

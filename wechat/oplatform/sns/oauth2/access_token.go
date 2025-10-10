@@ -2,6 +2,7 @@ package oauth2
 
 import (
 	"errors"
+	"fmt"
 
 	"resty.dev/v3"
 )
@@ -35,7 +36,7 @@ func AccessToken(httpClient *resty.Client, appid, secret, code string) (*AccessT
 		Get("/sns/oauth2/access_token")
 	if err != nil {
 		return &AccessTokenResponse{
-			Errcode: -2,
+			Errcode: res.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
@@ -43,13 +44,13 @@ func AccessToken(httpClient *resty.Client, appid, secret, code string) (*AccessT
 		accessTokenResponse, is := res.Result().(*AccessTokenResponse)
 		if is {
 			if accessTokenResponse.Errcode != 0 {
-				return accessTokenResponse, errors.New(accessTokenResponse.Errmsg)
+				return accessTokenResponse, fmt.Errorf("%d %s", accessTokenResponse.Errcode, accessTokenResponse.Errmsg)
 			}
 			return accessTokenResponse, nil
 		}
 	}
 	return &AccessTokenResponse{
-		Errcode: -2,
+		Errcode: res.StatusCode(),
 		Errmsg:  res.String(),
 	}, errors.New(res.String())
 }

@@ -2,6 +2,7 @@ package sns
 
 import (
 	"errors"
+	"fmt"
 
 	"resty.dev/v3"
 )
@@ -31,7 +32,7 @@ func Jscode2session(httpClient *resty.Client, appid, secret, code string) (*Jsco
 		Get("/sns/jscode2session")
 	if err != nil {
 		return &Jscode2sessionResponse{
-			Errcode: -2,
+			Errcode: res.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
@@ -39,13 +40,13 @@ func Jscode2session(httpClient *resty.Client, appid, secret, code string) (*Jsco
 		jscode2sessionResponse, is := res.Result().(*Jscode2sessionResponse)
 		if is {
 			if jscode2sessionResponse.Errcode != 0 {
-				return jscode2sessionResponse, errors.New(jscode2sessionResponse.Errmsg)
+				return jscode2sessionResponse, fmt.Errorf("%d %s", jscode2sessionResponse.Errcode, jscode2sessionResponse.Errmsg)
 			}
 			return jscode2sessionResponse, nil
 		}
 	}
 	return &Jscode2sessionResponse{
-		Errcode: -2,
+		Errcode: res.StatusCode(),
 		Errmsg:  res.String(),
 	}, errors.New(res.String())
 }

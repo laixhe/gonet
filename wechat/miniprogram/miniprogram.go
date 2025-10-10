@@ -65,16 +65,21 @@ func (wx *Miniprogram) GetAccessToken() (*cgibin.TokenResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	wx.token.NetTime = time.Now().Unix()
 	wx.token.AccessToken = token.AccessToken
 	if token.ExpiresIn > 0 {
 		if token.ExpiresIn >= 7200 {
 			wx.token.ExpiresIn = token.ExpiresIn - 300
+			wx.token.NetTime = time.Now().Unix()
 		} else {
 			wx.token.ExpiresIn = int64(float64(token.ExpiresIn) * 0.8)
+			if wx.token.ExpiresIn < 300 {
+				wx.token.ExpiresIn = 0
+			} else {
+				wx.token.NetTime = time.Now().Unix()
+			}
 		}
 	} else {
-		wx.token.ExpiresIn = 7200 - 300
+		wx.token.ExpiresIn = 0
 	}
 	return token, nil
 }
@@ -95,4 +100,13 @@ func (wx *Miniprogram) GenerateScheme(req *wxa.GenerateSchemeRequest) (*wxa.Gene
 		return nil, err
 	}
 	return wxa.GenerateScheme(wx.httpClient, getAccessToken.AccessToken, req)
+}
+
+// QueryScheme 查询 scheme 码
+func (wx *Miniprogram) QueryScheme(req *wxa.QuerySchemeRequest) (*wxa.QuerySchemeResponse, error) {
+	getAccessToken, err := wx.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	return wxa.QueryScheme(wx.httpClient, getAccessToken.AccessToken, req)
 }
