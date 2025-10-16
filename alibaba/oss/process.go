@@ -33,7 +33,7 @@ func (oc *OssClient) ProcessImageWatermark(ctx context.Context, objectName strin
 	}
 	targetBase64 := base64.URLEncoding.EncodeToString([]byte(targetImageName))
 	// 指定处理指令
-	process := fmt.Sprintf("image/watermark,image_%s,t_60,g_se,x_20,y_20", watermarkBase64)                                    // 水印
+	process := fmt.Sprintf("image/auto-orient,1/watermark,image_%s,t_60,g_se,x_20,y_20", watermarkBase64)                      // 水印
 	process += fmt.Sprintf("|sys/saveas,o_%s,b_%s", targetBase64, base64.URLEncoding.EncodeToString([]byte(oc.config.Bucket))) // 存储
 	request := &ossv2.ProcessObjectRequest{
 		Bucket:  ossv2.Ptr(oc.config.Bucket),
