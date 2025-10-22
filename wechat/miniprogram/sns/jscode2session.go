@@ -20,7 +20,7 @@ type Jscode2sessionResponse struct {
 // DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/code2Session.html
 // GET https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
 func Jscode2session(httpClient *resty.Client, appid, secret, code string) (*Jscode2sessionResponse, error) {
-	res, err := httpClient.R().
+	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"appid":      appid,
 			"secret":     secret,
@@ -32,21 +32,21 @@ func Jscode2session(httpClient *resty.Client, appid, secret, code string) (*Jsco
 		Get("/sns/jscode2session")
 	if err != nil {
 		return &Jscode2sessionResponse{
-			Errcode: res.StatusCode(),
+			Errcode: httpResp.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
-	if res.IsSuccess() {
-		jscode2sessionResponse, is := res.Result().(*Jscode2sessionResponse)
+	if httpResp.IsSuccess() {
+		resp, is := httpResp.Result().(*Jscode2sessionResponse)
 		if is {
-			if jscode2sessionResponse.Errcode != 0 {
-				return jscode2sessionResponse, fmt.Errorf("%d %s", jscode2sessionResponse.Errcode, jscode2sessionResponse.Errmsg)
+			if resp.Errcode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
 			}
-			return jscode2sessionResponse, nil
+			return resp, nil
 		}
 	}
 	return &Jscode2sessionResponse{
-		Errcode: res.StatusCode(),
-		Errmsg:  res.String(),
-	}, errors.New(res.String())
+		Errcode: httpResp.StatusCode(),
+		Errmsg:  httpResp.String(),
+	}, errors.New(httpResp.String())
 }

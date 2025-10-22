@@ -37,7 +37,7 @@ type QuerySchemeResponse struct {
 // POST https://api.weixin.qq.com/wxa/queryscheme?access_token=ACCESS_TOKEN
 // BODY {"scheme":"xxx"}
 func QueryScheme(httpClient *resty.Client, accessToken string, req *QuerySchemeRequest) (*QuerySchemeResponse, error) {
-	res, err := httpClient.R().
+	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"access_token": accessToken,
 		}).
@@ -47,21 +47,21 @@ func QueryScheme(httpClient *resty.Client, accessToken string, req *QuerySchemeR
 		Post("/wxa/queryscheme")
 	if err != nil {
 		return &QuerySchemeResponse{
-			Errcode: res.StatusCode(),
+			Errcode: httpResp.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
-	if res.IsSuccess() {
-		querySchemeResponse, is := res.Result().(*QuerySchemeResponse)
+	if httpResp.IsSuccess() {
+		resp, is := httpResp.Result().(*QuerySchemeResponse)
 		if is {
-			if querySchemeResponse.Errcode != 0 {
-				return querySchemeResponse, fmt.Errorf("%d %s", querySchemeResponse.Errcode, querySchemeResponse.Errmsg)
+			if resp.Errcode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
 			}
-			return querySchemeResponse, nil
+			return resp, nil
 		}
 	}
 	return &QuerySchemeResponse{
-		Errcode: res.StatusCode(),
-		Errmsg:  res.String(),
-	}, errors.New(res.String())
+		Errcode: httpResp.StatusCode(),
+		Errmsg:  httpResp.String(),
+	}, errors.New(httpResp.String())
 }

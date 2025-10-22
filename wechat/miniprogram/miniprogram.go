@@ -110,3 +110,12 @@ func (wx *Miniprogram) QueryScheme(req *wxa.QuerySchemeRequest) (*wxa.QuerySchem
 	}
 	return wxa.QueryScheme(wx.httpClient, getAccessToken.AccessToken, req)
 }
+
+// GetWxaCodeUnlimit 获取不限制的小程序码
+func (wx *Miniprogram) GetWxaCodeUnlimit(req *wxa.GetWxaCodeUnlimitRequest) (*wxa.GetWxaCodeUnlimitResponse, error) {
+	getAccessToken, err := wx.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	return wxa.GetWxaCodeUnlimit(wx.httpClient, getAccessToken.AccessToken, req)
+}

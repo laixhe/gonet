@@ -31,7 +31,7 @@ type GenerateSchemeResponse struct {
 // POST https://api.weixin.qq.com/wxa/generatescheme?access_token=ACCESS_TOKEN
 // BODY {"jump_wxa":{"path":"/pages/index/index","query":"id=1&age=18"}}
 func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateSchemeRequest) (*GenerateSchemeResponse, error) {
-	res, err := httpClient.R().
+	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"access_token": accessToken,
 		}).
@@ -41,21 +41,21 @@ func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateS
 		Post("/wxa/generatescheme")
 	if err != nil {
 		return &GenerateSchemeResponse{
-			Errcode: res.StatusCode(),
+			Errcode: httpResp.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
-	if res.IsSuccess() {
-		generateSchemeResponse, is := res.Result().(*GenerateSchemeResponse)
+	if httpResp.IsSuccess() {
+		resp, is := httpResp.Result().(*GenerateSchemeResponse)
 		if is {
-			if generateSchemeResponse.Errcode != 0 {
-				return generateSchemeResponse, fmt.Errorf("%d %s", generateSchemeResponse.Errcode, generateSchemeResponse.Errmsg)
+			if resp.Errcode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
 			}
-			return generateSchemeResponse, nil
+			return resp, nil
 		}
 	}
 	return &GenerateSchemeResponse{
-		Errcode: res.StatusCode(),
-		Errmsg:  res.String(),
-	}, errors.New(res.String())
+		Errcode: httpResp.StatusCode(),
+		Errmsg:  httpResp.String(),
+	}, errors.New(httpResp.String())
 }

@@ -30,7 +30,7 @@ type GetUserPhoneNumberResponse struct {
 // POST https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=ACCESS_TOKEN
 // BODY {"code":"XXX"}
 func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*GetUserPhoneNumberResponse, error) {
-	res, err := httpClient.R().
+	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"access_token": accessToken,
 		}).
@@ -42,21 +42,21 @@ func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*Ge
 		Post("/wxa/business/getuserphonenumber")
 	if err != nil {
 		return &GetUserPhoneNumberResponse{
-			Errcode: res.StatusCode(),
+			Errcode: httpResp.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
-	if res.IsSuccess() {
-		getUserPhoneNumberResponse, is := res.Result().(*GetUserPhoneNumberResponse)
+	if httpResp.IsSuccess() {
+		resp, is := httpResp.Result().(*GetUserPhoneNumberResponse)
 		if is {
-			if getUserPhoneNumberResponse.Errcode != 0 {
-				return getUserPhoneNumberResponse, fmt.Errorf("%d %s", getUserPhoneNumberResponse.Errcode, getUserPhoneNumberResponse.Errmsg)
+			if resp.Errcode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
 			}
-			return getUserPhoneNumberResponse, nil
+			return resp, nil
 		}
 	}
 	return &GetUserPhoneNumberResponse{
-		Errcode: res.StatusCode(),
-		Errmsg:  res.String(),
-	}, errors.New(res.String())
+		Errcode: httpResp.StatusCode(),
+		Errmsg:  httpResp.String(),
+	}, errors.New(httpResp.String())
 }

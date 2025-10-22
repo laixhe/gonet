@@ -24,7 +24,7 @@ type AccessTokenResponse struct {
 // DOC APP https://developers.weixin.qq.com/doc/oplatform/Mobile_App/WeChat_Login/Development_Guide.html
 // GET https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
 func AccessToken(httpClient *resty.Client, appid, secret, code string) (*AccessTokenResponse, error) {
-	res, err := httpClient.R().
+	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"appid":      appid,
 			"secret":     secret,
@@ -36,21 +36,21 @@ func AccessToken(httpClient *resty.Client, appid, secret, code string) (*AccessT
 		Get("/sns/oauth2/access_token")
 	if err != nil {
 		return &AccessTokenResponse{
-			Errcode: res.StatusCode(),
+			Errcode: httpResp.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
-	if res.IsSuccess() {
-		accessTokenResponse, is := res.Result().(*AccessTokenResponse)
+	if httpResp.IsSuccess() {
+		resp, is := httpResp.Result().(*AccessTokenResponse)
 		if is {
-			if accessTokenResponse.Errcode != 0 {
-				return accessTokenResponse, fmt.Errorf("%d %s", accessTokenResponse.Errcode, accessTokenResponse.Errmsg)
+			if resp.Errcode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
 			}
-			return accessTokenResponse, nil
+			return resp, nil
 		}
 	}
 	return &AccessTokenResponse{
-		Errcode: res.StatusCode(),
-		Errmsg:  res.String(),
-	}, errors.New(res.String())
+		Errcode: httpResp.StatusCode(),
+		Errmsg:  httpResp.String(),
+	}, errors.New(httpResp.String())
 }

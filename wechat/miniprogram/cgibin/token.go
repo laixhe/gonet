@@ -18,7 +18,7 @@ type TokenResponse struct {
 // DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-access-token/getAccessToken.html
 // GET https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
 func Token(httpClient *resty.Client, appid, secret string) (*TokenResponse, error) {
-	res, err := httpClient.R().
+	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"appid":      appid,
 			"secret":     secret,
@@ -29,21 +29,21 @@ func Token(httpClient *resty.Client, appid, secret string) (*TokenResponse, erro
 		Get("/cgi-bin/token")
 	if err != nil {
 		return &TokenResponse{
-			Errcode: res.StatusCode(),
+			Errcode: httpResp.StatusCode(),
 			Errmsg:  err.Error(),
 		}, err
 	}
-	if res.IsSuccess() {
-		tokenResponse, is := res.Result().(*TokenResponse)
+	if httpResp.IsSuccess() {
+		resp, is := httpResp.Result().(*TokenResponse)
 		if is {
-			if tokenResponse.Errcode != 0 {
-				return tokenResponse, fmt.Errorf("%d %s", tokenResponse.Errcode, tokenResponse.Errmsg)
+			if resp.Errcode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
 			}
-			return tokenResponse, nil
+			return resp, nil
 		}
 	}
 	return &TokenResponse{
-		Errcode: res.StatusCode(),
-		Errmsg:  res.String(),
-	}, errors.New(res.String())
+		Errcode: httpResp.StatusCode(),
+		Errmsg:  httpResp.String(),
+	}, errors.New(httpResp.String())
 }
