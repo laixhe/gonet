@@ -8,6 +8,7 @@ use (
 	./crypto
 	./douyin
 	./grpc
+	./imaging
 	./jwt
 	./log
 	./mongo
