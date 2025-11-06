@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/bytedance/sonic"
 	"resty.dev/v3"
 )
 
@@ -29,11 +30,21 @@ type GetWxaCodeUnlimitResponse struct {
 // POST https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=ACCESS_TOKEN
 // BODY {"page":"xxx","scene":"xxx","width":1280}
 func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxaCodeUnlimitRequest) (*GetWxaCodeUnlimitResponse, error) {
+	if req.Width <= 0 {
+		req.Width = 1280
+	}
+	reqBody, err := sonic.Marshal(req)
+	if err != nil {
+		return &GetWxaCodeUnlimitResponse{
+			Errcode: 400,
+			Errmsg:  err.Error(),
+		}, err
+	}
 	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"access_token": accessToken,
 		}).
-		SetBody(req).
+		SetBody(string(reqBody)).
 		Post("/wxa/getwxacodeunlimit")
 	if err != nil {
 		return &GetWxaCodeUnlimitResponse{

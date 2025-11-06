@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/bytedance/sonic"
 	"resty.dev/v3"
 )
 
@@ -31,11 +32,18 @@ type GenerateSchemeResponse struct {
 // POST https://api.weixin.qq.com/wxa/generatescheme?access_token=ACCESS_TOKEN
 // BODY {"jump_wxa":{"path":"/pages/index/index","query":"id=1&age=18"}}
 func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateSchemeRequest) (*GenerateSchemeResponse, error) {
+	reqBody, err := sonic.Marshal(req)
+	if err != nil {
+		return &GenerateSchemeResponse{
+			Errcode: 400,
+			Errmsg:  err.Error(),
+		}, err
+	}
 	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"access_token": accessToken,
 		}).
-		SetBody(req).
+		SetBody(string(reqBody)).
 		SetResult(&GenerateSchemeResponse{}).
 		SetForceResponseContentType("application/json").
 		Post("/wxa/generatescheme")
