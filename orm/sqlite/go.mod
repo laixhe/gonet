@@ -7,7 +7,7 @@ replace github.com/laixhe/gonet/orm/orm => ../orm
 require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/laixhe/gonet/orm/orm v0.0.0-00010101000000-000000000000
-	gorm.io/gorm v1.31.0
+	gorm.io/gorm v1.31.1
 )
 
 require (

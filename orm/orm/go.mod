@@ -2,7 +2,7 @@ module github.com/laixhe/gonet/orm/orm
 
 go 1.24
 
-require gorm.io/gorm v1.31.0
+require gorm.io/gorm v1.31.1
 
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
