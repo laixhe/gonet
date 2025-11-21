@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/orm/orm
 
-go 1.24
+go 1.25
 
 require gorm.io/gorm v1.31.1
 

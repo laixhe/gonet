@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/mongo
 
-go 1.24
+go 1.25
 
 require go.mongodb.org/mongo-driver/v2 v2.4.0
 

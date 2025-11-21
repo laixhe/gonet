@@ -1,6 +1,6 @@
-module github.com/laixhe/gonet/grpc
+module github.com/laixhe/gonet/xgrpc
 
-go 1.24
+go 1.25
 
 require (
 	go.etcd.io/etcd/api/v3 v3.6.6

@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/orm/postgres
 
-go 1.24
+go 1.25
 
 replace github.com/laixhe/gonet/orm/orm => ../orm
 

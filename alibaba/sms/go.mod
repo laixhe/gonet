@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/alibaba/sms
 
-go 1.24
+go 1.25
 
 require (
 	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.13

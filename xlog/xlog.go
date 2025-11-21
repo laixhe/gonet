@@ -1,8 +1,7 @@
-package log
+package xlog
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"time"
 
@@ -79,30 +78,30 @@ func (c *Config) Check() error {
 	return nil
 }
 
-type ZapClient struct {
+type LogClient struct {
 	config      *Config
 	logger      *zap.Logger
 	sugarLogger *zap.SugaredLogger
 }
 
-func (zc *ZapClient) Logger() *zap.Logger {
-	return zc.logger
+func (c *LogClient) Logger() *zap.Logger {
+	return c.logger
 }
 
-func (zc *ZapClient) SugaredLogger() *zap.SugaredLogger {
-	return zc.sugarLogger
+func (c *LogClient) SugaredLogger() *zap.SugaredLogger {
+	return c.sugarLogger
 }
 
-func (zc *ZapClient) Level() string {
-	return zc.config.Level
+func (c *LogClient) Level() string {
+	return c.config.Level
 }
 
 // Init 初始日志
-func Init(config *Config) (*ZapClient, error) {
+func Init(config *Config) (*LogClient, error) {
 	if err := config.Check(); err != nil {
 		return nil, err
 	}
-	client := &ZapClient{
+	client := &LogClient{
 		config: config,
 	}
 	if config.Run == RunTypeFile {
@@ -113,28 +112,28 @@ func Init(config *Config) (*ZapClient, error) {
 	return client, nil
 }
 
-// initSizeFile 初始 zap 日志，按大小切割和备份个数、文件有效期
-func initSizeFile(zc *ZapClient) {
+// initSizeFile 初始文件日志，按大小切割和备份个数、文件有效期
+func initSizeFile(c *LogClient) {
 	// 日志分割
 	hook := &lumberjack.Logger{
-		Filename:   zc.config.Path, // 日志文件路径，默认 os.TempDir()
-		MaxSize:    zc.config.MaxSize,
-		MaxBackups: zc.config.MaxBackups,
-		MaxAge:     zc.config.MaxAge,
+		Filename:   c.config.Path, // 日志文件路径，默认 os.TempDir()
+		MaxSize:    c.config.MaxSize,
+		MaxBackups: c.config.MaxBackups,
+		MaxAge:     c.config.MaxAge,
 		Compress:   false,
 	}
 	// 打印到文件
 	write := zapcore.AddSync(hook)
-	// 初始 zap 日志
-	zapInit(zc, write)
+	// 初始日志
+	zapInit(c, write)
 }
 
-// initConsole 初始 zap 日志，输出到终端
-func initConsole(zc *ZapClient) {
+// initConsole 初始终端日志，输出到终端
+func initConsole(c *LogClient) {
 	// 打印到控制台
 	write := zapcore.AddSync(os.Stdout)
-	// 初始 zap 日志
-	zapInit(zc, write)
+	// 初始日志
+	zapInit(c, write)
 }
 
 // zapInit 初始化 zap 基本信息
@@ -142,10 +141,10 @@ func initConsole(zc *ZapClient) {
 // serviceName 服务名
 // logLevel    日志级别
 // callerSkip 提升的堆栈帧数，0=当前函数，1=上一层函数，....
-func zapInit(zc *ZapClient, write zapcore.WriteSyncer) {
+func zapInit(c *LogClient, write zapcore.WriteSyncer) {
 	// 设置日志级别
 	var level zapcore.Level
-	switch zc.config.Level {
+	switch c.config.Level {
 	case LevelTypeDebug:
 		level = zap.DebugLevel
 	case LevelTypeInfo:
@@ -177,18 +176,19 @@ func zapInit(zc *ZapClient, write zapcore.WriteSyncer) {
 		write,
 		level,
 	)
+	zapOptions := make([]zap.Option, 0, 5)
 	// 开启开发模式，堆栈跟踪
-	caller := zap.AddCaller()
-	// 提升打印的堆栈帧数
-	addCallerSkip := zap.AddCallerSkip(zc.config.CallerSkip + 1)
+	zapOptions = append(zapOptions, zap.Development())
 	// 开启文件及行号
-	development := zap.Development()
+	zapOptions = append(zapOptions, zap.AddCaller())
+	// 提升打印的堆栈帧数
+	zapOptions = append(zapOptions, zap.AddCallerSkip(c.config.CallerSkip+1))
 	// 添加字段-服务器名称
-	//filed := zap.Fields(zap.String("service", serviceName))
+	// zapOptions = append(zapOptions, zap.Fields(zap.String("service", serviceName)))
 	// 构造日志
-	//client.logger = zap.New(core, caller, addCallerSkip, development, filed)
-	zc.logger = zap.New(core, caller, addCallerSkip, development)
-	zc.sugarLogger = zc.logger.Sugar()
+	//client.logger = zap.New(core, zapOptions...)
+	c.logger = zap.New(core, zapOptions...)
+	c.sugarLogger = c.logger.Sugar()
 }
 
 // zapTimeEncoder 日志时间格式
@@ -197,46 +197,46 @@ func zapTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 }
 
 // Debug 调试
-func (zc *ZapClient) Debug(msg string, args ...zap.Field) {
-	zc.logger.Debug(msg, args...)
+func (c *LogClient) Debug(msg string, args ...zap.Field) {
+	c.logger.Debug(msg, args...)
 }
 
 // Debugf 调试
-func (zc *ZapClient) Debugf(template string, args ...interface{}) {
-	zc.sugarLogger.Debugf(template, args...)
+func (c *LogClient) Debugf(template string, args ...interface{}) {
+	c.sugarLogger.Debugf(template, args...)
 }
 
 // Info 信息
-func (zc *ZapClient) Info(msg string, args ...zap.Field) {
-	zc.logger.Info(msg, args...)
+func (c *LogClient) Info(msg string, args ...zap.Field) {
+	c.logger.Info(msg, args...)
 }
 
 // Infof 信息
-func (zc *ZapClient) Infof(template string, args ...interface{}) {
-	zc.sugarLogger.Infof(template, args...)
+func (c *LogClient) Infof(template string, args ...interface{}) {
+	c.sugarLogger.Infof(template, args...)
 }
 
 // Warn 警告
-func (zc *ZapClient) Warn(msg string, args ...zap.Field) {
-	zc.logger.Warn(msg, args...)
+func (c *LogClient) Warn(msg string, args ...zap.Field) {
+	c.logger.Warn(msg, args...)
 }
 
 // Warnf 警告
-func (zc *ZapClient) Warnf(template string, args ...interface{}) {
-	zc.sugarLogger.Warnf(template, args...)
+func (c *LogClient) Warnf(template string, args ...interface{}) {
+	c.sugarLogger.Warnf(template, args...)
 }
 
 // Error 错误
-func (zc *ZapClient) Error(msg string, args ...zap.Field) {
-	zc.logger.Error(msg, args...)
+func (c *LogClient) Error(msg string, args ...zap.Field) {
+	c.logger.Error(msg, args...)
 }
 
 // Errorf 错误
-func (zc *ZapClient) Errorf(template string, args ...interface{}) {
-	zc.sugarLogger.Errorf(template, args...)
+func (c *LogClient) Errorf(template string, args ...interface{}) {
+	c.sugarLogger.Errorf(template, args...)
 }
 
 // Print 打印
-func (zc *ZapClient) Printf(template string, args ...interface{}) {
-	zc.logger.Debug(fmt.Sprintf(template, args...))
+func (c *LogClient) Printf(template string, args ...interface{}) {
+	c.sugarLogger.Debugf(template, args...)
 }
