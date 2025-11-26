@@ -9,27 +9,37 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/gofiber/fiber/v3/middleware/cors"
-	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/gofiber/fiber/v3/middleware/requestid"
+	"go.uber.org/zap"
 )
 
 const RequestIdLogKey = "requestId"
 
 type Server struct {
-	app *fiber.App
+	logger *zap.Logger
+	app    *fiber.App
 }
 
-func New(config ...fiber.Config) *Server {
+func New(logger *zap.Logger, config ...fiber.Config) *Server {
 	if len(config) == 0 {
 		config = []fiber.Config{{}}
 	}
 	if config[0].ErrorHandler == nil {
 		config[0].ErrorHandler = ErrorHandlerDefault()
 	}
-	return &Server{
-		app: fiber.New(config...),
+	s := &Server{
+		logger: logger,
+		app:    fiber.New(config...),
 	}
+	s.useRequestId()
+	s.useLog()
+	// 替换默认日志
+	log.SetLogger(contribZap.NewLogger(contribZap.LoggerConfig{
+		ExtraKeys: []string{RequestIdLogKey},
+		SetLogger: logger,
+	}))
+	return s
 }
 
 func (s *Server) App() *fiber.App {
@@ -48,8 +58,8 @@ func (s *Server) UseCors(config ...cors.Config) *Server {
 	return s
 }
 
-// UseRequestId 中间件-请求ID
-func (s *Server) UseRequestId() *Server {
+// useRequestId 中间件-请求ID
+func (s *Server) useRequestId() *Server {
 	s.app.Use(requestid.New())
 	s.app.Use(func(ctx fiber.Ctx) error {
 		newCtx := context.WithValue(ctx.Context(), RequestIdLogKey, ctx.GetRespHeader(fiber.HeaderXRequestID))
@@ -59,28 +69,19 @@ func (s *Server) UseRequestId() *Server {
 	return s
 }
 
-// UseLog 中间件-日志
-func (s *Server) UseLog(config ...logger.Config) *Server {
-	s.app.Use(logger.New(config...))
-	return s
-}
-
-// UseLogZap 中间件-日志
-func (s *Server) UseLogZap(config ...contribZap.Config) *Server {
-	if len(config) == 0 {
-		config = []contribZap.Config{{}}
+// useLog 中间件-日志
+func (s *Server) useLog() *Server {
+	config := contribZap.Config{
+		Logger: s.logger,
+		Fields: []string{"ip", "latency", "status", RequestIdLogKey, "method", "url", "body"},
+		FieldsFunc: func(ctx fiber.Ctx) []zap.Field {
+			fields := make([]zap.Field, 0, 2)
+			fields = append(fields, zap.String("contentType", ctx.Get(fiber.HeaderContentType)))
+			fields = append(fields, zap.String("authorization", ctx.Get(fiber.HeaderAuthorization)))
+			return fields
+		},
 	}
-	if len(config[0].Fields) == 0 {
-		config[0].Fields = []string{"ip", "latency", "status", RequestIdLogKey, "method", "url"}
-	}
-	if config[0].Logger != nil {
-		// 替换默认日志
-		log.SetLogger(contribZap.NewLogger(contribZap.LoggerConfig{
-			ExtraKeys: []string{RequestIdLogKey},
-			SetLogger: config[0].Logger,
-		}))
-	}
-	s.app.Use(contribZap.New(config[0]))
+	s.app.Use(contribZap.New(config))
 	return s
 }
 
