@@ -17,8 +17,9 @@ import (
 const RequestIdLogKey = "requestId"
 
 type Server struct {
-	logger *zap.Logger
-	app    *fiber.App
+	logger       *zap.Logger
+	loggerConfig *contribZap.LoggerConfig
+	app          *fiber.App
 }
 
 func New(logger *zap.Logger, config ...fiber.Config) *Server {
@@ -28,22 +29,29 @@ func New(logger *zap.Logger, config ...fiber.Config) *Server {
 	if config[0].ErrorHandler == nil {
 		config[0].ErrorHandler = ErrorHandlerDefault()
 	}
+	// 默认日志
+	loggerConfig := contribZap.NewLogger(contribZap.LoggerConfig{
+		ExtraKeys: []string{RequestIdLogKey},
+		SetLogger: logger,
+	})
 	s := &Server{
-		logger: logger,
-		app:    fiber.New(config...),
+		logger:       logger,
+		loggerConfig: loggerConfig,
+		app:          fiber.New(config...),
 	}
 	s.useRequestId()
 	s.useLog()
 	// 替换默认日志
-	log.SetLogger[*zap.Logger](contribZap.NewLogger(contribZap.LoggerConfig{
-		ExtraKeys: []string{RequestIdLogKey},
-		SetLogger: logger,
-	}))
+	log.SetLogger[*zap.Logger](loggerConfig)
 	return s
 }
 
 func (s *Server) App() *fiber.App {
 	return s.app
+}
+
+func (s *Server) LoggerConfig() *contribZap.LoggerConfig {
+	return s.loggerConfig
 }
 
 // UseRecover 中间件-恢复panic
