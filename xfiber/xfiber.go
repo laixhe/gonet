@@ -35,7 +35,7 @@ func New(logger *zap.Logger, config ...fiber.Config) *Server {
 	s.useRequestId()
 	s.useLog()
 	// 替换默认日志
-	log.SetLogger(contribZap.NewLogger(contribZap.LoggerConfig{
+	log.SetLogger[*zap.Logger](contribZap.NewLogger(contribZap.LoggerConfig{
 		ExtraKeys: []string{RequestIdLogKey},
 		SetLogger: logger,
 	}))
@@ -73,11 +73,12 @@ func (s *Server) useRequestId() *Server {
 func (s *Server) useLog() *Server {
 	config := contribZap.Config{
 		Logger: s.logger,
-		Fields: []string{"ip", "latency", "status", RequestIdLogKey, "method", "url", "body"},
+		Fields: []string{"ip", "latency", "status", RequestIdLogKey, "method", "url", "body", "resBody"},
 		FieldsFunc: func(ctx fiber.Ctx) []zap.Field {
-			fields := make([]zap.Field, 0, 2)
-			fields = append(fields, zap.String("contentType", ctx.Get(fiber.HeaderContentType)))
-			fields = append(fields, zap.String("authorization", ctx.Get(fiber.HeaderAuthorization)))
+			fields := []zap.Field{
+				zap.String("contentType", ctx.Get(fiber.HeaderContentType)),
+				zap.String("authorization", ctx.Get(fiber.HeaderAuthorization)),
+			}
 			return fields
 		},
 	}

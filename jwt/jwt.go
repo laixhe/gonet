@@ -23,9 +23,10 @@ var (
 
 // JWT 认证头部
 const (
-	Authorization = "Authorization"
-	Bearer        = "Bearer "
-	BearerLen     = 7
+	Authorization       = "Authorization"
+	Bearer              = "Bearer "
+	BearerLen           = 7
+	AuthorizationClaims = "AuthorizationClaims"
 )
 
 // JWT 签名方法(签名算法)
@@ -35,7 +36,6 @@ const (
 	SigningMethodHS512 = "HS512"
 )
 
-// JWT配置
 type Config struct {
 	// 密钥
 	SecretKey string `json:"secret_key" mapstructure:"secret_key" toml:"secret_key" yaml:"secret_key"`
@@ -60,7 +60,7 @@ func (c *Config) JwtSigningMethod() *jwtv5.SigningMethodHMAC {
 	}
 }
 
-// Checking 检查
+// Check 检查
 func (c *Config) Check() error {
 	if c == nil {
 		return errors.New("没有JWT配置")
@@ -77,7 +77,7 @@ func (c *Config) Check() error {
 	return nil
 }
 
-// 自定义声明类型
+// CustomClaims 自定义声明类型
 // 内嵌 jwt.RegisteredClaims
 // jwt 包自带的 jwt.RegisteredClaims 只包含了官方字段
 type CustomClaims struct {

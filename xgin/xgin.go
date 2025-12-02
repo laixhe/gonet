@@ -67,8 +67,8 @@ func (s *Server) UseCors(config ...cors.Config) *Server {
 // useLog 中间件-日志
 func (s *Server) useLog() *Server {
 	s.app.Use(contribZap.GinzapWithConfig(s.logger, &contribZap.Config{
-		Context: contribZap.Fn(func(ctx *gin.Context) []zapcore.Field {
-			fields := []zapcore.Field{}
+		Context: func(ctx *gin.Context) []zapcore.Field {
+			fields := make([]zapcore.Field, 0, 5)
 			// log X-Request-Id
 			fields = append(fields, zap.String("requestId", requestid.Get(ctx)))
 			// log Content-Type
@@ -79,7 +79,6 @@ func (s *Server) useLog() *Server {
 			fields = append(fields, zap.String("authorization", authorization))
 			// log Body
 			if ctx.Request.Method == http.MethodPost || ctx.Request.Method == http.MethodPut {
-				contentType := ctx.Request.Header.Get("Content-Type")
 				// 如果不是文件上传类型，则读取 body
 				if !strings.Contains(contentType, binding.MIMEMultipartPOSTForm) {
 					// 读取 body 数据
@@ -93,7 +92,7 @@ func (s *Server) useLog() *Server {
 				}
 			}
 			return fields
-		}),
+		},
 	}))
 	return s
 }
@@ -105,15 +104,12 @@ func (s *Server) UseJwt(config *jwt.Config, claims jwtv5.Claims) *Server {
 		if authorization != "" {
 			if strings.HasPrefix(authorization, jwt.Bearer) {
 				claimsToken, err := jwt.ParseToken(config, authorization[jwt.BearerLen:], claims)
-				if err == nil {
-					_ = claimsToken
-					ctx.Next()
-					return
+				if err == nil && claimsToken != nil {
+					ctx.Set(jwt.AuthorizationClaims, claimsToken)
 				}
 			}
 		}
-		// 返回错误
-		ctx.Abort()
+		ctx.Next()
 	})
 	return s
 }
