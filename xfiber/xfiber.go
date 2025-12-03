@@ -81,7 +81,7 @@ func (s *Server) useRequestId() *Server {
 func (s *Server) useLog() *Server {
 	config := contribZap.Config{
 		Logger: s.logger,
-		Fields: []string{"ip", "latency", "status", RequestIdLogKey, "method", "url", "body", "resBody"},
+		Fields: []string{"ip", "latency", "status", RequestIdLogKey, "method", "url", "body"},
 		FieldsFunc: func(ctx fiber.Ctx) []zap.Field {
 			fields := []zap.Field{
 				zap.String("contentType", ctx.Get(fiber.HeaderContentType)),
