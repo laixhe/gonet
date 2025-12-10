@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"os"
 
 	xdraw "golang.org/x/image/draw"
 	"golang.org/x/image/font"
@@ -71,12 +70,7 @@ func Merge(dst draw.Image, src image.Image, x, y int) {
 
 // AddText 添加文字到图片
 // 添加文字到 dst 图片上指定位置 (x, y)，使用指定字体、字体大小和字体颜色
-func AddText(dst *image.RGBA, text string, x, y int, fontSize float64, fontColor color.RGBA, fontPath string) error {
-	// 读取字体文件
-	fontFile, err := os.ReadFile(fontPath)
-	if err != nil {
-		return err
-	}
+func AddText(dst *image.RGBA, text string, x, y int, fontSize float64, fontColor color.RGBA, fontFile []byte) error {
 	// 解析字体
 	fontFileParse, err := opentype.Parse(fontFile)
 	if err != nil {
