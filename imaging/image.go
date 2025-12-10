@@ -12,35 +12,35 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-// 透明
-var Transparent = color.RGBA{0, 0, 0, 0}
+// Transparent 透明
+var Transparent = color.RGBA{R: 0, G: 0, B: 0, A: 0}
 
-// 白色
-var White = color.RGBA{255, 255, 255, 255}
+// White 白色
+var White = color.RGBA{R: 255, G: 255, B: 255, A: 255}
 
-// 黑色
-var Black = color.RGBA{0, 0, 0, 255}
+// Black 黑色
+var Black = color.RGBA{R: 0, G: 0, B: 0, A: 255}
 
-// 红色
-var Red = color.RGBA{255, 0, 0, 255}
+// Red 红色
+var Red = color.RGBA{R: 255, G: 0, B: 0, A: 255}
 
-// 绿色
-var Green = color.RGBA{0, 255, 0, 255}
+// Green 绿色
+var Green = color.RGBA{R: 0, G: 255, B: 0, A: 255}
 
-// 蓝色
-var Blue = color.RGBA{0, 0, 255, 255}
+// Blue 蓝色
+var Blue = color.RGBA{R: 0, G: 0, B: 255, A: 255}
 
-// 黄色
-var Yellow = color.RGBA{255, 255, 0, 255}
+// Yellow 黄色
+var Yellow = color.RGBA{R: 255, G: 255, B: 0, A: 255}
 
-// 青色
-var Cyan = color.RGBA{0, 255, 255, 255}
+// Cyan 青色
+var Cyan = color.RGBA{R: 0, G: 255, B: 255, A: 255}
 
-// 品红色（洋红色）
-var Magenta = color.RGBA{255, 0, 255, 255}
+// Magenta 品红色（洋红色）
+var Magenta = color.RGBA{R: 255, G: 0, B: 255, A: 255}
 
-// 灰色
-var Gray = color.RGBA{128, 128, 128, 255}
+// Gray 灰色
+var Gray = color.RGBA{R: 128, G: 128, B: 128, A: 255}
 
 // Create 创建图像
 // 创建一个指定宽度和高度的 RGBA 图像，可选地填充背景颜色
@@ -48,7 +48,7 @@ func Create(width, height int, rgba ...color.RGBA) *image.RGBA {
 	dst := image.NewRGBA(image.Rect(0, 0, width, height))
 	// 填充背景
 	if len(rgba) > 0 {
-		draw.Draw(dst, dst.Bounds(), &image.Uniform{rgba[0]}, image.Point{}, draw.Src)
+		draw.Draw(dst, dst.Bounds(), &image.Uniform{C: rgba[0]}, image.Point{}, draw.Src)
 	}
 	return dst
 }
@@ -82,7 +82,7 @@ func AddText(dst *image.RGBA, text string, x, y int, fontSize float64, fontColor
 	if err != nil {
 		return err
 	}
-	// 创建字体face
+	// 创建字体 face
 	face, err := opentype.NewFace(fontFileParse, &opentype.FaceOptions{
 		Size: fontSize,
 		DPI:  72,
