@@ -10,6 +10,8 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
+
+	"github.com/laixhe/gonet/utils"
 )
 
 // Transparent 透明
@@ -76,7 +78,7 @@ func Merge(dst draw.Image, src image.Image, x, y int) {
 
 // AddText 添加文字到图片
 // 添加文字到 dst 图片上指定位置 (x, y)，使用指定字体、字体大小和字体颜色
-func AddText(dst *image.RGBA, text string, x, y int, fontSize float64, fontColor color.RGBA, fontFile []byte) error {
+func AddText(dst *image.RGBA, text string, x, y int, fontSize int, fontColor color.RGBA, fontFile []byte) error {
 	// 解析字体
 	fontFileParse, err := opentype.Parse(fontFile)
 	if err != nil {
@@ -84,7 +86,7 @@ func AddText(dst *image.RGBA, text string, x, y int, fontSize float64, fontColor
 	}
 	// 创建字体 face
 	face, err := opentype.NewFace(fontFileParse, &opentype.FaceOptions{
-		Size: fontSize,
+		Size: float64(fontSize),
 		DPI:  72,
 	})
 	if err != nil {
@@ -101,4 +103,14 @@ func AddText(dst *image.RGBA, text string, x, y int, fontSize float64, fontColor
 	// 绘制文字
 	d.DrawString(text)
 	return nil
+}
+
+// TextCenterX 计算文字的水平居中位置（图片 X 轴的位置）
+func TextCenterX(text string, fontSize int, imageWidth int) int {
+	textWidth := len(utils.ExtractEachChineseCharacters(text))*fontSize + len(utils.ExtractNonEachChineseCharacters(text))*fontSize/2
+	x := (imageWidth - textWidth) / 2
+	if x > 30 {
+		x -= 30
+	}
+	return x
 }
