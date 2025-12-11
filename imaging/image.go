@@ -1,6 +1,7 @@
 package imaging
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 	"image/draw"
@@ -40,6 +41,11 @@ var Magenta = color.RGBA{R: 255, G: 0, B: 255, A: 255}
 
 // Gray 灰色
 var Gray = color.RGBA{R: 128, G: 128, B: 128, A: 255}
+
+// DecodeBytes 解析图片
+func DecodeBytes(data []byte) (img image.Image, format string, err error) {
+	return image.Decode(bytes.NewBuffer(data))
+}
 
 // Create 创建图像
 // 创建一个指定宽度和高度的 RGBA 图像，可选地填充背景颜色

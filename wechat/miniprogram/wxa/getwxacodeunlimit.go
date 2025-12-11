@@ -20,9 +20,10 @@ type GetWxaCodeUnlimitRequest struct {
 }
 
 type GetWxaCodeUnlimitResponse struct {
-	Errcode int    `json:"errcode"` // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(40129 scene参数不正确)(41030 page路径不正确)
-	Errmsg  string `json:"errmsg"`  // 错误码，请求失败时返回
-	Buffer  []byte `json:"buffer"`  // 图片 Buffer
+	Errcode     int    `json:"errcode"`      // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(40129 scene参数不正确)(41030 page路径不正确)
+	Errmsg      string `json:"errmsg"`       // 错误码，请求失败时返回
+	ContentType string `json:"content_type"` // 图片响应类型
+	Buffer      []byte `json:"buffer"`       // 图片 Buffer
 }
 
 // GetWxaCodeUnlimit 获取不限制的小程序码(getUnlimitedQRCode)
@@ -54,9 +55,11 @@ func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxa
 	}
 	if httpResp.IsSuccess() {
 		data := httpResp.Bytes()
-		if strings.HasPrefix(httpResp.Header().Get("Content-Type"), "image") {
+		contentType := httpResp.Header().Get("Content-Type")
+		if strings.HasPrefix(contentType, "image") {
 			return &GetWxaCodeUnlimitResponse{
-				Buffer: data,
+				ContentType: contentType,
+				Buffer:      data,
 			}, nil
 		}
 		resp := &GetWxaCodeUnlimitResponse{}
