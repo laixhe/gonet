@@ -107,10 +107,40 @@ func AddText(dst *image.RGBA, text string, x, y int, fontSize int, fontColor col
 
 // TextCenterX 计算文字的水平居中位置（图片 X 轴的位置）
 func TextCenterX(text string, fontSize int, imageWidth int) int {
-	textWidth := len(utils.ExtractEachChineseCharacters(text))*fontSize + len(utils.ExtractNonEachChineseCharacters(text))*fontSize/2
+	eachChineseCharactersLen := len(utils.ExtractEachChineseCharacters(text))
+	nonEachChineseCharactersLen := len(utils.ExtractNonEachChineseCharacters(text))
+	textWidth := eachChineseCharactersLen*fontSize + nonEachChineseCharactersLen*fontSize/2
 	x := (imageWidth - textWidth) / 2
-	if x > 30 {
-		x -= 30
+	if eachChineseCharactersLen > 0 && nonEachChineseCharactersLen == 0 {
+		return x
+	}
+	if nonEachChineseCharactersLen > 0 && eachChineseCharactersLen == 0 {
+		if x > 30 {
+			x -= 30
+		}
+		if nonEachChineseCharactersLen > 30 {
+			if x > 30 {
+				x -= 30
+			}
+		} else if nonEachChineseCharactersLen > 20 {
+			if x > 20 {
+				x -= 20
+			}
+		} else if nonEachChineseCharactersLen >= 14 {
+			if x > 10 {
+				x -= 10
+			}
+		}
+		return x
+	}
+	if fontSize >= 60 {
+		if x > 30 {
+			x -= 30
+		}
+		return x
+	}
+	if x > 20 {
+		x -= 20
 	}
 	return x
 }
