@@ -59,7 +59,7 @@ func StableToken(httpClient *resty.Client, appid string, secret string, forceRef
 		}).
 		SetResult(&TokenResponse{}).
 		SetForceResponseContentType("application/json").
-		Get("/cgi-bin/stable_token")
+		Post("/cgi-bin/stable_token")
 	if err != nil {
 		return &TokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
