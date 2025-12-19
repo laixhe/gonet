@@ -14,8 +14,8 @@ import (
 type Token struct {
 	mutex       *sync.Mutex
 	NetTime     int64  // 最新时间戳
+	ExpiresIn   int64  // 凭证有效时间，单位：秒。目前是 7200 秒之内的值(2个小时)
 	AccessToken string // 获取到的凭证
-	ExpiresIn   int64  // 凭证有效时间，单位：秒。目前是7200秒之内的值(2个小时)
 }
 
 // MiniProgram 微信小程序
@@ -66,18 +66,9 @@ func (wx *MiniProgram) GetAccessToken() (*cgibin.TokenResponse, error) {
 		return nil, err
 	}
 	wx.token.AccessToken = token.AccessToken
-	if token.ExpiresIn > 0 {
-		if token.ExpiresIn >= 7200 {
-			wx.token.ExpiresIn = token.ExpiresIn - 300
-			wx.token.NetTime = time.Now().Unix()
-		} else {
-			wx.token.ExpiresIn = int64(float64(token.ExpiresIn) * 0.8)
-			if wx.token.ExpiresIn < 300 {
-				wx.token.ExpiresIn = 0
-			} else {
-				wx.token.NetTime = time.Now().Unix()
-			}
-		}
+	wx.token.NetTime = time.Now().Unix()
+	if token.ExpiresIn > 300 {
+		wx.token.ExpiresIn = token.ExpiresIn - 300
 	} else {
 		wx.token.ExpiresIn = 0
 	}
