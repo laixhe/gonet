@@ -8,8 +8,8 @@ import (
 )
 
 type AccessTokenResponse struct {
-	Errcode      int    `json:"errcode"`
-	Errmsg       string `json:"errmsg"`
+	ErrCode      int    `json:"errcode"`
+	ErrMsg       string `json:"errmsg"`
 	AccessToken  string `json:"access_token"`  // 接口调用凭证
 	Unionid      string `json:"unionid"`       // 开放平台的唯一标识符
 	Openid       string `json:"openid"`        // 授权用户唯一标识
@@ -35,22 +35,19 @@ func AccessToken(httpClient *resty.Client, appid, secret, code string) (*AccessT
 		SetForceResponseContentType("application/json").
 		Get("/sns/oauth2/access_token")
 	if err != nil {
-		return &AccessTokenResponse{
-			Errcode: httpResp.StatusCode(),
-			Errmsg:  err.Error(),
-		}, err
+		return &AccessTokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
 	if httpResp.IsSuccess() {
 		resp, is := httpResp.Result().(*AccessTokenResponse)
 		if is {
-			if resp.Errcode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
+			if resp.ErrCode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
 			}
 			return resp, nil
 		}
 	}
 	return &AccessTokenResponse{
-		Errcode: httpResp.StatusCode(),
-		Errmsg:  httpResp.String(),
+		ErrCode: httpResp.StatusCode(),
+		ErrMsg:  httpResp.String(),
 	}, errors.New(httpResp.String())
 }

@@ -3,8 +3,8 @@ module github.com/laixhe/gonet/xgrpc
 go 1.25
 
 require (
-	go.etcd.io/etcd/api/v3 v3.6.6
-	go.etcd.io/etcd/client/v3 v3.6.6
+	go.etcd.io/etcd/api/v3 v3.6.7
+	go.etcd.io/etcd/client/v3 v3.6.7
 	google.golang.org/grpc v1.77.0
 )
 
@@ -14,7 +14,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.6.6 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.6.7 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/net v0.46.1-0.20251013234738-63d1a5100f82 // indirect

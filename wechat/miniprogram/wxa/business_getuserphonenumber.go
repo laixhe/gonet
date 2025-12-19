@@ -20,8 +20,8 @@ type GetUserPhoneNumberPhoneInfo struct {
 }
 
 type GetUserPhoneNumberResponse struct {
-	Errcode   int                         `json:"errcode"`    // 错误信息，请求失败时返回(-1 系统繁忙)
-	Errmsg    string                      `json:"errmsg"`     // 错误码，请求失败时返回
+	ErrCode   int                         `json:"errcode"`    // 错误信息，请求失败时返回(-1 系统繁忙)
+	ErrMsg    string                      `json:"errmsg"`     // 错误码，请求失败时返回
 	PhoneInfo GetUserPhoneNumberPhoneInfo `json:"phone_info"` // 用户手机号信息
 }
 
@@ -41,22 +41,19 @@ func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*Ge
 		SetForceResponseContentType("application/json").
 		Post("/wxa/business/getuserphonenumber")
 	if err != nil {
-		return &GetUserPhoneNumberResponse{
-			Errcode: httpResp.StatusCode(),
-			Errmsg:  err.Error(),
-		}, err
+		return &GetUserPhoneNumberResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
 	if httpResp.IsSuccess() {
 		resp, is := httpResp.Result().(*GetUserPhoneNumberResponse)
 		if is {
-			if resp.Errcode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
+			if resp.ErrCode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
 			}
 			return resp, nil
 		}
 	}
 	return &GetUserPhoneNumberResponse{
-		Errcode: httpResp.StatusCode(),
-		Errmsg:  httpResp.String(),
+		ErrCode: httpResp.StatusCode(),
+		ErrMsg:  httpResp.String(),
 	}, errors.New(httpResp.String())
 }

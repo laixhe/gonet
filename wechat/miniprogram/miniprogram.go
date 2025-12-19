@@ -18,20 +18,20 @@ type Token struct {
 	ExpiresIn   int64  // 凭证有效时间，单位：秒。目前是7200秒之内的值(2个小时)
 }
 
-// Miniprogram 微信小程序
-type Miniprogram struct {
+// MiniProgram 微信小程序
+type MiniProgram struct {
 	config     *Config
 	httpClient *resty.Client
 	token      *Token
 }
 
-func NewMiniprogram(config *Config) *Miniprogram {
+func NewMiniProgram(config *Config) *MiniProgram {
 	if err := config.Check(); err != nil {
 		panic(err)
 	}
 	httpClient := resty.New()
 	httpClient.SetBaseURL("https://api.weixin.qq.com")
-	return &Miniprogram{
+	return &MiniProgram{
 		config:     config,
 		httpClient: httpClient,
 		token: &Token{
@@ -41,17 +41,17 @@ func NewMiniprogram(config *Config) *Miniprogram {
 }
 
 // Config 获取配置
-func (wx *Miniprogram) Config() *Config {
+func (wx *MiniProgram) Config() *Config {
 	return wx.config
 }
 
 // Code2Session 小程序登录
-func (wx *Miniprogram) Code2Session(code string) (*sns.Jscode2sessionResponse, error) {
-	return sns.Jscode2session(wx.httpClient, wx.config.AppId, wx.config.Secret, code)
+func (wx *MiniProgram) Code2Session(code string) (*sns.JsCode2SessionResponse, error) {
+	return sns.JsCode2Session(wx.httpClient, wx.config.AppId, wx.config.Secret, code)
 }
 
 // GetAccessToken 获取接口调用凭据
-func (wx *Miniprogram) GetAccessToken() (*cgibin.TokenResponse, error) {
+func (wx *MiniProgram) GetAccessToken() (*cgibin.TokenResponse, error) {
 	wx.token.mutex.Lock()
 	defer wx.token.mutex.Unlock()
 
@@ -61,7 +61,7 @@ func (wx *Miniprogram) GetAccessToken() (*cgibin.TokenResponse, error) {
 			ExpiresIn:   wx.token.ExpiresIn,
 		}, nil
 	}
-	token, err := cgibin.Token(wx.httpClient, wx.config.AppId, wx.config.Secret)
+	token, err := cgibin.StableToken(wx.httpClient, wx.config.AppId, wx.config.Secret, false)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (wx *Miniprogram) GetAccessToken() (*cgibin.TokenResponse, error) {
 }
 
 // GetPhoneNumber 获取手机号
-func (wx *Miniprogram) GetPhoneNumber(code string) (*wxa.GetUserPhoneNumberResponse, error) {
+func (wx *MiniProgram) GetPhoneNumber(code string) (*wxa.GetUserPhoneNumberResponse, error) {
 	getAccessToken, err := wx.GetAccessToken()
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (wx *Miniprogram) GetPhoneNumber(code string) (*wxa.GetUserPhoneNumberRespo
 }
 
 // GenerateScheme 获取加密 scheme 码
-func (wx *Miniprogram) GenerateScheme(req *wxa.GenerateSchemeRequest) (*wxa.GenerateSchemeResponse, error) {
+func (wx *MiniProgram) GenerateScheme(req *wxa.GenerateSchemeRequest) (*wxa.GenerateSchemeResponse, error) {
 	getAccessToken, err := wx.GetAccessToken()
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (wx *Miniprogram) GenerateScheme(req *wxa.GenerateSchemeRequest) (*wxa.Gene
 }
 
 // QueryScheme 查询 scheme 码
-func (wx *Miniprogram) QueryScheme(req *wxa.QuerySchemeRequest) (*wxa.QuerySchemeResponse, error) {
+func (wx *MiniProgram) QueryScheme(req *wxa.QuerySchemeRequest) (*wxa.QuerySchemeResponse, error) {
 	getAccessToken, err := wx.GetAccessToken()
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (wx *Miniprogram) QueryScheme(req *wxa.QuerySchemeRequest) (*wxa.QuerySchem
 }
 
 // GetWxaCodeUnlimit 获取不限制的小程序码
-func (wx *Miniprogram) GetWxaCodeUnlimit(req *wxa.GetWxaCodeUnlimitRequest) (*wxa.GetWxaCodeUnlimitResponse, error) {
+func (wx *MiniProgram) GetWxaCodeUnlimit(req *wxa.GetWxaCodeUnlimitRequest) (*wxa.GetWxaCodeUnlimitResponse, error) {
 	getAccessToken, err := wx.GetAccessToken()
 	if err != nil {
 		return nil, err

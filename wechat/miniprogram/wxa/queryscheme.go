@@ -26,8 +26,8 @@ type QuerySchemeQuotaInfo struct {
 }
 
 type QuerySchemeResponse struct {
-	Errcode    int                  `json:"errcode"`     // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(85403 scheme不存在)
-	Errmsg     string               `json:"errmsg"`      // 错误码，请求失败时返回
+	ErrCode    int                  `json:"errcode"`     // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(85403 scheme不存在)
+	ErrMsg     string               `json:"errmsg"`      // 错误码，请求失败时返回
 	SchemeInfo QuerySchemeInfo      `json:"scheme_info"` // scheme 信息
 	QuotaInfo  QuerySchemeQuotaInfo `json:"quota_info"`  // quota 配置
 }
@@ -46,22 +46,19 @@ func QueryScheme(httpClient *resty.Client, accessToken string, req *QuerySchemeR
 		SetForceResponseContentType("application/json").
 		Post("/wxa/queryscheme")
 	if err != nil {
-		return &QuerySchemeResponse{
-			Errcode: httpResp.StatusCode(),
-			Errmsg:  err.Error(),
-		}, err
+		return &QuerySchemeResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
 	if httpResp.IsSuccess() {
 		resp, is := httpResp.Result().(*QuerySchemeResponse)
 		if is {
-			if resp.Errcode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
+			if resp.ErrCode != 0 {
+				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
 			}
 			return resp, nil
 		}
 	}
 	return &QuerySchemeResponse{
-		Errcode: httpResp.StatusCode(),
-		Errmsg:  httpResp.String(),
+		ErrCode: httpResp.StatusCode(),
+		ErrMsg:  httpResp.String(),
 	}, errors.New(httpResp.String())
 }

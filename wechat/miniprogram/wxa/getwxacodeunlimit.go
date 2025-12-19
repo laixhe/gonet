@@ -20,8 +20,8 @@ type GetWxaCodeUnlimitRequest struct {
 }
 
 type GetWxaCodeUnlimitResponse struct {
-	Errcode     int    `json:"errcode"`      // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(40129 scene参数不正确)(41030 page路径不正确)
-	Errmsg      string `json:"errmsg"`       // 错误码，请求失败时返回
+	ErrCode     int    `json:"errcode"`      // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(40129 scene参数不正确)(41030 page路径不正确)
+	ErrMsg      string `json:"errmsg"`       // 错误码，请求失败时返回
 	ContentType string `json:"content_type"` // 图片响应类型
 	Buffer      []byte `json:"buffer"`       // 图片 Buffer
 }
@@ -37,8 +37,8 @@ func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxa
 	reqBody, err := sonic.Marshal(req)
 	if err != nil {
 		return &GetWxaCodeUnlimitResponse{
-			Errcode: 400,
-			Errmsg:  err.Error(),
+			ErrCode: 400,
+			ErrMsg:  err.Error(),
 		}, err
 	}
 	httpResp, err := httpClient.R().
@@ -48,10 +48,7 @@ func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxa
 		SetBody(string(reqBody)).
 		Post("/wxa/getwxacodeunlimit")
 	if err != nil {
-		return &GetWxaCodeUnlimitResponse{
-			Errcode: httpResp.StatusCode(),
-			Errmsg:  err.Error(),
-		}, err
+		return &GetWxaCodeUnlimitResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
 	if httpResp.IsSuccess() {
 		data := httpResp.Bytes()
@@ -64,13 +61,13 @@ func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxa
 		}
 		resp := &GetWxaCodeUnlimitResponse{}
 		if err = json.Unmarshal(data, resp); err != nil {
-			resp.Errcode = 500
-			resp.Errmsg = err.Error()
+			resp.ErrCode = 500
+			resp.ErrMsg = err.Error()
 		}
-		return resp, fmt.Errorf("%d %s", resp.Errcode, resp.Errmsg)
+		return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
 	}
 	return &GetWxaCodeUnlimitResponse{
-		Errcode: httpResp.StatusCode(),
-		Errmsg:  httpResp.String(),
+		ErrCode: httpResp.StatusCode(),
+		ErrMsg:  httpResp.String(),
 	}, errors.New(httpResp.String())
 }

@@ -2,7 +2,7 @@ package oplatform
 
 import "errors"
 
-// 微信开放平台配置
+// Config 微信开放平台配置
 type Config struct {
 	// 唯一凭证 App ID
 	AppId string `json:"app_id" mapstructure:"appid" toml:"appid" yaml:"appid"`
