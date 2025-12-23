@@ -2,7 +2,7 @@ package miniprogram
 
 import "errors"
 
-// 微信小程序配置
+// Config 微信小程序配置
 type Config struct {
 	// 唯一凭证 App ID
 	AppId string `json:"app_id" mapstructure:"appid" toml:"appid" yaml:"appid"`

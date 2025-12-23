@@ -43,8 +43,8 @@ func (s *Server) App() *gin.Engine {
 	return s.app
 }
 
-// UseRecovery 中间件-恢复panic
-func (s *Server) UseRecovery(isZapLog ...bool) *Server {
+// UseRecover 中间件-恢复panic
+func (s *Server) UseRecover(isZapLog ...bool) *Server {
 	if len(isZapLog) > 0 && isZapLog[0] {
 		s.app.Use(contribZap.RecoveryWithZap(s.logger, true))
 	} else {

@@ -18,7 +18,7 @@ func main() {
 	}
 	app := xgin.New(true, logs.Logger()).
 		UseCors().
-		UseRecovery()
+		UseRecover()
 
 	t := app.App().Group("test")
 	t.POST("123", func(ctx *gin.Context) {
