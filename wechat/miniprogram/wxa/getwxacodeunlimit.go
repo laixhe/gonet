@@ -34,6 +34,7 @@ func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxa
 	if req.Width <= 0 {
 		req.Width = 1280
 	}
+	// 原生的 json 会对类似的字符串路径的 / 进行转义，如 {"path": "xxx/xxx/xxx"}
 	reqBody, err := sonic.Marshal(req)
 	if err != nil {
 		return &GetWxaCodeUnlimitResponse{

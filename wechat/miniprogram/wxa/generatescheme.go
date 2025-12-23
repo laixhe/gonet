@@ -32,6 +32,7 @@ type GenerateSchemeResponse struct {
 // POST https://api.weixin.qq.com/wxa/generatescheme?access_token=ACCESS_TOKEN
 // BODY {"jump_wxa":{"path":"/pages/index/index","query":"id=1&age=18"}}
 func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateSchemeRequest) (*GenerateSchemeResponse, error) {
+	// 原生的 json 会对类似的字符串路径的 / 进行转义，如 {"path": "xxx/xxx/xxx"}
 	reqBody, err := sonic.Marshal(req)
 	if err != nil {
 		return &GenerateSchemeResponse{
