@@ -17,6 +17,11 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// ErrorRecoveryFunc 恢复 panic 的回调处理
+var ErrorRecoveryFunc = func(ctx *gin.Context, err any) {
+	ctx.JSON(http.StatusInternalServerError, ServerError())
+}
+
 type Server struct {
 	isDebug bool
 	logger  *zap.Logger
@@ -44,18 +49,18 @@ func (s *Server) App() *gin.Engine {
 }
 
 // UseRecover 中间件-恢复panic
-func (s *Server) UseRecover(recoveryFunc ...gin.RecoveryFunc) *Server {
+func (s *Server) UseRecover(errorFunc ...gin.RecoveryFunc) *Server {
 	if s.logger != nil {
-		if len(recoveryFunc) > 0 {
-			s.app.Use(contribZap.CustomRecoveryWithZap(s.logger, true, recoveryFunc[0]))
+		if len(errorFunc) > 0 {
+			s.app.Use(contribZap.CustomRecoveryWithZap(s.logger, true, errorFunc[0]))
 		} else {
-			s.app.Use(contribZap.RecoveryWithZap(s.logger, true))
+			s.app.Use(contribZap.CustomRecoveryWithZap(s.logger, true, ErrorRecoveryFunc))
 		}
 	} else {
-		if len(recoveryFunc) > 0 {
-			s.app.Use(gin.CustomRecovery(recoveryFunc[0]))
+		if len(errorFunc) > 0 {
+			s.app.Use(gin.CustomRecovery(errorFunc[0]))
 		} else {
-			s.app.Use(gin.Recovery())
+			s.app.Use(gin.CustomRecovery(ErrorRecoveryFunc))
 		}
 	}
 	return s
@@ -123,21 +128,18 @@ func (s *Server) UseJwt(config *jwt.Config, claims jwtv5.Claims) *Server {
 }
 
 // ErrorHandler404 处理所有未找到的路由
-func (s *Server) ErrorHandler404() *Server {
+func (s *Server) ErrorHandler404(error404Func ...gin.HandlerFunc) *Server {
 	s.app.NoRoute(func(ctx *gin.Context) {
-		ctx.JSON(http.StatusNotFound, Error{
-			Code:    http.StatusNotFound,
-			Message: "Not Found",
-		})
+		if len(error404Func) == 0 {
+			ctx.JSON(http.StatusNotFound, Error{
+				Code:    http.StatusNotFound,
+				Message: "Not Found",
+			})
+		} else {
+			error404Func[0](ctx)
+		}
 	})
 	return s
-}
-
-// ErrorRecoveryFunc 恢复 panic 的回调处理
-func (s *Server) ErrorRecoveryFunc() gin.RecoveryFunc {
-	return func(ctx *gin.Context, err any) {
-		ctx.JSON(http.StatusInternalServerError, ServerError())
-	}
 }
 
 // Listen 启动 Http 服务
