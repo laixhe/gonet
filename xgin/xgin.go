@@ -44,11 +44,19 @@ func (s *Server) App() *gin.Engine {
 }
 
 // UseRecover 中间件-恢复panic
-func (s *Server) UseRecover(isZapLog ...bool) *Server {
-	if len(isZapLog) > 0 && isZapLog[0] {
-		s.app.Use(contribZap.RecoveryWithZap(s.logger, true))
+func (s *Server) UseRecover(recoveryFunc ...gin.RecoveryFunc) *Server {
+	if s.logger != nil {
+		if len(recoveryFunc) > 0 {
+			s.app.Use(contribZap.CustomRecoveryWithZap(s.logger, true, recoveryFunc[0]))
+		} else {
+			s.app.Use(contribZap.RecoveryWithZap(s.logger, true))
+		}
 	} else {
-		s.app.Use(gin.Recovery())
+		if len(recoveryFunc) > 0 {
+			s.app.Use(gin.CustomRecovery(recoveryFunc[0]))
+		} else {
+			s.app.Use(gin.Recovery())
+		}
 	}
 	return s
 }
@@ -82,7 +90,7 @@ func (s *Server) useLog() *Server {
 				// 如果不是文件上传类型，则读取 body
 				if !strings.Contains(contentType, binding.MIMEMultipartPOSTForm) {
 					// 读取 body 数据
-					if body, err := io.ReadAll(ctx.Request.Body); err == nil {
+					if body, err := ctx.GetRawData(); err == nil {
 						fields = append(fields, zap.String("body", string(body)))
 						// 重置 body 指针，以便后续处理
 						if len(body) > 0 {
@@ -112,6 +120,24 @@ func (s *Server) UseJwt(config *jwt.Config, claims jwtv5.Claims) *Server {
 		ctx.Next()
 	})
 	return s
+}
+
+// ErrorHandler404 处理所有未找到的路由
+func (s *Server) ErrorHandler404() *Server {
+	s.app.NoRoute(func(ctx *gin.Context) {
+		ctx.JSON(http.StatusNotFound, Error{
+			Code:    http.StatusNotFound,
+			Message: "Not Found",
+		})
+	})
+	return s
+}
+
+// ErrorRecoveryFunc 恢复 panic 的回调处理
+func (s *Server) ErrorRecoveryFunc() gin.RecoveryFunc {
+	return func(ctx *gin.Context, err any) {
+		ctx.JSON(http.StatusInternalServerError, ServerError())
+	}
 }
 
 // Listen 启动 Http 服务

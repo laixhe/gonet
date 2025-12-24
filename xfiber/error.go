@@ -21,7 +21,7 @@ func AuthorizedError(messages ...string) *fiber.Error {
 // ParamError 参数错误
 func ParamError(messages ...string) *fiber.Error {
 	if len(messages) == 0 {
-		return fiber.NewError(fiber.StatusUnprocessableEntity, "参数错误")
+		return fiber.NewError(fiber.StatusUnprocessableEntity, "Param Error")
 	}
 	return fiber.NewError(fiber.StatusUnprocessableEntity, messages[0])
 }
@@ -30,7 +30,7 @@ func ParamError(messages ...string) *fiber.Error {
 func TipError(messages ...string) *fiber.Error {
 	if len(messages) == 0 {
 		return &fiber.Error{
-			Message: "提示错误",
+			Message: "Tip Error",
 			Code:    427,
 		}
 	}
