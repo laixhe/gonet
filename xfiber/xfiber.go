@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// RequestIdLogKey 请求 ID 日志 Key
 const RequestIdLogKey = "requestId"
 
 type Server struct {
@@ -108,15 +109,14 @@ func UseJwt(config ...contribJwt.Config) fiber.Handler {
 // JwtErrorHandler 自定义JWT错误处理
 func JwtErrorHandler(ctx fiber.Ctx, err error) error {
 	log.WithContext(ctx.Context()).
-		Errorf("jwt: %s error: Invalid or expired JWT", ctx.Get(fiber.HeaderAuthorization))
-	return ctx.Status(fiber.StatusUnauthorized).
-		JSON(fiber.NewError(fiber.StatusUnauthorized, "Invalid or expired JWT"))
+		Errorf("jwt: %s error: %v", ctx.Get(fiber.HeaderAuthorization), err)
+	return ctx.Status(fiber.StatusUnauthorized).JSON(AuthorizedError())
 }
 
 // JwtErrorHandlerNext 自定义JWT错误处理
 func JwtErrorHandlerNext(ctx fiber.Ctx, err error) error {
 	log.WithContext(ctx.Context()).
-		Errorf("jwt: %s error: Invalid or expired JWT", ctx.Get(fiber.HeaderAuthorization))
+		Errorf("jwt: %s error: %v", ctx.Get(fiber.HeaderAuthorization), err)
 	return ctx.Next()
 }
 

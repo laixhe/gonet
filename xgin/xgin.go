@@ -75,7 +75,7 @@ func (s *Server) useLog() *Server {
 			contentType := ctx.Request.Header.Get("Content-Type")
 			fields = append(fields, zap.String("contentType", contentType))
 			// log Authorization
-			authorization := ctx.Request.Header.Get("Authorization")
+			authorization := ctx.Request.Header.Get(jwt.Authorization)
 			fields = append(fields, zap.String("authorization", authorization))
 			// log Body
 			if ctx.Request.Method == http.MethodPost || ctx.Request.Method == http.MethodPut {
