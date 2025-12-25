@@ -20,8 +20,8 @@ type GetUserPhoneNumberPhoneInfo struct {
 }
 
 type GetUserPhoneNumberResponse struct {
-	ErrCode   int                         `json:"errcode"`    // 错误信息，请求失败时返回(-1 系统繁忙)
-	ErrMsg    string                      `json:"errmsg"`     // 错误码，请求失败时返回
+	ErrCode   int                         `json:"errcode"`    // 错误码(0 成功)(-1 系统繁忙)(40001 无效access_token)
+	ErrMsg    string                      `json:"errmsg"`     // 错误信息，请求失败时返回
 	PhoneInfo GetUserPhoneNumberPhoneInfo `json:"phone_info"` // 用户手机号信息
 }
 

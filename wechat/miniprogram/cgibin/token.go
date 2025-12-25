@@ -8,8 +8,8 @@ import (
 )
 
 type TokenResponse struct {
-	ErrCode     int    `json:"errcode"`      // 错误信息，请求失败时返回(-1 系统繁忙)(40164 IP白名单)(50004 禁止使用)(50007 账号已冻结)
-	ErrMsg      string `json:"errmsg"`       // 错误码，请求失败时返回
+	ErrCode     int    `json:"errcode"`      // 错误码(0 成功)(-1 系统繁忙)(40164 IP白名单)(50004 禁止使用)(50007 账号已冻结)
+	ErrMsg      string `json:"errmsg"`       // 错误信息，请求失败时返回
 	AccessToken string `json:"access_token"` // 获取到的凭证
 	ExpiresIn   int64  `json:"expires_in"`   // 凭证有效时间，单位：秒。目前是7200秒之内的值(2个小时)
 }

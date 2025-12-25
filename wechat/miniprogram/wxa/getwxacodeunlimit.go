@@ -20,8 +20,8 @@ type GetWxaCodeUnlimitRequest struct {
 }
 
 type GetWxaCodeUnlimitResponse struct {
-	ErrCode     int    `json:"errcode"`      // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(40129 scene参数不正确)(41030 page路径不正确)
-	ErrMsg      string `json:"errmsg"`       // 错误码，请求失败时返回
+	ErrCode     int    `json:"errcode"`      // 错误码(0 成功)(-1 系统繁忙)(40001 无效access_token)(40129 scene参数不正确)(41030 page路径不正确)
+	ErrMsg      string `json:"errmsg"`       // 错误信息，请求失败时返回
 	ContentType string `json:"content_type"` // 图片响应类型
 	Buffer      []byte `json:"buffer"`       // 图片 Buffer
 }

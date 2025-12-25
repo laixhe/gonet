@@ -8,8 +8,8 @@ import (
 )
 
 type AccessTokenResponse struct {
-	ErrCode      int    `json:"errcode"`
-	ErrMsg       string `json:"errmsg"`
+	ErrCode      int    `json:"errcode"`       // 错误码(0 成功)(-1 系统繁忙)
+	ErrMsg       string `json:"errmsg"`        // 错误信息，请求失败时返回
 	AccessToken  string `json:"access_token"`  // 接口调用凭证
 	Unionid      string `json:"unionid"`       // 开放平台的唯一标识符
 	Openid       string `json:"openid"`        // 授权用户唯一标识

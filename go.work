@@ -19,6 +19,7 @@ use (
 	./utils
 	./wechat/miniprogram
 	./wechat/oplatform
+	./wechat/work
 	./xfiber
 	./xgin
 	./xgrpc

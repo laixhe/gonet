@@ -61,18 +61,18 @@ func (wx *MiniProgram) GetAccessToken() (*cgibin.TokenResponse, error) {
 			ExpiresIn:   wx.token.ExpiresIn,
 		}, nil
 	}
-	token, err := cgibin.StableToken(wx.httpClient, wx.config.AppId, wx.config.Secret, false)
+	tokenResp, err := cgibin.StableToken(wx.httpClient, wx.config.AppId, wx.config.Secret, false)
 	if err != nil {
 		return nil, err
 	}
-	wx.token.AccessToken = token.AccessToken
+	wx.token.AccessToken = tokenResp.AccessToken
 	wx.token.NetTime = time.Now().Unix()
-	if token.ExpiresIn > 300 {
-		wx.token.ExpiresIn = token.ExpiresIn - 300
+	if tokenResp.ExpiresIn > 200 {
+		wx.token.ExpiresIn = tokenResp.ExpiresIn - 200
 	} else {
 		wx.token.ExpiresIn = 0
 	}
-	return token, nil
+	return tokenResp, nil
 }
 
 // GetPhoneNumber 获取手机号

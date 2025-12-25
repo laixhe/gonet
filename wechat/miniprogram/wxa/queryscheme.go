@@ -26,8 +26,8 @@ type QuerySchemeQuotaInfo struct {
 }
 
 type QuerySchemeResponse struct {
-	ErrCode    int                  `json:"errcode"`     // 错误信息，请求失败时返回(-1 系统繁忙)(40001 无效access_token)(85403 scheme不存在)
-	ErrMsg     string               `json:"errmsg"`      // 错误码，请求失败时返回
+	ErrCode    int                  `json:"errcode"`     // 错误码(0 成功)(-1 系统繁忙)(40001 无效access_token)(85403 scheme不存在)
+	ErrMsg     string               `json:"errmsg"`      // 错误信息，请求失败时返回
 	SchemeInfo QuerySchemeInfo      `json:"scheme_info"` // scheme 信息
 	QuotaInfo  QuerySchemeQuotaInfo `json:"quota_info"`  // quota 配置
 }
