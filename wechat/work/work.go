@@ -51,7 +51,7 @@ func (w *Work) GetToken() (*cgibin.GetTokenResponse, error) {
 			ExpiresIn:   w.token.ExpiresIn,
 		}, nil
 	}
-	tokenResp, err := cgibin.GetToken(w.httpClient, w.config.Corpid, w.config.Corpid)
+	tokenResp, err := cgibin.GetToken(w.httpClient, w.config.Corpid, w.config.Corpsecret)
 	if err != nil {
 		return nil, err
 	}
@@ -67,27 +67,27 @@ func (w *Work) GetToken() (*cgibin.GetTokenResponse, error) {
 
 // GetUserInfo 获取访问用户身份
 func (w *Work) GetUserInfo(code string) (*cgibin.GetUserInfoResponse, error) {
-	getAccessToken, err := w.GetToken()
+	getToken, err := w.GetToken()
 	if err != nil {
 		return nil, err
 	}
-	return cgibin.GetUserInfo(w.httpClient, getAccessToken.AccessToken, code)
+	return cgibin.GetUserInfo(w.httpClient, getToken.AccessToken, code)
 }
 
 // GetUserDetail 获取访问用户敏感信息
 func (w *Work) GetUserDetail(userTicket string) (*cgibin.GetUserDetailResponse, error) {
-	getAccessToken, err := w.GetToken()
+	getToken, err := w.GetToken()
 	if err != nil {
 		return nil, err
 	}
-	return cgibin.GetUserDetail(w.httpClient, getAccessToken.AccessToken, userTicket)
+	return cgibin.GetUserDetail(w.httpClient, getToken.AccessToken, userTicket)
 }
 
 // UserGet 读取成员
 func (w *Work) UserGet(userid string) (*cgibin.UserGetResponse, error) {
-	getAccessToken, err := w.GetToken()
+	getToken, err := w.GetToken()
 	if err != nil {
 		return nil, err
 	}
-	return cgibin.UserGet(w.httpClient, getAccessToken.AccessToken, userid)
+	return cgibin.UserGet(w.httpClient, getToken.AccessToken, userid)
 }
