@@ -9,7 +9,7 @@ import (
 /*
 jwt:
   # 密钥
-  secret_key: 6Kbj0VFeXYMp60lEyiFoVq4UzqX8Z0GSSfnvTh2VuAQn0oHgQNYexU6yYVTk4xf9
+  secret_key: abcb9f07bfd4eaf7b8a63d9abc
   # 过期时长(单位秒)
   expire_time: 604800
   # 签名方法(签名算法) HS256 HS384 HS512
@@ -67,6 +67,9 @@ func (c *Config) Check() error {
 	}
 	if c.SecretKey == "" {
 		return errors.New("没有JWT密钥配置")
+	}
+	if c.ExpireTime <= 0 {
+		return errors.New("没有JWT过期时长配置")
 	}
 	switch c.SigningMethod {
 	case SigningMethodHS256, SigningMethodHS384, SigningMethodHS512:

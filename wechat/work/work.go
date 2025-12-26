@@ -32,6 +32,9 @@ func NewWork(config *Config) *Work {
 	return &Work{
 		config:     config,
 		httpClient: httpClient,
+		token: &Token{
+			mutex: &sync.Mutex{},
+		},
 	}
 }
 
