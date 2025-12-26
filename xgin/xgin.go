@@ -11,16 +11,10 @@ import (
 	contribZap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	jwtv5 "github.com/golang-jwt/jwt/v5"
 	"github.com/laixhe/gonet/jwt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
-
-// ErrorRecoveryFunc 恢复 panic 的回调处理
-var ErrorRecoveryFunc = func(ctx *gin.Context, err any) {
-	ctx.JSON(http.StatusInternalServerError, ServerError())
-}
 
 type Server struct {
 	isDebug bool
@@ -110,33 +104,16 @@ func (s *Server) useLog() *Server {
 	return s
 }
 
-// UseJwt 中间件-JWT
-func (s *Server) UseJwt(config *jwt.Config, claims jwtv5.Claims) *Server {
-	s.app.Use(func(ctx *gin.Context) {
-		authorization := ctx.Request.Header.Get(jwt.Authorization)
-		if authorization != "" {
-			if strings.HasPrefix(authorization, jwt.Bearer) {
-				claimsToken, err := jwt.ParseToken(config, authorization[jwt.BearerLen:], claims)
-				if err == nil && claimsToken != nil {
-					ctx.Set(jwt.AuthorizationClaims, claimsToken)
-				}
-			}
-		}
-		ctx.Next()
-	})
-	return s
-}
-
-// ErrorHandler404 处理所有未找到的路由
-func (s *Server) ErrorHandler404(error404Func ...gin.HandlerFunc) *Server {
+// Handlers404Error 处理所有未找到的路由
+func (s *Server) Handlers404Error(errorFunc ...gin.HandlerFunc) *Server {
 	s.app.NoRoute(func(ctx *gin.Context) {
-		if len(error404Func) == 0 {
+		if len(errorFunc) == 0 {
 			ctx.JSON(http.StatusNotFound, Error{
 				Code:    http.StatusNotFound,
 				Message: "Not Found",
 			})
 		} else {
-			error404Func[0](ctx)
+			errorFunc[0](ctx)
 		}
 	})
 	return s

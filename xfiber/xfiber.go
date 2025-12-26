@@ -2,9 +2,7 @@ package xfiber
 
 import (
 	"context"
-	"errors"
 
-	contribJwt "github.com/gofiber/contrib/v3/jwt"
 	contribZap "github.com/gofiber/contrib/v3/zap"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
@@ -28,7 +26,7 @@ func New(logger *zap.Logger, config ...fiber.Config) *Server {
 		config = []fiber.Config{{}}
 	}
 	if config[0].ErrorHandler == nil {
-		config[0].ErrorHandler = ErrorHandlerDefault()
+		config[0].ErrorHandler = DefaultErrorHandler()
 	}
 	// 默认日志
 	loggerConfig := contribZap.NewLogger(contribZap.LoggerConfig{
@@ -93,46 +91,6 @@ func (s *Server) useLog() *Server {
 	}
 	s.app.Use(contribZap.New(config))
 	return s
-}
-
-// UseJwt 中间件-JWT
-func UseJwt(config ...contribJwt.Config) fiber.Handler {
-	if len(config) == 0 {
-		config = []contribJwt.Config{{}}
-	}
-	if config[0].ErrorHandler == nil {
-		config[0].ErrorHandler = JwtErrorHandler
-	}
-	return contribJwt.New(config[0])
-}
-
-// JwtErrorHandler 自定义JWT错误处理
-func JwtErrorHandler(ctx fiber.Ctx, err error) error {
-	log.WithContext(ctx.Context()).
-		Errorf("jwt: %s error: %v", ctx.Get(fiber.HeaderAuthorization), err)
-	return ctx.Status(fiber.StatusUnauthorized).JSON(AuthorizedError())
-}
-
-// JwtErrorHandlerNext 自定义JWT错误处理
-func JwtErrorHandlerNext(ctx fiber.Ctx, err error) error {
-	log.WithContext(ctx.Context()).
-		Errorf("jwt: %s error: %v", ctx.Get(fiber.HeaderAuthorization), err)
-	return ctx.Next()
-}
-
-// ErrorHandlerDefault 默认错误处理
-func ErrorHandlerDefault() fiber.ErrorHandler {
-	return func(ctx fiber.Ctx, err error) error {
-		code := fiber.StatusInternalServerError
-		var errType *fiber.Error
-		switch {
-		case errors.As(err, &errType):
-			code = errType.Code
-		default:
-			err = fiber.NewError(code, err.Error())
-		}
-		return ctx.Status(code).JSON(err)
-	}
 }
 
 // Listen 启动 Http 服务

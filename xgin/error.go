@@ -1,6 +1,15 @@
 package xgin
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+// ErrorRecoveryFunc 错误恢复函数
+var ErrorRecoveryFunc = func(ctx *gin.Context, err any) {
+	ctx.JSON(http.StatusInternalServerError, ServerError())
+}
 
 type Error struct {
 	Code    int    `json:"code"`
