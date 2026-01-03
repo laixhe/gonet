@@ -90,9 +90,10 @@ func (s *Server) useLog() *Server {
 				if !strings.Contains(contentType, binding.MIMEMultipartPOSTForm) {
 					// 读取 body 数据
 					if body, err := ctx.GetRawData(); err == nil {
-						fields = append(fields, zap.String("body", string(body)))
-						// 重置 body 指针，以便后续处理
 						if len(body) > 0 {
+							fields = append(fields, zap.String("body", string(body)))
+							ctx.Set("RequestBody", body)
+							// 重置 body 指针，以便后续处理
 							ctx.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 						}
 					}
