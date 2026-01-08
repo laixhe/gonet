@@ -9,8 +9,8 @@ require (
 	github.com/gin-contrib/requestid v1.0.5
 	github.com/gin-contrib/zap v1.1.6
 	github.com/gin-gonic/gin v1.11.0
-	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/laixhe/gonet/jwt v0.6.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/laixhe/gonet/jwt v0.8.0
 	go.uber.org/zap v1.27.1
 )
 

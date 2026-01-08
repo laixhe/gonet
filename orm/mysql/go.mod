@@ -5,7 +5,7 @@ go 1.25
 replace github.com/laixhe/gonet/orm/orm => ../orm
 
 require (
-	github.com/laixhe/gonet/orm/orm v0.6.0
+	github.com/laixhe/gonet/orm/orm v0.8.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.1
 )
