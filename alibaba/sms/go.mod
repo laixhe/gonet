@@ -3,9 +3,9 @@ module github.com/laixhe/gonet/alibaba/sms
 go 1.25
 
 require (
-	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.13
-	github.com/alibabacloud-go/dysmsapi-20170525/v5 v5.3.1
-	github.com/alibabacloud-go/tea v1.3.14
+	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.14
+	github.com/alibabacloud-go/dysmsapi-20170525/v5 v5.4.0
+	github.com/alibabacloud-go/tea v1.4.0
 )
 
 require (
