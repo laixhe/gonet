@@ -15,7 +15,7 @@ type TokenResponse struct {
 }
 
 // Token 获取接口调用凭据(getAccessToken)
-// DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-access-token/getAccessToken.html
+// DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-access-token/api_getaccesstoken.html
 // GET https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
 func Token(httpClient *resty.Client, appid, secret string) (*TokenResponse, error) {
 	httpResp, err := httpClient.R().
@@ -46,7 +46,7 @@ func Token(httpClient *resty.Client, appid, secret string) (*TokenResponse, erro
 }
 
 // StableToken 获取稳定版接口调用凭据
-// DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-access-token/getStableAccessToken.html
+// DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-access-token/api_getstableaccesstoken.html
 // POST https://api.weixin.qq.com/cgi-bin/stable_token
 // BODY {"grant_type":"client_credential","appid":"APPID","secret":"APPSECRET","force_refresh":false}
 func StableToken(httpClient *resty.Client, appid string, secret string, forceRefresh bool) (*TokenResponse, error) {

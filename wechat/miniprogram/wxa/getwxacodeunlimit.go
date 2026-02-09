@@ -27,14 +27,15 @@ type GetWxaCodeUnlimitResponse struct {
 }
 
 // GetWxaCodeUnlimit 获取不限制的小程序码(getUnlimitedQRCode)
-// DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getUnlimitedQRCode.html
+// DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/qr-code/api_getunlimitedqrcode.html
 // POST https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=ACCESS_TOKEN
-// BODY {"page":"xxx","scene":"xxx","width":1280}
+// BODY {"page":"pages/index/index","scene":"id=1&age=18","width":1280}  普通例子
+// BODY {"page":"","scene":"wxcomponent","width":1280,"is_hyaline":true} 主页例子
 func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxaCodeUnlimitRequest) (*GetWxaCodeUnlimitResponse, error) {
 	if req.Width <= 0 {
 		req.Width = 1280
 	}
-	// 原生的 json 会对类似的字符串路径的 / 进行转义，如 {"path": "xxx/xxx/xxx"}
+	// 原生的 encoding/json 会对字符串中的 / 进行转义，如 {"path": "pages/index/index"}
 	reqBody, err := sonic.Marshal(req)
 	if err != nil {
 		return &GetWxaCodeUnlimitResponse{

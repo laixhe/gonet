@@ -26,7 +26,7 @@ type GetUserPhoneNumberResponse struct {
 }
 
 // GetUserPhoneNumber 获取手机号(getPhoneNumber)
-// DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html
+// DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/user-info/phone-number/api_getphonenumber.html
 // POST https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=ACCESS_TOKEN
 // BODY {"code":"XXX"}
 func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*GetUserPhoneNumberResponse, error) {

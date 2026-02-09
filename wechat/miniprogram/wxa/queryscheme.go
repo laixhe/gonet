@@ -33,7 +33,7 @@ type QuerySchemeResponse struct {
 }
 
 // QueryScheme 查询 scheme 码(queryScheme)
-// DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/queryScheme.html
+// DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/url-scheme/api_queryscheme.html
 // POST https://api.weixin.qq.com/wxa/queryscheme?access_token=ACCESS_TOKEN
 // BODY {"scheme":"xxx"}
 func QueryScheme(httpClient *resty.Client, accessToken string, req *QuerySchemeRequest) (*QuerySchemeResponse, error) {

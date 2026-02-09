@@ -17,8 +17,8 @@ type JsCode2SessionResponse struct {
 
 // JsCode2Session 小程序登录
 // 通过 code 获取 openid
-// DOC https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/code2Session.html
-// GET https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
+// DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/user-login/api_code2session.html
+// GET https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JS_CODE&grant_type=GRANT_TYPE
 func JsCode2Session(httpClient *resty.Client, appid, secret, code string) (*JsCode2SessionResponse, error) {
 	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
