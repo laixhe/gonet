@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/rand"
+	"io"
 	"math/big"
 )
 
@@ -13,4 +14,13 @@ func RandInt64(min, max int64) int64 {
 	result, _ := rand.Int(rand.Reader, big.NewInt(max-min))
 	data := result.Int64() + min
 	return data
+}
+
+// RandBytes 随机生成 n 个字节
+func RandBytes(n int) ([]byte, error) {
+	data := make([]byte, n)
+	if _, err := io.ReadFull(rand.Reader, data); err != nil {
+		return nil, err
+	}
+	return data, nil
 }

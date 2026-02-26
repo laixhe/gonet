@@ -3,7 +3,7 @@ module github.com/laixhe/gonet/alibaba/imagesearch
 go 1.25
 
 require (
-	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.14
+	github.com/alibabacloud-go/darabonba-openapi/v2 v2.1.15
 	github.com/alibabacloud-go/imagesearch-20201214/v4 v4.2.3
 	github.com/alibabacloud-go/tea v1.4.0
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.9
