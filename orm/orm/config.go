@@ -31,13 +31,13 @@ const (
 	DriverSqlite     = "sqlite"
 )
 
-// 数据库配置
+// Config 数据库配置
 type Config struct {
 	// 驱动名称 mysql postgresql sqlite
 	Driver string `json:"driver" mapstructure:"driver" toml:"driver" yaml:"driver"`
 	// 连接地址
 	Dsn string `json:"dsn" mapstructure:"dsn" toml:"dsn" yaml:"dsn"`
-	// 模式(postgresql专用)
+	// 模式( PostgreSQL 专用)
 	Schema string `json:"schema" mapstructure:"schema" toml:"schema" yaml:"schema"`
 	// 设置空闲连接池中连接的最大数量
 	MaxIdleCount int `json:"max_idle_count" mapstructure:"max_idle_count" toml:"max_idle_count" yaml:"max_idle_count"`
@@ -65,7 +65,7 @@ func (c *Config) Check() error {
 	return nil
 }
 
-func (c *Config) SetLog(writer logger.Writer, requestid string) logger.Interface {
+func (c *Config) SetLog(writer logger.Writer, requestId string) logger.Interface {
 	logLevel := logger.Info
 	if c.LogLevel == logger.Silent ||
 		c.LogLevel == logger.Error ||
@@ -73,11 +73,11 @@ func (c *Config) SetLog(writer logger.Writer, requestid string) logger.Interface
 		c.LogLevel == logger.Info {
 		logLevel = c.LogLevel
 	}
-	return NewOrmLogger(writer,
+	return NewLogger(writer,
 		logger.Config{
 			SlowThreshold: 200 * time.Millisecond,
 			LogLevel:      logLevel,
-		}, requestid)
+		}, requestId)
 }
 
 // SetDB 设置数据库连接
