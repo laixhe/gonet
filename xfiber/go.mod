@@ -3,8 +3,8 @@ module github.com/laixhe/gonet/xfiber
 go 1.25
 
 require (
-	github.com/gofiber/contrib/v3/jwt v1.0.0
-	github.com/gofiber/contrib/v3/zap v1.0.0
+	github.com/gofiber/contrib/v3/jwt v1.1.0
+	github.com/gofiber/contrib/v3/zap v1.0.1
 	github.com/gofiber/fiber/v3 v3.1.0
 	go.uber.org/zap v1.27.1
 )
@@ -25,7 +25,7 @@ require (
 	github.com/valyala/fasthttp v1.69.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.48.0 // indirect
-	golang.org/x/net v0.50.0 // indirect
+	golang.org/x/net v0.51.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 )

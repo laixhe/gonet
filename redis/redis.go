@@ -23,7 +23,7 @@ redis:
   min_idle_conn: 5
 */
 
-// Redis配置
+// Config 配置
 type Config struct {
 	// 连接地址(多个地址是以 , 分割)
 	Addr string `json:"addr,omitempty" mapstructure:"addr" toml:"addr" yaml:"addr"`
@@ -37,7 +37,7 @@ type Config struct {
 	MinIdleConn int `json:"min_idle_conn,omitempty" mapstructure:"min_idle_conn" toml:"min_idle_conn" yaml:"min_idle_conn"`
 }
 
-// Checking 检查
+// Check 检查
 func (c *Config) Check() error {
 	if c == nil {
 		return errors.New("没有Redis配置")
@@ -57,14 +57,14 @@ func (c *Config) Check() error {
 	return nil
 }
 
-// RedisClient 客户端
-type RedisClient struct {
+// Client 客户端
+type Client struct {
 	config *Config
 	client redisv9.Cmdable
 }
 
 // Ping 判断服务是否可用
-func (rc *RedisClient) Ping() error {
+func (rc *Client) Ping() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	err := rc.client.Ping(ctx).Err()
@@ -75,7 +75,7 @@ func (rc *RedisClient) Ping() error {
 }
 
 // Client get redis client
-func (rc *RedisClient) Client() redisv9.Cmdable {
+func (rc *Client) Client() redisv9.Cmdable {
 	return rc.client
 }
 
@@ -128,8 +128,8 @@ func initCluster(config *Config) redisv9.Cmdable {
 }
 
 // connect 连接数据库
-func connect(config *Config) (*RedisClient, error) {
-	rc := &RedisClient{
+func connect(config *Config) (*Client, error) {
+	rc := &Client{
 		config: config,
 	}
 	addrs := strings.Split(config.Addr, ",")
@@ -145,7 +145,7 @@ func connect(config *Config) (*RedisClient, error) {
 	return rc, nil
 }
 
-func Init(config *Config) (*RedisClient, error) {
+func Init(config *Config) (*Client, error) {
 	if err := config.Check(); err != nil {
 		return nil, err
 	}
