@@ -2,16 +2,20 @@ package imaging
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
+	"errors"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	"os"
+	"sync"
 
 	xdraw "golang.org/x/image/draw"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
-
-	"github.com/laixhe/gonet/utils"
 )
 
 // Transparent 透明
@@ -44,6 +48,9 @@ var Magenta = color.RGBA{R: 255, G: 0, B: 255, A: 255}
 // Gray 灰色
 var Gray = color.RGBA{R: 128, G: 128, B: 128, A: 255}
 
+// 加载字体
+var fontMap = &sync.Map{}
+
 // DecodeBytes 解析图片
 func DecodeBytes(data []byte) (img image.Image, format string, err error) {
 	return image.Decode(bytes.NewBuffer(data))
@@ -61,12 +68,11 @@ func Create(width, height int, rgba ...color.RGBA) *image.RGBA {
 }
 
 // Resize 缩放图片到指定尺寸
-// 缩放 src 图片到指定的宽度和高度
-func Resize(src image.Image, width, height int) *image.RGBA {
+func Resize(img image.Image, width, height int) *image.RGBA {
 	// 创建目标图像
 	dst := image.NewRGBA(image.Rect(0, 0, width, height))
 	// 使用 NearestNeighbor 算法进行缩放
-	xdraw.NearestNeighbor.Scale(dst, dst.Bounds(), src, src.Bounds(), draw.Over, nil)
+	xdraw.NearestNeighbor.Scale(dst, dst.Bounds(), img, img.Bounds(), draw.Over, nil)
 	return dst
 }
 
@@ -76,71 +82,107 @@ func Merge(dst draw.Image, src image.Image, x, y int) {
 	draw.Draw(dst, dst.Bounds().Add(image.Pt(x, y)), src, src.Bounds().Min, draw.Over)
 }
 
-// AddText 添加文字到图片
-// 添加文字到 dst 图片上指定位置 (x, y)，使用指定字体、字体大小和字体颜色
-func AddText(dst *image.RGBA, text string, x, y int, fontSize int, fontColor color.RGBA, fontFile []byte) error {
-	// 解析字体
-	fontFileParse, err := opentype.Parse(fontFile)
-	if err != nil {
-		return err
-	}
-	// 创建字体 face
-	face, err := opentype.NewFace(fontFileParse, &opentype.FaceOptions{
-		Size: float64(fontSize),
-		DPI:  72,
-	})
-	if err != nil {
-		return err
-	}
-	defer face.Close()
-	// 创建绘图上下文
+// DrawText 绘制文字到图片
+func DrawText(img *image.RGBA, face font.Face, fontColor color.Color, text string, x, y int) {
 	d := &font.Drawer{
-		Dst:  dst,
+		Dst:  img,
 		Src:  image.NewUniform(fontColor),
 		Face: face,
-		Dot:  fixed.Point26_6{X: fixed.Int26_6(x * 64), Y: fixed.Int26_6(y * 64)},
+		Dot: fixed.Point26_6{
+			X: fixed.I(x),
+			Y: fixed.I(y),
+		},
 	}
-	// 绘制文字
 	d.DrawString(text)
-	return nil
 }
 
-// TextCenterX 计算文字的水平居中位置（图片 X 轴的位置）
-func TextCenterX(text string, fontSize int, imageWidth int) int {
-	eachChineseCharactersLen := len(utils.ExtractEachChineseCharacters(text))
-	nonEachChineseCharactersLen := len(utils.ExtractNonEachChineseCharacters(text))
-	textWidth := eachChineseCharactersLen*fontSize + nonEachChineseCharactersLen*fontSize/2
-	x := (imageWidth - textWidth) / 2
-	if eachChineseCharactersLen > 0 && nonEachChineseCharactersLen == 0 {
-		return x
-	}
-	if nonEachChineseCharactersLen > 0 && eachChineseCharactersLen == 0 {
-		if x > 30 {
-			x -= 30
+// TextSplit 分割文本为多行
+func TextSplit(text string, face font.Face, maxWidth int) []string {
+	var lines []string
+	var currentLine string
+
+	textRune := []rune(text)
+	for _, v := range textRune {
+		currentLine += string(v)
+		width := TextWidth(currentLine, face)
+		if width > maxWidth && currentLine != "" {
+			lines = append(lines, currentLine)
+			currentLine = ""
 		}
-		if nonEachChineseCharactersLen > 30 {
-			if x > 30 {
-				x -= 30
-			}
-		} else if nonEachChineseCharactersLen > 20 {
-			if x > 20 {
-				x -= 20
-			}
-		} else if nonEachChineseCharactersLen >= 14 {
-			if x > 10 {
-				x -= 10
-			}
+	}
+	if currentLine != "" {
+		lines = append(lines, currentLine)
+	}
+	return lines
+}
+
+// TextWidth 计算文本宽度
+func TextWidth(text string, face font.Face) int {
+	width := fixed.Int26_6(0)
+	for _, r := range []rune(text) {
+		advance, ok := face.GlyphAdvance(r)
+		if ok {
+			width += advance
 		}
-		return x
 	}
-	if fontSize >= 60 {
-		if x > 30 {
-			x -= 30
+	return width.Ceil()
+}
+
+// FontLoad 加载字体
+func FontLoad(fontPath any, fontSize float64, fontDPI float64) (font.Face, error) {
+	key := ""
+	var fontBytes []byte
+	var err error
+	// 判断字体类型
+	switch fontPath.(type) {
+	case string:
+		fontPathString := fontPath.(string)
+		key = fmt.Sprintf("%s_%f_%f", fontPathString, fontSize, fontDPI)
+		//
+		faceAny, ok := fontMap.Load(key)
+		if ok {
+			return faceAny.(font.Face), nil
 		}
-		return x
+		//
+		fontBytes, err = os.ReadFile(fontPathString)
+		if err != nil {
+			return nil, err
+		}
+	case []byte:
+		fontBytes = fontPath.([]byte)
+		md5Data := md5.Sum(fontBytes)
+		key = fmt.Sprintf("%s_%f_%f", hex.EncodeToString(md5Data[:]), fontSize, fontDPI)
+		//
+		faceAny, ok := fontMap.Load(key)
+		if ok {
+			return faceAny.(font.Face), nil
+		}
+	default:
+		return nil, errors.New("font path not supported")
 	}
-	if x > 20 {
-		x -= 20
+	// 解析字体
+	fontParse, err := opentype.Parse(fontBytes)
+	if err != nil {
+		return nil, err
 	}
-	return x
+	// 创建字体
+	face, err := opentype.NewFace(fontParse, &opentype.FaceOptions{
+		Size: fontSize,
+		DPI:  fontDPI,
+	})
+	fontMap.Store(key, face)
+	return face, nil
+}
+
+// AddText 添加文字到图片
+// 添加文字到图片上指定位置 (x, y)，使用指定字体、字体大小和字体颜色
+func AddText(img *image.RGBA, fontPath any, fontSize float64, fontDPI float64, fontColor color.Color, text string, x, y int) error {
+	// 加载字体
+	face, err := FontLoad(fontPath, fontSize, fontDPI)
+	if err != nil {
+		return err
+	}
+	// 绘制文字到图片
+	DrawText(img, face, fontColor, text, x, y)
+	return nil
 }

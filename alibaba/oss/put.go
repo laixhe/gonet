@@ -7,7 +7,7 @@ import (
 	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 )
 
-// PutFile 简单上传
+// Put 简单上传
 func (oc *OssClient) Put(ctx context.Context, objectName string, body io.Reader, contentType string, acls ...ossv2.ObjectACLType) error {
 	request := &ossv2.PutObjectRequest{
 		Bucket: ossv2.Ptr(oc.config.Bucket), // 存储空间名称
