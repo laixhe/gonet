@@ -1,9 +1,9 @@
 module github.com/laixhe/gonet/alibaba/oss
 
-go 1.25
+go 1.26
 
 require (
-	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.4.0
+	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.4.1
 	github.com/rs/xid v1.6.0
 )
 

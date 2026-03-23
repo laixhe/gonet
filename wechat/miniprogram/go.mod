@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/wechat/miniprogram
 
-go 1.25
+go 1.26
 
 require (
 	github.com/bytedance/sonic v1.15.0

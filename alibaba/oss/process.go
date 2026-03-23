@@ -14,8 +14,13 @@ import (
 // objectName 图片
 // watermarkObjectName 水印图片
 // watermarkWidth 水印宽度
+// watermarkY 水印右下角 Y 位置
+// watermarkX 水印角 X 位置
 // acls 访问权限
-func (oc *OssClient) ProcessImageWatermark(ctx context.Context, objectName string, watermarkObjectName string, watermarkWidth int, acls ...ossv2.ObjectACLType) (string, error) {
+func (oc *OssClient) ProcessImageWatermark(ctx context.Context,
+	objectName string, watermarkObjectName string,
+	watermarkWidth int, watermarkY int, watermarkX int,
+	acls ...ossv2.ObjectACLType) (string, error) {
 	// 处理水印
 	watermarkProcess := watermarkObjectName
 	if watermarkWidth > 0 {
@@ -33,8 +38,8 @@ func (oc *OssClient) ProcessImageWatermark(ctx context.Context, objectName strin
 	}
 	targetBase64 := base64.URLEncoding.EncodeToString([]byte(targetImageName))
 	// 指定处理指令
-	process := fmt.Sprintf("image/auto-orient,1/watermark,image_%s,t_60,g_se,x_20,y_20", watermarkBase64)                      // 水印
-	process += fmt.Sprintf("|sys/saveas,o_%s,b_%s", targetBase64, base64.URLEncoding.EncodeToString([]byte(oc.config.Bucket))) // 存储
+	process := fmt.Sprintf("image/auto-orient,1/watermark,image_%s,t_60,g_se,x_%d,y_%d", watermarkBase64, watermarkY, watermarkX) // 水印
+	process += fmt.Sprintf("|sys/saveas,o_%s,b_%s", targetBase64, base64.URLEncoding.EncodeToString([]byte(oc.config.Bucket)))    // 存储
 	request := &ossv2.ProcessObjectRequest{
 		Bucket:  ossv2.Ptr(oc.config.Bucket),
 		Key:     ossv2.Ptr(objectName),
@@ -45,7 +50,7 @@ func (oc *OssClient) ProcessImageWatermark(ctx context.Context, objectName strin
 		return "", err
 	}
 	if len(acls) > 0 {
-		_ = oc.SetObjectACL(ctx, targetImageName)
+		_ = oc.SetObjectACL(ctx, targetImageName, acls[0])
 	}
 	return targetImageName, nil
 }

@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/xlog
 
-go 1.25
+go 1.26
 
 require (
 	go.uber.org/zap v1.27.1

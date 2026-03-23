@@ -1,13 +1,13 @@
 module github.com/laixhe/gonet/xgin
 
-go 1.25
+go 1.26
 
 replace github.com/laixhe/gonet/jwt => ../jwt
 
 require (
-	github.com/gin-contrib/cors v1.7.6
-	github.com/gin-contrib/requestid v1.0.5
-	github.com/gin-contrib/zap v1.1.6
+	github.com/gin-contrib/cors v1.7.7
+	github.com/gin-contrib/requestid v1.0.6
+	github.com/gin-contrib/zap v1.1.7
 	github.com/gin-gonic/gin v1.12.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/laixhe/gonet/jwt v0.8.0
@@ -40,10 +40,10 @@ require (
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/arch v0.22.0 // indirect
+	golang.org/x/arch v0.23.0 // indirect
 	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/net v0.51.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
