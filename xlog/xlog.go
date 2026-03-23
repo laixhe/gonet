@@ -38,7 +38,6 @@ const (
 	LevelTypeError = "error"
 )
 
-// 日志配置
 type Config struct {
 	// 日志模式 console file
 	Run string `json:"run,omitempty" mapstructure:"run" toml:"run" yaml:"run"`
@@ -56,7 +55,7 @@ type Config struct {
 	CallerSkip int `json:"caller_skip,omitempty" mapstructure:"caller_skip" toml:"caller_skip" yaml:"caller_skip"`
 }
 
-// Checking 检查
+// Check 检查
 func (c *Config) Check() error {
 	if c == nil {
 		return errors.New("没有日志配置")
@@ -96,7 +95,6 @@ func (c *LogClient) Level() string {
 	return c.config.Level
 }
 
-// Init 初始日志
 func Init(config *Config) (*LogClient, error) {
 	if err := config.Check(); err != nil {
 		return nil, err
@@ -236,7 +234,7 @@ func (c *LogClient) Errorf(template string, args ...interface{}) {
 	c.sugarLogger.Errorf(template, args...)
 }
 
-// Print 打印
+// Printf 打印
 func (c *LogClient) Printf(template string, args ...interface{}) {
 	c.sugarLogger.Debugf(template, args...)
 }

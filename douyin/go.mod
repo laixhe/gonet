@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/douyin
 
-go 1.25
+go 1.26
 
 require (
 	github.com/alibabacloud-go/tea v1.4.0

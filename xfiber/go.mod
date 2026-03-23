@@ -1,6 +1,6 @@
 module github.com/laixhe/gonet/xfiber
 
-go 1.25
+go 1.26
 
 require (
 	github.com/gofiber/contrib/v3/jwt v1.1.0
