@@ -5,7 +5,7 @@ go 1.26
 replace github.com/laixhe/gonet/orm/orm => ../orm
 
 require (
-	github.com/laixhe/gonet/orm/orm v0.8.1
+	github.com/laixhe/gonet/orm/orm v0.8.3
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 )
