@@ -1,6 +1,17 @@
 package orm
 
-import "fmt"
+import (
+	"fmt"
+
+	"gorm.io/gorm"
+)
+
+func Model(db *gorm.DB, model any) *gorm.DB {
+	if s, ok := model.(string); ok {
+		return db.Table(s)
+	}
+	return db.Model(model)
+}
 
 // PageParamCheck 检查分页参数
 // page: 当前页

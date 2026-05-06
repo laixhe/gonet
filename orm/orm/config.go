@@ -37,8 +37,6 @@ type Config struct {
 	Driver string `json:"driver" mapstructure:"driver" toml:"driver" yaml:"driver"`
 	// 连接地址
 	Dsn string `json:"dsn" mapstructure:"dsn" toml:"dsn" yaml:"dsn"`
-	// 模式( PostgreSQL 专用)
-	Schema string `json:"schema" mapstructure:"schema" toml:"schema" yaml:"schema"`
 	// 设置空闲连接池中连接的最大数量
 	MaxIdleCount int `json:"max_idle_count" mapstructure:"max_idle_count" toml:"max_idle_count" yaml:"max_idle_count"`
 	// 设置打开数据库连接的最大数量

@@ -1,10 +1,10 @@
 package wxa
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
-	"github.com/bytedance/sonic"
 	"resty.dev/v3"
 )
 
@@ -32,8 +32,8 @@ type GenerateSchemeResponse struct {
 // POST https://api.weixin.qq.com/wxa/generatescheme?access_token=ACCESS_TOKEN
 // BODY {"jump_wxa":{"path":"/pages/index/index","query":"id=1&age=18"}}
 func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateSchemeRequest) (*GenerateSchemeResponse, error) {
-	// 原生的 encoding/json 会对字符串中的 / 进行转义，如 {"path": "/pages/index/index"}
-	reqBody, err := sonic.Marshal(req)
+	// 原生的 resty 会对字符串中的 / 进行转义，如 {"path": "/pages/index/index"}
+	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return &GenerateSchemeResponse{
 			ErrCode: 400,
