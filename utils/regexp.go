@@ -38,19 +38,24 @@ func ExtractNonEachChineseCharacters(s string) []string {
 	return MatchingNonEachChineseCharacters.FindAllString(s, -1)
 }
 
-// MatchingPhone 定义匹配手机号码
-var MatchingPhone = regexp.MustCompile(`1\d{10}`)
+// ChineseMobileMatcher 定义匹配手机号码
+var ChineseMobileMatcher = regexp.MustCompile(`1\d{10}`)
 
-// ObfuscatePhone 隐藏手机号码中间部分
-func ObfuscatePhone(phone string) string {
-	if len(phone) != 11 {
-		return phone
+// ObfuscateMobile 隐藏手机号码中间部分
+func ObfuscateMobile(mobileNum string) string {
+	if len(mobileNum) != 11 {
+		return mobileNum
 	}
-	return phone[:3] + "****" + phone[7:]
+	return mobileNum[:3] + "****" + mobileNum[7:]
 }
 
-// ReplaceObfuscatePhone 替换字符串中的所有手机号为隐藏格式
-func ReplaceObfuscatePhone(text string) string {
+// ReplaceObfuscateMobile 替换字符串中的所有手机号为隐藏格式
+func ReplaceObfuscateMobile(text string) string {
 	// 替换所有匹配项
-	return MatchingPhone.ReplaceAllStringFunc(text, ObfuscatePhone)
+	return ChineseMobileMatcher.ReplaceAllStringFunc(text, ObfuscateMobile)
+}
+
+// IsChineseMobile 是否手机号码
+func IsChineseMobile(mobileNum string) bool {
+	return ChineseMobileMatcher.MatchString(mobileNum)
 }
