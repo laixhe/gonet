@@ -24,7 +24,6 @@ mongodb:
   max_conn_idle_time: 300
 */
 
-// 数据库配置
 type Config struct {
 	// 连接地址
 	Uri string `json:"uri,omitempty" mapstructure:"uri" toml:"uri" yaml:"uri"`
@@ -38,7 +37,6 @@ type Config struct {
 	MaxConnIdleTime int64 `json:"max_conn_idle_time,omitempty" mapstructure:"max_conn_idle_time" toml:"max_conn_idle_time" yaml:"max_conn_idle_time"`
 }
 
-// Checking 检查
 func (c *Config) Check() error {
 	if c == nil {
 		return errors.New("没有Mongo配置")
@@ -52,8 +50,8 @@ func (c *Config) Check() error {
 	return nil
 }
 
-// MongoClient 客户端
-type MongoClient struct {
+// MClient 客户端
+type MClient struct {
 	config          *Config
 	client          *mongov2.Client
 	defaultDatabase *mongov2.Database            // 默认指定的数据库
@@ -61,17 +59,17 @@ type MongoClient struct {
 }
 
 // Ping 判断服务是否可用
-func (mc *MongoClient) Ping() error {
+func (mc *MClient) Ping() error {
 	return mc.client.Ping(context.Background(), readprefv2.Primary())
 }
 
 // Client get mongo client
-func (mc *MongoClient) Client() *mongov2.Client {
+func (mc *MClient) Client() *mongov2.Client {
 	return mc.client
 }
 
 // Database 指定数据库
-func (mc *MongoClient) Database(name string) *mongov2.Database {
+func (mc *MClient) Database(name string) *mongov2.Database {
 	loadDatabase, ok := mc.databaseMap[name]
 	if ok {
 		return loadDatabase
@@ -82,12 +80,12 @@ func (mc *MongoClient) Database(name string) *mongov2.Database {
 }
 
 // Collection 选择集合(表)
-func (mc *MongoClient) Collection(name string) *mongov2.Collection {
+func (mc *MClient) Collection(name string) *mongov2.Collection {
 	return mc.defaultDatabase.Collection(name)
 }
 
 // connect 连接数据库
-func connect(config *Config) (*MongoClient, error) {
+func connect(config *Config) (*MClient, error) {
 	opts := optionsv2.Client()
 	opts.ApplyURI(config.Uri)
 	// 进行配置
@@ -111,7 +109,7 @@ func connect(config *Config) (*MongoClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MongoClient{
+	return &MClient{
 		config:          config,
 		client:          client,
 		defaultDatabase: client.Database(config.Database),
@@ -120,7 +118,7 @@ func connect(config *Config) (*MongoClient, error) {
 }
 
 // Init 初始化数据库
-func Init(config *Config) (*MongoClient, error) {
+func Init(config *Config) (*MClient, error) {
 	if err := config.Check(); err != nil {
 		return nil, err
 	}
