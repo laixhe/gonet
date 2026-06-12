@@ -38,12 +38,12 @@ func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*Ge
 			"code": code,
 		}).
 		SetResult(&GetUserPhoneNumberResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Post("/wxa/business/getuserphonenumber")
 	if err != nil {
 		return &GetUserPhoneNumberResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*GetUserPhoneNumberResponse)
 		if is {
 			if resp.ErrCode != 0 {

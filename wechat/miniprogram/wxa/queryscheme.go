@@ -43,12 +43,12 @@ func QueryScheme(httpClient *resty.Client, accessToken string, req *QuerySchemeR
 		}).
 		SetBody(req).
 		SetResult(&QuerySchemeResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Post("/wxa/queryscheme")
 	if err != nil {
 		return &QuerySchemeResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*QuerySchemeResponse)
 		if is {
 			if resp.ErrCode != 0 {

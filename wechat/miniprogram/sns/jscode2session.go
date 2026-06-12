@@ -28,12 +28,12 @@ func JsCode2Session(httpClient *resty.Client, appid, secret, code string) (*JsCo
 			"grant_type": "authorization_code",
 		}).
 		SetResult(&JsCode2SessionResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Get("/sns/jscode2session")
 	if err != nil {
 		return &JsCode2SessionResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*JsCode2SessionResponse)
 		if is {
 			if resp.ErrCode != 0 {

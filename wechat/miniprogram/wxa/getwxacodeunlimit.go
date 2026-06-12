@@ -51,7 +51,7 @@ func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxa
 	if err != nil {
 		return &GetWxaCodeUnlimitResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		data := httpResp.Bytes()
 		contentType := httpResp.Header().Get("Content-Type")
 		if strings.HasPrefix(contentType, "image") {

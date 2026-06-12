@@ -32,12 +32,12 @@ func AccessToken(httpClient *resty.Client, appid, secret, code string) (*AccessT
 			"grant_type": "authorization_code",
 		}).
 		SetResult(&AccessTokenResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Get("/sns/oauth2/access_token")
 	if err != nil {
 		return &AccessTokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*AccessTokenResponse)
 		if is {
 			if resp.ErrCode != 0 {

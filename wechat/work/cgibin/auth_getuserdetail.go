@@ -33,12 +33,12 @@ func GetUserDetail(httpClient *resty.Client, accessToken, userTicket string) (*G
 			"user_ticket": userTicket,
 		}).
 		SetResult(&GetUserDetailResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Post("/cgi-bin/auth/getuserdetail")
 	if err != nil {
 		return &GetUserDetailResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*GetUserDetailResponse)
 		if is {
 			if resp.ErrCode != 0 {

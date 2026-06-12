@@ -26,12 +26,12 @@ func GetUserInfo(httpClient *resty.Client, accessToken, code string) (*GetUserIn
 			"code":         code,
 		}).
 		SetResult(&GetUserInfoResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Get("/cgi-bin/auth/getuserinfo")
 	if err != nil {
 		return &GetUserInfoResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*GetUserInfoResponse)
 		if is {
 			if resp.ErrCode != 0 {

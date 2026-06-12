@@ -79,12 +79,12 @@ func UserGet(httpClient *resty.Client, accessToken, userid string) (*UserGetResp
 			"userid":       userid,
 		}).
 		SetResult(&UserGetResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Get("/cgi-bin/user/get")
 	if err != nil {
 		return &UserGetResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*UserGetResponse)
 		if is {
 			if resp.ErrCode != 0 {

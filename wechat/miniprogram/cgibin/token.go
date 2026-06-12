@@ -25,12 +25,12 @@ func Token(httpClient *resty.Client, appid, secret string) (*TokenResponse, erro
 			"grant_type": "client_credential",
 		}).
 		SetResult(&TokenResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Get("/cgi-bin/token")
 	if err != nil {
 		return &TokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*TokenResponse)
 		if is {
 			if resp.ErrCode != 0 {
@@ -58,12 +58,12 @@ func StableToken(httpClient *resty.Client, appid string, secret string, forceRef
 			"grant_type":    "client_credential",
 		}).
 		SetResult(&TokenResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Post("/cgi-bin/stable_token")
 	if err != nil {
 		return &TokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*TokenResponse)
 		if is {
 			if resp.ErrCode != 0 {

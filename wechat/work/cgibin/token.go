@@ -24,12 +24,12 @@ func GetToken(httpClient *resty.Client, corpid, corpsecret string) (*GetTokenRes
 			"corpsecret": corpsecret,
 		}).
 		SetResult(&GetTokenResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Get("/cgi-bin/gettoken")
 	if err != nil {
 		return &GetTokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*GetTokenResponse)
 		if is {
 			if resp.ErrCode != 0 {

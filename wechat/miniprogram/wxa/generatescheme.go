@@ -46,12 +46,12 @@ func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateS
 		}).
 		SetBody(string(reqBody)).
 		SetResult(&GenerateSchemeResponse{}).
-		SetForceResponseContentType("application/json").
+		SetResponseForceContentType("application/json").
 		Post("/wxa/generatescheme")
 	if err != nil {
 		return &GenerateSchemeResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsSuccess() {
+	if httpResp.IsStatusSuccess() {
 		resp, is := httpResp.Result().(*GenerateSchemeResponse)
 		if is {
 			if resp.ErrCode != 0 {
