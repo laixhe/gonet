@@ -1,12 +1,15 @@
 package xlog
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"io"
+	"log/slog"
 	"os"
+	"slices"
 	"time"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -45,14 +48,12 @@ type Config struct {
 	Path string `json:"path,omitempty" mapstructure:"path" toml:"path" yaml:"path"`
 	// 日志级别 debug info warn error
 	Level string `json:"level,omitempty" mapstructure:"level" toml:"level" yaml:"level"`
-	// 每个日志文件保存大小 *M
+	// 单个日志文件最大（MB）
 	MaxSize int `json:"max_size,omitempty" mapstructure:"max_size" toml:"max_size" yaml:"max_size"`
-	// 保留 N 个备份
+	// 保留的旧日志文件数
 	MaxBackups int `json:"max_backups,omitempty" mapstructure:"max_backups" toml:"max_backups" yaml:"max_backups"`
-	// 保留 N 天
+	// 保留旧日志文件的最大天数
 	MaxAge int `json:"max_age,omitempty" mapstructure:"max_age" toml:"max_age" yaml:"max_age"`
-	// 堆栈帧数
-	CallerSkip int `json:"caller_skip,omitempty" mapstructure:"caller_skip" toml:"caller_skip" yaml:"caller_skip"`
 }
 
 // Check 检查
@@ -68,173 +69,111 @@ func (c *Config) Check() error {
 			c.Path = "logs.log"
 		}
 	}
-	if !(c.Level == LevelTypeDebug ||
-		c.Level == LevelTypeInfo ||
-		c.Level == LevelTypeWarn ||
-		c.Level == LevelTypeError) {
+	if !slices.Contains([]string{LevelTypeDebug, LevelTypeInfo, LevelTypeWarn, LevelTypeError}, c.Level) {
 		c.Level = LevelTypeDebug
+	}
+	if c.MaxSize <= 0 {
+		c.MaxSize = 3
+	}
+	if c.MaxBackups <= 0 {
+		c.MaxBackups = 3
+	}
+	if c.MaxAge <= 0 {
+		c.MaxAge = 3
 	}
 	return nil
 }
 
-type LogClient struct {
-	config      *Config
-	logger      *zap.Logger
-	sugarLogger *zap.SugaredLogger
+// ContextHandler 包装一个 slog.Handler，在处理日志时自动从 context 中提取元素
+type ContextHandler struct {
+	slog.Handler
+	ContextKey string
 }
 
-func (c *LogClient) Logger() *zap.Logger {
-	return c.logger
-}
-
-func (c *LogClient) SugaredLogger() *zap.SugaredLogger {
-	return c.sugarLogger
-}
-
-func (c *LogClient) Level() string {
-	return c.config.Level
-}
-
-func Init(config *Config) (*LogClient, error) {
-	if err := config.Check(); err != nil {
-		return nil, err
+func (ch *ContextHandler) Handle(ctx context.Context, record slog.Record) error {
+	if ctx != nil {
+		if v, ok := ctx.Value(ch.ContextKey).(string); ok && v != "" {
+			record.AddAttrs(slog.String(ch.ContextKey, v))
+		}
 	}
-	client := &LogClient{
-		config: config,
-	}
-	if config.Run == RunTypeFile {
-		initSizeFile(client)
+	return ch.Handler.Handle(ctx, record)
+}
+
+type LClient struct {
+	config  *Config
+	writer  io.Writer         // 日志写入接口
+	handler *slog.JSONHandler // 配置 slog 格式处理器
+}
+
+func (lc *LClient) Writer() io.Writer {
+	return lc.writer
+}
+
+func (lc *LClient) Handler() *slog.JSONHandler {
+	return lc.handler
+}
+
+func Init(configs ...*Config) *LClient {
+	lc := &LClient{}
+	if len(configs) == 0 {
+		lc.config = &Config{}
 	} else {
-		initConsole(client)
+		lc.config = configs[0]
 	}
-	return client, nil
-}
-
-// initSizeFile 初始文件日志，按大小切割和备份个数、文件有效期
-func initSizeFile(c *LogClient) {
-	// 日志分割
-	hook := &lumberjack.Logger{
-		Filename:   c.config.Path, // 日志文件路径，默认 os.TempDir()
-		MaxSize:    c.config.MaxSize,
-		MaxBackups: c.config.MaxBackups,
-		MaxAge:     c.config.MaxAge,
-		Compress:   false,
+	if lc.config.Run == RunTypeFile {
+		// 日志分割
+		lc.writer = &lumberjack.Logger{
+			Filename:   lc.config.Path,       // 日志文件路径，为空时默认使用 os.TempDir() + 进程名
+			MaxSize:    lc.config.MaxSize,    // 单个日志文件最大（MB）
+			MaxBackups: lc.config.MaxBackups, // 保留的旧日志文件数
+			MaxAge:     lc.config.MaxAge,     // 保留旧日志文件的最大天数
+			LocalTime:  true,                 // 是否使用 本地时间 作为日志文件时间戳，否则使用 UTC 时间
+			Compress:   false,                // 是否对 旧日志进行 gzip 压缩
+		}
+	} else {
+		lc.writer = os.Stdout
 	}
-	// 打印到文件
-	write := zapcore.AddSync(hook)
-	// 初始日志
-	zapInit(c, write)
-}
-
-// initConsole 初始终端日志，输出到终端
-func initConsole(c *LogClient) {
-	// 打印到控制台
-	write := zapcore.AddSync(os.Stdout)
-	// 初始日志
-	zapInit(c, write)
-}
-
-// zapInit 初始化 zap 基本信息
-// write       文件描述符
-// serviceName 服务名
-// logLevel    日志级别
-// callerSkip 提升的堆栈帧数，0=当前函数，1=上一层函数，....
-func zapInit(c *LogClient, write zapcore.WriteSyncer) {
-	// 设置日志级别
-	var level zapcore.Level
-	switch c.config.Level {
+	options := &slog.HandlerOptions{
+		// 显示调用日志的位置
+		AddSource: true,
+		ReplaceAttr: func(groups []string, attr slog.Attr) slog.Attr {
+			// 处理时间格式
+			if attr.Key == slog.TimeKey {
+				attr.Value = slog.StringValue(attr.Value.Time().Format(time.DateTime))
+			}
+			// 简化调用源信息，只保留文件名和行号
+			if attr.Key == slog.SourceKey {
+				source, ok := attr.Value.Any().(*slog.Source)
+				if ok {
+					shortFile := source.File
+					shortFileCount := 0
+					for i := len(source.File) - 1; i > 0; i-- {
+						if shortFileCount <= 2 {
+							if source.File[i] == '/' {
+								shortFile = source.File[i+1:]
+								shortFileCount++
+							}
+						}
+					}
+					return slog.String("source", fmt.Sprintf("%s:%d", shortFile, source.Line))
+				}
+			}
+			return attr
+		},
+	}
+	switch lc.config.Level {
 	case LevelTypeDebug:
-		level = zap.DebugLevel
+		options.Level = slog.LevelDebug
 	case LevelTypeInfo:
-		level = zap.InfoLevel
+		options.Level = slog.LevelInfo
 	case LevelTypeWarn:
-		level = zap.WarnLevel
+		options.Level = slog.LevelWarn
 	case LevelTypeError:
-		level = zap.ErrorLevel
+		options.Level = slog.LevelError
 	default:
-		level = zap.DebugLevel
+		options.Level = slog.LevelDebug
 	}
-	// 编码器配置
-	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "ts",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "call",
-		MessageKey:     "msg",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
-		EncodeTime:     zapTimeEncoder,                 // 日志时间格式
-		EncodeDuration: zapcore.SecondsDurationEncoder, // 执行消耗的时间转化成浮点型的秒
-		EncodeCaller:   zapcore.ShortCallerEncoder,     // 短路径编码器,格式化调用堆栈
-		EncodeName:     zapcore.FullNameEncoder,
-	}
-	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
-		write,
-		level,
-	)
-	zapOptions := make([]zap.Option, 0, 5)
-	// 开启开发模式，堆栈跟踪
-	zapOptions = append(zapOptions, zap.Development())
-	// 开启文件及行号
-	zapOptions = append(zapOptions, zap.AddCaller())
-	// 提升打印的堆栈帧数
-	zapOptions = append(zapOptions, zap.AddCallerSkip(c.config.CallerSkip+1))
-	// 添加字段-服务器名称
-	// zapOptions = append(zapOptions, zap.Fields(zap.String("service", serviceName)))
-	// 构造日志
-	//client.logger = zap.New(core, zapOptions...)
-	c.logger = zap.New(core, zapOptions...)
-	c.sugarLogger = c.logger.Sugar()
-}
-
-// zapTimeEncoder 日志时间格式
-func zapTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString(t.Format(time.DateTime))
-}
-
-// Debug 调试
-func (c *LogClient) Debug(msg string, args ...zap.Field) {
-	c.logger.Debug(msg, args...)
-}
-
-// Debugf 调试
-func (c *LogClient) Debugf(template string, args ...interface{}) {
-	c.sugarLogger.Debugf(template, args...)
-}
-
-// Info 信息
-func (c *LogClient) Info(msg string, args ...zap.Field) {
-	c.logger.Info(msg, args...)
-}
-
-// Infof 信息
-func (c *LogClient) Infof(template string, args ...interface{}) {
-	c.sugarLogger.Infof(template, args...)
-}
-
-// Warn 警告
-func (c *LogClient) Warn(msg string, args ...zap.Field) {
-	c.logger.Warn(msg, args...)
-}
-
-// Warnf 警告
-func (c *LogClient) Warnf(template string, args ...interface{}) {
-	c.sugarLogger.Warnf(template, args...)
-}
-
-// Error 错误
-func (c *LogClient) Error(msg string, args ...zap.Field) {
-	c.logger.Error(msg, args...)
-}
-
-// Errorf 错误
-func (c *LogClient) Errorf(template string, args ...interface{}) {
-	c.sugarLogger.Errorf(template, args...)
-}
-
-// Printf 打印
-func (c *LogClient) Printf(template string, args ...interface{}) {
-	c.sugarLogger.Debugf(template, args...)
+	// 配置 JSON 格式处理器
+	lc.handler = slog.NewJSONHandler(lc.writer, options)
+	return lc
 }
