@@ -5,6 +5,8 @@ import (
 	openApiSdkClient "github.com/bytedance/douyin-openapi-sdk-go/client"
 )
 
+// 抖音开放平台
+
 type Douyin struct {
 	config *Config
 	client *openApiSdkClient.Client
