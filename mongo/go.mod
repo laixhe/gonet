@@ -2,7 +2,7 @@ module github.com/laixhe/gonet/mongo
 
 go 1.26
 
-require go.mongodb.org/mongo-driver/v2 v2.7.0
+require go.mongodb.org/mongo-driver/v2 v2.8.0
 
 require (
 	github.com/klauspost/compress v1.17.6 // indirect

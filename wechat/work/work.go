@@ -38,7 +38,6 @@ func NewWork(config *Config) *Work {
 	}
 }
 
-// Config 获取配置
 func (w *Work) Config() *Config {
 	return w.config
 }

@@ -2,7 +2,6 @@ package work
 
 import "errors"
 
-// Config 企业微信配置
 type Config struct {
 	// 企业ID
 	Corpid string `json:"corpid" mapstructure:"corpid" toml:"corpid" yaml:"corpid"`
@@ -12,7 +11,6 @@ type Config struct {
 	Agentid string `json:"agentid" mapstructure:"agentid" toml:"agentid" yaml:"agentid"`
 }
 
-// Check 检查
 func (c *Config) Check() error {
 	if c == nil {
 		return errors.New("企业微信配置不能为空")
