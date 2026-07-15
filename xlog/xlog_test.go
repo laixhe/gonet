@@ -7,7 +7,8 @@ import (
 
 func TestInIt(t *testing.T) {
 	l := Init()
-	slog.SetDefault(slog.New(l.Handler()))
+	slog.SetDefault(l.Logger())
 
-	slog.Info("hello world")
+	slog.Info("hello world...")
+	l.Logger().Info("hello world")
 }

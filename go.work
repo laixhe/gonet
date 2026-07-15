@@ -1,27 +1,28 @@
 go 1.26
 
 use (
-	./alibaba/imagesearch
-	./alibaba/oss
-	./alibaba/sms
+
 	./config
 	./crypto
-	./douyin
+    ./db/gorm/orm
+	./db/gorm/mysql
+    ./db/gorm/postgres
+    ./db/gorm/sqlite
+	./db/mongo
+	./db/redis
 	./imaging
 	./jwt
-	./mongo
 	./network
-	./orm/mysql
-	./orm/orm
-	./orm/postgres
-	./orm/sqlite
-	./redis
+	./rpc
+	./sdk/alibaba/imagesearch
+    ./sdk/alibaba/oss
+    ./sdk/alibaba/sms
+	./sdk/douyin
+	./sdk/wechat/miniprogram
+	./sdk/wechat/oplatform
+	./sdk/wechat/work
 	./utils
-	./wechat/miniprogram
-	./wechat/oplatform
-	./wechat/work
 	./xfiber
 	./xgin
-	./xgrpc
 	./xlog
 )

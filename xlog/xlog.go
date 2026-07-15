@@ -56,7 +56,6 @@ type Config struct {
 	MaxAge int `json:"max_age,omitempty" mapstructure:"max_age" toml:"max_age" yaml:"max_age"`
 }
 
-// Check 检查
 func (c *Config) Check() error {
 	if c == nil {
 		return errors.New("没有日志配置")
@@ -103,6 +102,7 @@ type LClient struct {
 	config  *Config
 	writer  io.Writer         // 日志写入接口
 	handler *slog.JSONHandler // 配置 slog 格式处理器
+	logger  *slog.Logger
 }
 
 func (lc *LClient) Writer() io.Writer {
@@ -111,6 +111,10 @@ func (lc *LClient) Writer() io.Writer {
 
 func (lc *LClient) Handler() *slog.JSONHandler {
 	return lc.handler
+}
+
+func (lc *LClient) Logger() *slog.Logger {
+	return lc.logger
 }
 
 func Init(configs ...*Config) *LClient {
@@ -175,5 +179,6 @@ func Init(configs ...*Config) *LClient {
 	}
 	// 配置 JSON 格式处理器
 	lc.handler = slog.NewJSONHandler(lc.writer, options)
+	lc.logger = slog.New(lc.handler)
 	return lc
 }
