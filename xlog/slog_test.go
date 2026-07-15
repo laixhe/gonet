@@ -6,7 +6,7 @@ import (
 )
 
 func TestInIt(t *testing.T) {
-	l := Init()
+	l := InitSlog()
 	slog.SetDefault(l.Logger())
 
 	slog.Info("hello world...")
