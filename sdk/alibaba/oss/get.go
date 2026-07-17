@@ -42,7 +42,7 @@ type GetInfoResponse struct {
 }
 
 // GetInfo 获取公共读或者公共读写图片的信息
-func (oc *OssClient) GetInfo(ctx context.Context, objectName string) (*GetInfoResponse, error) {
+func (oc *OClient) GetInfo(ctx context.Context, objectName string) (*GetInfoResponse, error) {
 	if strings.HasPrefix(objectName, "http") {
 		objectName = strings.Split(objectName, "?")[0]
 	} else {

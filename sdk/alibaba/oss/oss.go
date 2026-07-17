@@ -2,6 +2,7 @@ package oss
 
 import (
 	"errors"
+	"time"
 
 	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss/credentials"
@@ -65,7 +66,7 @@ func Init(config *Config) (*OClient, error) {
 	// doc https://help.aliyun.com/zh/oss
 	cfg := ossv2.NewConfig().
 		WithCredentialsProvider(credentials.NewStaticCredentialsProvider(config.AccessKeyID, config.AccessKeySecret)).
-		WithRegion(config.Region).WithEndpoint(config.Endpoint)
+		WithRegion(config.Region).WithEndpoint(config.Endpoint).WithReadWriteTimeout(60 * time.Second)
 	client := ossv2.NewClient(cfg)
 	// 检查存储空间是否存在
 	//isBucket, err := client.IsBucketExist(context.TODO(), config.Bucket)
