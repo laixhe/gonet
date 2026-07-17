@@ -1,7 +1,6 @@
 package wxa
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -32,20 +31,14 @@ type GenerateSchemeResponse struct {
 // POST https://api.weixin.qq.com/wxa/generatescheme?access_token=ACCESS_TOKEN
 // BODY {"jump_wxa":{"path":"/pages/index/index","query":"id=1&age=18"}}
 func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateSchemeRequest) (*GenerateSchemeResponse, error) {
-	// 原生的 resty 会对字符串中的 / 进行转义，如 {"path": "/pages/index/index"}
-	reqBody, err := json.Marshal(req)
-	if err != nil {
-		return &GenerateSchemeResponse{
-			ErrCode: 400,
-			ErrMsg:  err.Error(),
-		}, err
-	}
+	// 原生的 encoding/json 会对字符串 & < > 进行转义，需要 SetJSONEscapeHTML(false) 禁用转义
 	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"access_token": accessToken,
 		}).
-		SetBody(string(reqBody)).
+		SetBody(req).
 		SetResult(&GenerateSchemeResponse{}).
+		SetJSONEscapeHTML(false).
 		SetResponseForceContentType("application/json").
 		Post("/wxa/generatescheme")
 	if err != nil {

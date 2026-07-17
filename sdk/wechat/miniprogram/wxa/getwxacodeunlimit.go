@@ -34,19 +34,13 @@ func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxa
 	if req.Width <= 0 {
 		req.Width = 1280
 	}
-	// 原生的 resty 会对字符串中的 / 进行转义，如 {"path": "pages/index/index"}
-	reqBody, err := json.Marshal(req)
-	if err != nil {
-		return &GetWxaCodeUnlimitResponse{
-			ErrCode: 400,
-			ErrMsg:  err.Error(),
-		}, err
-	}
+	// 原生的 encoding/json 会对字符串 & < > 进行转义，需要 SetJSONEscapeHTML(false) 禁用转义
 	httpResp, err := httpClient.R().
 		SetQueryParams(map[string]string{
 			"access_token": accessToken,
 		}).
-		SetBody(string(reqBody)).
+		SetBody(req).
+		SetJSONEscapeHTML(false).
 		Post("/wxa/getwxacodeunlimit")
 	if err != nil {
 		return &GetWxaCodeUnlimitResponse{ErrCode: -1, ErrMsg: err.Error()}, err
