@@ -2,10 +2,8 @@ package crypto
 
 import "golang.org/x/crypto/bcrypt"
 
-// 因为 bcrypt 加密使用了随机的盐，所以同一个字串每次 hash 的结果也是不一样的
-// 同一字串的加密结果都是等价
-
-// BcryptPasswordHash 进行加密
+// BcryptPasswordHash 对密码进行 bcrypt 哈希
+// 因为 bcrypt 使用了随机的盐，所以同一个密码每次生成的哈希值都不同，但都可以通过校验
 func BcryptPasswordHash(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {

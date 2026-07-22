@@ -61,13 +61,10 @@ func IsAllASCII(str string) bool {
 	return true
 }
 
-// IsPrintable 是否全是可打印字符组成
+// IsPrintable 是否全是可打印字符（包括空格、字母、数字、标点等，不含换行符、制表符等控制字符）
 func IsPrintable(str string) bool {
 	for _, r := range str {
 		if !unicode.IsPrint(r) {
-			if r == '\n' || r == '\r' || r == '\t' || r == '`' {
-				continue
-			}
 			return false
 		}
 	}
@@ -77,7 +74,7 @@ func IsPrintable(str string) bool {
 // IsContainUpper 是否至少包含一个大写字母
 func IsContainUpper(str string) bool {
 	for _, r := range str {
-		if unicode.IsUpper(r) && unicode.IsLetter(r) {
+		if unicode.IsUpper(r) {
 			return true
 		}
 	}
@@ -87,7 +84,7 @@ func IsContainUpper(str string) bool {
 // IsContainLower 是否至少包含一个小写字母
 func IsContainLower(str string) bool {
 	for _, r := range str {
-		if unicode.IsLower(r) && unicode.IsLetter(r) {
+		if unicode.IsLower(r) {
 			return true
 		}
 	}
@@ -121,7 +118,7 @@ func IsJSON(str string) bool {
 	return json.Unmarshal([]byte(str), &js) == nil
 }
 
-// IsJWT 是否为 JWT 格式
+// IsJWT 是否为 JWT 格式（Header.Payload.Signature 三部分，每部分为 Base64URL 编码）
 func IsJWT(v string) bool {
 	ss := strings.Split(v, ".")
 	if len(ss) != 3 {

@@ -1,3 +1,22 @@
+// Package crypto 提供常用的加密和哈希工具函数。
+//
+// 加密算法：
+//   - AES (GCM/CTR/CBC 模式)：对称加密，适合数据加密传输
+//   - Bcrypt：密码哈希，适合密码存储
+//
+// 哈希算法（仅用于校验，不适合安全场景）：
+//   - MD5：已存在碰撞攻击，仅用于非安全场景（如文件校验）
+//   - SHA-1：已存在碰撞攻击，仅用于非安全场景
+//
+// 使用示例：
+//
+//	// AES-GCM 加密（推荐）
+//	ciphertext, nonce, _ := AesEncryptGCM(key, plaintext)
+//	plaintext, _ := AesDecryptGCM(key, ciphertext, nonce)
+//
+//	// 密码哈希
+//	hash, _ := BcryptPasswordHash("mypassword")
+//	ok := BcryptPasswordCheck("mypassword", hash)
 package crypto
 
 import (
@@ -5,6 +24,8 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
+	"fmt"
 	"io"
 )
 
@@ -130,8 +151,8 @@ func AesEncryptCBC(key, plainText []byte) ([]byte, []byte, error) {
 // AesDecryptCBC 使用 CBC 模式的 AES 解密
 // key 密钥，长度要 16/24/32 字节分别对应 AES-128/192/256
 // cipherText 加密内容
-// vi 向量
-func AesDecryptCBC(key, cipherText, vi []byte) ([]byte, error) {
+// iv 初始化向量
+func AesDecryptCBC(key, cipherText, iv []byte) ([]byte, error) {
 	// 分组秘钥
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -140,7 +161,7 @@ func AesDecryptCBC(key, cipherText, vi []byte) ([]byte, error) {
 	// 创建解密内容(存放)
 	plainTextPadding := make([]byte, len(cipherText))
 	// 加密模式
-	blockMode := cipher.NewCBCDecrypter(block, vi)
+	blockMode := cipher.NewCBCDecrypter(block, iv)
 	// 进行解密
 	blockMode.CryptBlocks(plainTextPadding, cipherText)
 	// 去补全码
@@ -156,11 +177,97 @@ func PKCS7Padding(plainText []byte, blocksize int) []byte {
 }
 
 // PKCS7UnPadding 去填充
+// 会自动校验填充的合法性，若填充不合法则返回原数据，避免 panic
 func PKCS7UnPadding(cipherText []byte) []byte {
 	length := len(cipherText)
 	if length == 0 {
 		return cipherText
 	}
 	unPadding := int(cipherText[length-1])
+	// 填充值必须 > 0 且不超过数据长度，否则视为非法填充
+	if unPadding <= 0 || unPadding > length {
+		return cipherText
+	}
+	// 验证所有填充字节是否一致
+	for i := length - unPadding; i < length; i++ {
+		if cipherText[i] != byte(unPadding) {
+			return cipherText
+		}
+	}
 	return cipherText[:(length - unPadding)]
+}
+
+// AesEncryptGCMString GCM 模式 string 版本，返回 Base64 编码的密文（已包含 nonce）
+func AesEncryptGCMString(key string, plainText string) (string, error) {
+	cipherText, nonce, err := AesEncryptGCM([]byte(key), []byte(plainText))
+	if err != nil {
+		return "", err
+	}
+	// nonce + cipherText 合并后 Base64 编码，调用方无需单独管理 nonce
+	data := append(nonce, cipherText...)
+	return base64.StdEncoding.EncodeToString(data), nil
+}
+
+// AesDecryptGCMString GCM 模式 string 版本，解密 Base64 编码的密文
+func AesDecryptGCMString(key string, cipherBase64 string) (string, error) {
+	data, err := base64.StdEncoding.DecodeString(cipherBase64)
+	if err != nil {
+		return "", err
+	}
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+	nonceSize := gcm.NonceSize()
+	// 注意：此处不能返回 err，因为前面的 base64 解码和 AES 初始化均已成功，
+	// 此时 err 为 nil，直接返回 err 会导致静默返回空字符串。
+	// 必须构造明确的错误信息。
+	if len(data) < nonceSize {
+		return "", fmt.Errorf("data too short: need at least %d bytes, got %d", nonceSize, len(data))
+	}
+	nonce, cipherText := data[:nonceSize], data[nonceSize:]
+	plainBytes, err := AesDecryptGCM([]byte(key), cipherText, nonce)
+	if err != nil {
+		return "", err
+	}
+	return string(plainBytes), nil
+}
+
+// AesEncryptCBCString CBC 模式 string 版本，返回 Base64 编码的密文（已包含 IV）
+func AesEncryptCBCString(key string, plainText string) (string, error) {
+	cipherText, iv, err := AesEncryptCBC([]byte(key), []byte(plainText))
+	if err != nil {
+		return "", err
+	}
+	data := append(iv, cipherText...)
+	return base64.StdEncoding.EncodeToString(data), nil
+}
+
+// AesDecryptCBCString CBC 模式 string 版本，解密 Base64 编码的密文
+func AesDecryptCBCString(key string, cipherBase64 string) (string, error) {
+	data, err := base64.StdEncoding.DecodeString(cipherBase64)
+	if err != nil {
+		return "", err
+	}
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
+	}
+	blockSize := block.BlockSize()
+	// 注意：此处不能返回 err，原因同 AesDecryptGCMString ——
+	// 前面的 base64 解码和 AES 初始化均已成功，err 为 nil，
+	// 直接返回 err 会导致静默返回空字符串。
+	if len(data) < blockSize {
+		return "", fmt.Errorf("data too short: need at least %d bytes, got %d", blockSize, len(data))
+	}
+	iv, cipherText := data[:blockSize], data[blockSize:]
+	plainBytes, err := AesDecryptCBC([]byte(key), cipherText, iv)
+	if err != nil {
+		return "", err
+	}
+	return string(plainBytes), nil
 }

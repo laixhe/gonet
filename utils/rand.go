@@ -2,28 +2,18 @@ package utils
 
 import (
 	"math"
-	"sync"
-	"time"
 
 	crand "crypto/rand"
 	mrand "math/rand/v2"
 )
 
-// RandPool 为每个 goroutine 独立的 rand.Rand，避免并发问题
-var RandPool = sync.Pool{
-	New: func() any {
-		return mrand.New(mrand.NewPCG(uint64(time.Now().UnixNano()), 0))
-	},
-}
-
-// RandBool 随机布尔值
+// RandBool 返回随机布尔值
 func RandBool() bool {
 	return mrand.IntN(2) == 1
 }
 
-// RandRange 生成区间随机数
-// min 不能小于 0
-// max 不能小于等于 0
+// RandRange 返回 [min, max] 区间内的随机整数
+// 若 min == max 直接返回 min；若 max < min 自动交换两者
 func RandRange(min, max int) int {
 	if min == max {
 		return min
@@ -37,7 +27,8 @@ func RandRange(min, max int) int {
 	return mrand.IntN(max-min+1) + min
 }
 
-// RandBytes 随机生成 n 个字节
+// RandBytes 生成 n 个加密安全的随机字节
+// 优先使用 crypto/rand，失败时回退到 math/rand
 func RandBytes(n int) []byte {
 	if n <= 0 {
 		return []byte{}
@@ -52,78 +43,83 @@ func RandBytes(n int) []byte {
 	return data
 }
 
-// RandNumeral 随机生成整数字符串
+// RandNumeral 生成 n 位随机数字字符串
 func RandNumeral(n int) string {
 	if n <= 0 {
 		return ""
 	}
 	data := make([]byte, n)
 	for i := range data {
-		data[i] = byte(mrand.IntN(10) + 48)
+		data[i] = byte(mrand.IntN(10) + '0')
 	}
 	return string(data)
 }
 
-// RandString 随机生成字符串，默认包含大小写字母和整数
+// RandString 生成 n 位随机字符串
+// 不带参数：包含大小写字母和数字
+// isUpper[0]=true：大写字母 + 数字
+// isUpper[0]=false：小写字母 + 数字
 func RandString(n int, isUpper ...bool) string {
 	if n <= 0 {
 		return ""
 	}
 	data := make([]byte, n)
 	if len(isUpper) == 0 {
+		// 混合：大写 + 小写 + 数字
 		for i := range data {
-			randInt := mrand.IntN(3)
-			switch randInt {
+			switch mrand.IntN(3) {
 			case 1:
-				data[i] = byte(mrand.IntN(26) + 97)
+				data[i] = byte(mrand.IntN(26) + 'a')
 			case 2:
-				data[i] = byte(mrand.IntN(26) + 65)
+				data[i] = byte(mrand.IntN(26) + 'A')
 			default:
-				data[i] = byte(mrand.IntN(10) + 48)
+				data[i] = byte(mrand.IntN(10) + '0')
 			}
 		}
 		return string(data)
 	}
-	// 区分大小写与整数
+	// 指定大小写 + 数字
+	letterBase := int('a')
+	if isUpper[0] {
+		letterBase = int('A')
+	}
 	for i := range data {
 		if mrand.IntN(2) == 1 {
-			if isUpper[0] {
-				data[i] = byte(mrand.IntN(26) + 65)
-			} else {
-				data[i] = byte(mrand.IntN(26) + 97)
-			}
+			data[i] = byte(mrand.IntN(26) + letterBase)
 		} else {
-			data[i] = byte(mrand.IntN(10) + 48)
+			data[i] = byte(mrand.IntN(10) + '0')
 		}
 	}
 	return string(data)
 }
 
-// RandLetter 随机生成字母字符串，默认包含不区分大小写
-// isUpper 可选：是否大写
+// RandLetter 生成 n 位随机字母字符串
+// 不带参数：混合大小写
+// isUpper[0]=true：全大写
+// isUpper[0]=false：全小写
 func RandLetter(n int, isUpper ...bool) string {
 	if n <= 0 {
 		return ""
 	}
 	data := make([]byte, n)
-	// 不区分大小写
 	if len(isUpper) == 0 {
+		// 混合大小写
 		for i := range data {
 			if mrand.IntN(2) == 1 {
-				data[i] = byte(mrand.IntN(26) + 65)
+				data[i] = byte(mrand.IntN(26) + 'A')
 			} else {
-				data[i] = byte(mrand.IntN(26) + 97)
+				data[i] = byte(mrand.IntN(26) + 'a')
 			}
 		}
 		return string(data)
 	}
-	// 区分大小写
+	// 指定大小写
+	letterBase := int('a')
+	if isUpper[0] {
+		letterBase = int('A')
+	}
 	for i := range data {
-		if isUpper[0] {
-			data[i] = byte(mrand.IntN(26) + 65)
-		} else {
-			data[i] = byte(mrand.IntN(26) + 97)
-		}
+		data[i] = byte(mrand.IntN(26) + letterBase)
 	}
 	return string(data)
 }

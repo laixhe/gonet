@@ -19,7 +19,7 @@ func ReplaceObfuscateMobile(text string) string {
 	return MatchingChineseMobile.ReplaceAllStringFunc(text, ObfuscateMobile)
 }
 
-// IsChineseMobile 是否为手机号码
+// IsChineseMobile 是否包含手机号码（子串匹配，非全串匹配；若要严格校验整串请自行加 ^$ 锚点）
 func IsChineseMobile(mobileNum string) bool {
 	return MatchingChineseMobile.MatchString(mobileNum)
 }
