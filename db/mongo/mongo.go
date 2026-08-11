@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	mongov2 "go.mongodb.org/mongo-driver/v2/mongo"
@@ -37,6 +38,7 @@ type Config struct {
 	MaxConnIdleTime int64 `json:"max_conn_idle_time,omitempty" mapstructure:"max_conn_idle_time" toml:"max_conn_idle_time" yaml:"max_conn_idle_time"`
 }
 
+// Check 校验配置有效性，任一必填字段为空则返回错误。
 func (c *Config) Check() error {
 	if c == nil {
 		return errors.New("没有Mongo配置")
@@ -50,36 +52,53 @@ func (c *Config) Check() error {
 	return nil
 }
 
-// MClient 客户端
+// MClient MongoDB 客户端，所有导出方法均为并发安全。
 type MClient struct {
+	mu              sync.RWMutex
 	config          *Config
 	client          *mongov2.Client
 	defaultDatabase *mongov2.Database            // 默认指定的数据库
 	databaseMap     map[string]*mongov2.Database // 选择其他指定的数据库
 }
 
-// Ping 判断服务是否可用
-func (mc *MClient) Ping() error {
-	return mc.client.Ping(context.Background(), readprefv2.Primary())
+// Ping 通过向 MongoDB 发送 ping 命令判断服务是否可用，可用于健康检查。
+func (mc *MClient) Ping(ctx context.Context) error {
+	return mc.client.Ping(ctx, readprefv2.Primary())
 }
 
-// Client get mongo client
+// Close 关闭与 MongoDB 的连接，释放连接池资源。
+// 调用后 MClient 不可再使用。
+func (mc *MClient) Close(ctx context.Context) error {
+	return mc.client.Disconnect(ctx)
+}
+
+// Client 返回底层的 mongo.Client，供需要直接操作 driver 的高级场景使用。
 func (mc *MClient) Client() *mongov2.Client {
 	return mc.client
 }
 
-// Database 指定数据库
+// Database 返回指定名称的数据库实例，结果会被缓存以便复用。
+// 该方法并发安全。
 func (mc *MClient) Database(name string) *mongov2.Database {
-	loadDatabase, ok := mc.databaseMap[name]
+	mc.mu.RLock()
+	db, ok := mc.databaseMap[name]
+	mc.mu.RUnlock()
 	if ok {
-		return loadDatabase
+		return db
+	}
+
+	mc.mu.Lock()
+	defer mc.mu.Unlock()
+	// 双重检查，避免重复创建
+	if db, ok = mc.databaseMap[name]; ok {
+		return db
 	}
 	database := mc.client.Database(name)
 	mc.databaseMap[name] = database
 	return database
 }
 
-// Collection 选择集合(表)
+// Collection 返回默认数据库下指定名称的集合（表），供 CRUD 操作使用。
 func (mc *MClient) Collection(name string) *mongov2.Collection {
 	return mc.defaultDatabase.Collection(name)
 }
@@ -88,6 +107,9 @@ func (mc *MClient) Collection(name string) *mongov2.Collection {
 func connect(config *Config) (*MClient, error) {
 	opts := optionsv2.Client()
 	opts.ApplyURI(config.Uri)
+	// 默认连接超时 10 秒，避免无响应时长时间阻塞
+	opts.SetConnectTimeout(10 * time.Second)
+	opts.SetServerSelectionTimeout(10 * time.Second)
 	// 进行配置
 	if config.MaxPoolSize > 0 {
 		opts.SetMaxPoolSize(config.MaxPoolSize)
