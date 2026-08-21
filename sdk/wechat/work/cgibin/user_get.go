@@ -1,10 +1,11 @@
 package cgibin
 
 import (
-	"errors"
-	"fmt"
+	"context"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/work/internal/apiutil"
 )
 
 type UserGetResponse struct {
@@ -72,29 +73,9 @@ type UserGetResponse struct {
 // UserGet 读取成员
 // DOC https://developer.work.weixin.qq.com/document/path/90196
 // GET https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&userid=USERID
-func UserGet(httpClient *resty.Client, accessToken, userID string) (*UserGetResponse, error) {
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"access_token": accessToken,
-			"userid":       userID,
-		}).
-		SetResult(&UserGetResponse{}).
-		SetResponseForceContentType("application/json").
-		Get("/cgi-bin/user/get")
-	if err != nil {
-		return &UserGetResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*UserGetResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &UserGetResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func UserGet(ctx context.Context, httpClient *resty.Client, accessToken, userID string) (*UserGetResponse, error) {
+	return apiutil.Get[UserGetResponse](ctx, httpClient, "/cgi-bin/user/get", map[string]string{
+		"access_token": accessToken,
+		"userid":       userID,
+	})
 }

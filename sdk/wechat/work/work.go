@@ -1,15 +1,26 @@
 package work
 
 import (
+	"context"
 	"sync"
 	"time"
 
 	"resty.dev/v3"
 
 	"github.com/laixhe/gonet/sdk/wechat/work/cgibin"
+	"github.com/laixhe/gonet/sdk/wechat/work/internal/apiutil"
 )
 
 // 企业微信
+
+// defaultHTTPTimeout 企业微信接口默认超时时间。
+const defaultHTTPTimeout = 10 * time.Second
+
+// ApiError 企业微信接口调用错误,可通过 errors.As 获取错误码。
+//
+//	var apiErr *work.ApiError
+//	if errors.As(err, &apiErr) { _ = apiErr.ErrCode }
+type ApiError = apiutil.ApiError
 
 type Token struct {
 	mutex       *sync.Mutex
@@ -30,6 +41,7 @@ func NewWork(config *Config) *Work {
 	}
 	httpClient := resty.New()
 	httpClient.SetBaseURL("https://qyapi.weixin.qq.com")
+	httpClient.SetTimeout(defaultHTTPTimeout)
 	return &Work{
 		config:     config,
 		httpClient: httpClient,
@@ -43,18 +55,17 @@ func (w *Work) Config() *Config {
 	return w.config
 }
 
-// GetToken 获取接口调用凭据
-func (w *Work) GetToken() (*cgibin.GetTokenResponse, error) {
+// GetToken 获取接口调用凭据。
+//
+// forceRefresh 为 true 时忽略本地缓存,强制向微信刷新(可用于调试或令牌异常恢复)。
+func (w *Work) GetToken(ctx context.Context, forceRefresh bool) (*cgibin.GetTokenResponse, error) {
 	w.token.mutex.Lock()
 	defer w.token.mutex.Unlock()
 
-	if w.token.NetTime > 0 && w.token.ExpiresIn > 0 && w.token.ExpiresIn > (time.Now().Unix()-w.token.NetTime) {
-		return &cgibin.GetTokenResponse{
-			AccessToken: w.token.AccessToken,
-			ExpiresIn:   w.token.ExpiresIn,
-		}, nil
+	if !forceRefresh && w.token.NetTime > 0 && w.token.ExpiresIn > 0 && w.token.ExpiresIn > (time.Now().Unix()-w.token.NetTime) {
+		return w.tokenResponse(), nil
 	}
-	tokenResp, err := cgibin.GetToken(w.httpClient, w.config.CorpID, w.config.CorpSecret)
+	tokenResp, err := cgibin.GetToken(ctx, w.httpClient, w.config.CorpID, w.config.CorpSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -65,32 +76,40 @@ func (w *Work) GetToken() (*cgibin.GetTokenResponse, error) {
 	} else {
 		w.token.ExpiresIn = 0
 	}
-	return tokenResp, nil
+	return w.tokenResponse(), nil
+}
+
+// tokenResponse 返回缓存中的 token,命中缓存与刷新两条路径的返回值保持一致。
+func (w *Work) tokenResponse() *cgibin.GetTokenResponse {
+	return &cgibin.GetTokenResponse{
+		AccessToken: w.token.AccessToken,
+		ExpiresIn:   w.token.ExpiresIn,
+	}
 }
 
 // GetUserInfo 获取访问用户身份
-func (w *Work) GetUserInfo(code string) (*cgibin.GetUserInfoResponse, error) {
-	getToken, err := w.GetToken()
+func (w *Work) GetUserInfo(ctx context.Context, code string) (*cgibin.GetUserInfoResponse, error) {
+	getToken, err := w.GetToken(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	return cgibin.GetUserInfo(w.httpClient, getToken.AccessToken, code)
+	return cgibin.GetUserInfo(ctx, w.httpClient, getToken.AccessToken, code)
 }
 
 // GetUserDetail 获取访问用户敏感信息
-func (w *Work) GetUserDetail(userTicket string) (*cgibin.GetUserDetailResponse, error) {
-	getToken, err := w.GetToken()
+func (w *Work) GetUserDetail(ctx context.Context, userTicket string) (*cgibin.GetUserDetailResponse, error) {
+	getToken, err := w.GetToken(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	return cgibin.GetUserDetail(w.httpClient, getToken.AccessToken, userTicket)
+	return cgibin.GetUserDetail(ctx, w.httpClient, getToken.AccessToken, userTicket)
 }
 
 // UserGet 读取成员
-func (w *Work) UserGet(userID string) (*cgibin.UserGetResponse, error) {
-	getToken, err := w.GetToken()
+func (w *Work) UserGet(ctx context.Context, userID string) (*cgibin.UserGetResponse, error) {
+	getToken, err := w.GetToken(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	return cgibin.UserGet(w.httpClient, getToken.AccessToken, userID)
+	return cgibin.UserGet(ctx, w.httpClient, getToken.AccessToken, userID)
 }

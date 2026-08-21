@@ -1,10 +1,11 @@
 package cgibin
 
 import (
-	"errors"
-	"fmt"
+	"context"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/work/internal/apiutil"
 )
 
 type GetUserDetailResponse struct {
@@ -24,31 +25,10 @@ type GetUserDetailResponse struct {
 // DOC  https://developer.work.weixin.qq.com/document/path/95833
 // POST https://qyapi.weixin.qq.com/cgi-bin/auth/getuserdetail?access_token=ACCESS_TOKEN
 // BODY {"user_ticket":"XXX"}
-func GetUserDetail(httpClient *resty.Client, accessToken, userTicket string) (*GetUserDetailResponse, error) {
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"access_token": accessToken,
-		}).
-		SetBody(map[string]string{
-			"user_ticket": userTicket,
-		}).
-		SetResult(&GetUserDetailResponse{}).
-		SetResponseForceContentType("application/json").
-		Post("/cgi-bin/auth/getuserdetail")
-	if err != nil {
-		return &GetUserDetailResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*GetUserDetailResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &GetUserDetailResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func GetUserDetail(ctx context.Context, httpClient *resty.Client, accessToken, userTicket string) (*GetUserDetailResponse, error) {
+	return apiutil.Post[GetUserDetailResponse](ctx, httpClient, "/cgi-bin/auth/getuserdetail", map[string]string{
+		"access_token": accessToken,
+	}, map[string]string{
+		"user_ticket": userTicket,
+	})
 }
