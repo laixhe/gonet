@@ -3,7 +3,6 @@ package douyin
 import (
 	"encoding/json"
 	"errors"
-	"strconv"
 
 	"github.com/alibabacloud-go/tea/tea"
 	openApiSdkClient "github.com/bytedance/douyin-openapi-sdk-go/client"
@@ -19,7 +18,7 @@ type JsCode2SessionResponse struct {
 // MiniLoginJsCode2Session 小程序登录
 // 通常用于小程序通过临时登录凭证 code 换取用户唯一标识 openid unionid session_key 等信息
 // DOC https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/basic-abilities/log-in/code-2-session
-func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (*JsCode2SessionResponse, *ErrorData) {
+func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (*JsCode2SessionResponse, error) {
 	req := &openApiSdkClient.V2Jscode2sessionRequest{}
 	req.SetAppid(d.config.AppID)
 	req.SetSecret(d.config.AppSecret)
@@ -34,11 +33,18 @@ func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (
 		var sdkError *tea.SDKError
 		switch {
 		case errors.As(err, &sdkError):
-			errorCode, _ := strconv.Atoi(tea.StringValue(sdkError.Code))
-			return nil, NewErrorData(errorCode, tea.StringValue(sdkError.Message))
+			errCode, kind := parseSDKErrorCode(sdkError)
+			return nil, newError(kind, errCode, 0, tea.StringValue(sdkError.Message))
 		default:
-			return nil, NewErrorData(ECodeCall, err.Error())
+			return nil, newError(ErrKindLocal, ECodeCall, 0, err.Error())
 		}
+	}
+	if resp == nil {
+		return nil, newError(ErrKindLocal, ECodeCall, 0, "调用失败:响应为空")
+	}
+	// 请求级业务错误(err_no 非 0)优先返回,避免 data 非空时误判成功
+	if resp.ErrNo != nil && tea.Int64Value(resp.ErrNo) != 0 {
+		return nil, newError(ErrKindBusiness, int(tea.Int64Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrTips))
 	}
 	if code != "" {
 		if resp.Data == nil || resp.Data.Openid == nil || resp.Data.Unionid == nil || *resp.Data.Openid == "" || *resp.Data.Unionid == "" {
@@ -48,7 +54,7 @@ func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (
 			if resp.ErrTips == nil {
 				resp.ErrTips = tea.String("调用失败")
 			}
-			return nil, NewErrorData(int(tea.Int64Value(resp.ErrNo)), tea.StringValue(resp.ErrTips))
+			return nil, newError(ErrKindBusiness, int(tea.Int64Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrTips))
 		}
 	}
 	if code == "" && len(anonymousCode) > 0 && len(anonymousCode[0]) > 0 {
@@ -59,7 +65,7 @@ func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (
 			if resp.ErrTips == nil {
 				resp.ErrTips = tea.String("调用失败")
 			}
-			return nil, NewErrorData(int(tea.Int64Value(resp.ErrNo)), tea.StringValue(resp.ErrTips))
+			return nil, newError(ErrKindBusiness, int(tea.Int64Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrTips))
 		}
 	}
 	return &JsCode2SessionResponse{
@@ -83,10 +89,10 @@ type GetPhoneNumberResponse struct {
 // MiniLoginGetPhoneNumberInfo 获取手机号
 // 每个 code 只能使用一次，code 的有效期为 5 min
 // DOC https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/basic-abilities/log-in/get-phone-number
-func (d *Douyin) MiniLoginGetPhoneNumberInfo(code string) (*GetPhoneNumberResponse, *ErrorData) {
+func (d *Douyin) MiniLoginGetPhoneNumberInfo(code string) (*GetPhoneNumberResponse, error) {
 	getToken, err := d.ClientToken()
 	if err != nil {
-		return nil, NewErrorData(ECodeCall, err.Error())
+		return nil, err
 	}
 	req := &openApiSdkClient.V1GetPhonenumberInfoRequest{}
 	req.SetAccessToken(getToken)
@@ -96,11 +102,18 @@ func (d *Douyin) MiniLoginGetPhoneNumberInfo(code string) (*GetPhoneNumberRespon
 		var sdkError *tea.SDKError
 		switch {
 		case errors.As(err, &sdkError):
-			errorCode, _ := strconv.Atoi(tea.StringValue(sdkError.Code))
-			return nil, NewErrorData(errorCode, tea.StringValue(sdkError.Message))
+			errCode, kind := parseSDKErrorCode(sdkError)
+			return nil, newError(kind, errCode, 0, tea.StringValue(sdkError.Message))
 		default:
-			return nil, NewErrorData(ECodeCall, err.Error())
+			return nil, newError(ErrKindLocal, ECodeCall, 0, err.Error())
 		}
+	}
+	if resp == nil {
+		return nil, newError(ErrKindLocal, ECodeCall, 0, "调用失败:响应为空")
+	}
+	// 请求级业务错误(err_no 非 0)优先返回,避免 data 非空时误判成功
+	if resp.ErrNo != nil && tea.Int32Value(resp.ErrNo) != 0 {
+		return nil, newError(ErrKindBusiness, int(tea.Int32Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrMsg))
 	}
 	if resp.Data == nil || *resp.Data == "" {
 		if resp.ErrNo == nil {
@@ -109,16 +122,16 @@ func (d *Douyin) MiniLoginGetPhoneNumberInfo(code string) (*GetPhoneNumberRespon
 		if resp.ErrMsg == nil {
 			resp.ErrMsg = tea.String("调用失败")
 		}
-		return nil, NewErrorData(int(tea.Int32Value(resp.ErrNo)), tea.StringValue(resp.ErrMsg))
+		return nil, newError(ErrKindBusiness, int(tea.Int32Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrMsg))
 	}
 	originText, err := d.RsaDecryptByPrivateKeyStr(*resp.Data)
 	if err != nil {
-		return nil, NewErrorData(ECodeCall, err.Error())
+		return nil, newError(ErrKindLocal, ECodeCall, 0, err.Error())
 	}
 	getPhoneNumberResponse := &GetPhoneNumberResponse{}
 	err = json.Unmarshal([]byte(originText), getPhoneNumberResponse)
 	if err != nil {
-		return nil, NewErrorData(ECodeCall, err.Error())
+		return nil, newError(ErrKindDecode, ECodeCall, 0, err.Error())
 	}
 	return getPhoneNumberResponse, nil
 }

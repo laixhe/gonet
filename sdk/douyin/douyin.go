@@ -7,6 +7,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -31,6 +33,8 @@ type Douyin struct {
 	config *Config
 	client *openApiSdkClient.Client
 	token  *Token
+	// textCensorClient 内容安全检测 HTTP 客户端,默认超时 10 秒,可通过 SetTextCensorHTTPClient 注入
+	textCensorClient *http.Client
 }
 
 func NewDouyin(config *Config) (*Douyin, error) {
@@ -45,16 +49,30 @@ func NewDouyin(config *Config) (*Douyin, error) {
 		return nil, err
 	}
 	return &Douyin{
-		config: config,
-		client: client,
-		token: &Token{
-			mutex: &sync.Mutex{},
-		},
+		config:           config,
+		client:           client,
+		token:            &Token{mutex: &sync.Mutex{}},
+		textCensorClient: &http.Client{Timeout: contentSecurityTimeout},
 	}, nil
 }
 
 func (d *Douyin) Config() *Config {
 	return d.config
+}
+
+// SetTextCensorHTTPClient 注入内容安全检测使用的 HTTP 客户端(可自定义超时/传输层/代理)
+func (d *Douyin) SetTextCensorHTTPClient(c *http.Client) *Douyin {
+	d.textCensorClient = c
+	return d
+}
+
+// parseSDKErrorCode 解析官方 SDK 错误码,非数字错误码视为本地错误,避免误报为成功(0)
+func parseSDKErrorCode(sdkError *tea.SDKError) (int, ErrKind) {
+	errorCode, err := strconv.Atoi(tea.StringValue(sdkError.Code))
+	if err != nil {
+		return ECodeCall, ErrKindLocal
+	}
+	return errorCode, ErrKindBusiness
 }
 
 func (d *Douyin) ClientToken() (string, error) {
@@ -71,14 +89,14 @@ func (d *Douyin) ClientToken() (string, error) {
 	req.SetGrantType("client_credential")
 	resp, err := d.client.OauthClientToken(req)
 	if err != nil {
-		return "", err
+		return "", newError(ErrKindLocal, ECodeCall, 0, err.Error())
 	}
 	message := tea.StringValue(resp.Message)
 	if resp.Data == nil {
 		if message == "" {
 			message = "获取凭证失败"
 		}
-		return "", errors.New(message)
+		return "", newError(ErrKindLocal, ECodeCall, 0, message)
 	}
 
 	respErrorCode := tea.Int64Value(resp.Data.ErrorCode)
@@ -91,14 +109,14 @@ func (d *Douyin) ClientToken() (string, error) {
 			message = "获取凭证失败 "
 		}
 		message += respDescription
-		return "", errors.New(message)
+		return "", newError(ErrKindBusiness, int(respErrorCode), 0, message)
 	}
 	if respAccessToken == "" {
 		if message == "" {
 			message = "获取凭证失败 "
 		}
 		message += respDescription
-		return "", errors.New(message)
+		return "", newError(ErrKindLocal, ECodeCall, 0, message)
 	}
 	//
 	d.token.AccessToken = respAccessToken
@@ -121,10 +139,18 @@ func (d *Douyin) RsaDecryptByPrivateKeyStr(cipherData string) (originText string
 	if err != nil {
 		return "", fmt.Errorf("base64 解码私钥失败: %v", err)
 	}
-	// 解析私钥
+	// 解析私钥:优先 PKCS#1(openssl genrsa),回退 PKCS#8(官方 Java 示例格式)
 	privateRSA, err := x509.ParsePKCS1PrivateKey(privateKeyBytes)
 	if err != nil {
-		return "", fmt.Errorf("解析私钥失败: %v", err)
+		key, err2 := x509.ParsePKCS8PrivateKey(privateKeyBytes)
+		if err2 != nil {
+			return "", fmt.Errorf("解析私钥失败(PKCS#1/PKCS#8): %v / %v", err, err2)
+		}
+		rsaKey, ok := key.(*rsa.PrivateKey)
+		if !ok {
+			return "", fmt.Errorf("私钥类型不支持: %T", key)
+		}
+		privateRSA = rsaKey
 	}
 	// 读取数据
 	cipherDataBytes, err := base64.StdEncoding.DecodeString(cipherData)
