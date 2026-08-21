@@ -1,17 +1,28 @@
 package miniprogram
 
 import (
+	"context"
 	"sync"
 	"time"
 
 	"resty.dev/v3"
 
 	"github.com/laixhe/gonet/sdk/wechat/miniprogram/cgibin"
+	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 	"github.com/laixhe/gonet/sdk/wechat/miniprogram/sns"
 	"github.com/laixhe/gonet/sdk/wechat/miniprogram/wxa"
 )
 
 // 微信小程序
+
+// defaultHTTPTimeout 微信接口默认超时时间。
+const defaultHTTPTimeout = 10 * time.Second
+
+// ApiError 微信接口调用错误,可通过 errors.As 获取错误码。
+//
+//	var apiErr *miniprogram.ApiError
+//	if errors.As(err, &apiErr) { _ = apiErr.ErrCode }
+type ApiError = apiutil.ApiError
 
 type Token struct {
 	mutex       *sync.Mutex
@@ -32,6 +43,7 @@ func NewMiniProgram(config *Config) *MiniProgram {
 	}
 	httpClient := resty.New()
 	httpClient.SetBaseURL("https://api.weixin.qq.com")
+	httpClient.SetTimeout(defaultHTTPTimeout)
 	return &MiniProgram{
 		config:     config,
 		httpClient: httpClient,
@@ -46,22 +58,21 @@ func (wx *MiniProgram) Config() *Config {
 }
 
 // Code2Session 小程序登录
-func (wx *MiniProgram) Code2Session(code string) (*sns.JsCode2SessionResponse, error) {
-	return sns.JsCode2Session(wx.httpClient, wx.config.AppID, wx.config.Secret, code)
+func (wx *MiniProgram) Code2Session(ctx context.Context, code string) (*sns.JsCode2SessionResponse, error) {
+	return sns.JsCode2Session(ctx, wx.httpClient, wx.config.AppID, wx.config.Secret, code)
 }
 
-// GetAccessToken 获取接口调用凭据
-func (wx *MiniProgram) GetAccessToken() (*cgibin.TokenResponse, error) {
+// GetAccessToken 获取接口调用凭据。
+//
+// forceRefresh 为 true 时忽略本地缓存,强制向微信刷新(可用于调试或令牌异常恢复)。
+func (wx *MiniProgram) GetAccessToken(ctx context.Context, forceRefresh bool) (*cgibin.TokenResponse, error) {
 	wx.token.mutex.Lock()
 	defer wx.token.mutex.Unlock()
 
-	if wx.token.NetTime > 0 && wx.token.ExpiresIn > 0 && wx.token.ExpiresIn > (time.Now().Unix()-wx.token.NetTime) {
-		return &cgibin.TokenResponse{
-			AccessToken: wx.token.AccessToken,
-			ExpiresIn:   wx.token.ExpiresIn,
-		}, nil
+	if !forceRefresh && wx.token.NetTime > 0 && wx.token.ExpiresIn > 0 && wx.token.ExpiresIn > (time.Now().Unix()-wx.token.NetTime) {
+		return wx.tokenResponse(), nil
 	}
-	tokenResp, err := cgibin.StableToken(wx.httpClient, wx.config.AppID, wx.config.Secret, false)
+	tokenResp, err := cgibin.StableToken(ctx, wx.httpClient, wx.config.AppID, wx.config.Secret, forceRefresh)
 	if err != nil {
 		return nil, err
 	}
@@ -72,41 +83,49 @@ func (wx *MiniProgram) GetAccessToken() (*cgibin.TokenResponse, error) {
 	} else {
 		wx.token.ExpiresIn = 0
 	}
-	return tokenResp, nil
+	return wx.tokenResponse(), nil
+}
+
+// tokenResponse 返回缓存中的 token,命中缓存与刷新两条路径的返回值保持一致。
+func (wx *MiniProgram) tokenResponse() *cgibin.TokenResponse {
+	return &cgibin.TokenResponse{
+		AccessToken: wx.token.AccessToken,
+		ExpiresIn:   wx.token.ExpiresIn,
+	}
 }
 
 // GetPhoneNumber 获取手机号
-func (wx *MiniProgram) GetPhoneNumber(code string) (*wxa.GetUserPhoneNumberResponse, error) {
-	getAccessToken, err := wx.GetAccessToken()
+func (wx *MiniProgram) GetPhoneNumber(ctx context.Context, code string) (*wxa.GetUserPhoneNumberResponse, error) {
+	getAccessToken, err := wx.GetAccessToken(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	return wxa.GetUserPhoneNumber(wx.httpClient, getAccessToken.AccessToken, code)
+	return wxa.GetUserPhoneNumber(ctx, wx.httpClient, getAccessToken.AccessToken, code)
 }
 
 // GenerateScheme 获取加密 scheme 码
-func (wx *MiniProgram) GenerateScheme(req *wxa.GenerateSchemeRequest) (*wxa.GenerateSchemeResponse, error) {
-	getAccessToken, err := wx.GetAccessToken()
+func (wx *MiniProgram) GenerateScheme(ctx context.Context, req *wxa.GenerateSchemeRequest) (*wxa.GenerateSchemeResponse, error) {
+	getAccessToken, err := wx.GetAccessToken(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	return wxa.GenerateScheme(wx.httpClient, getAccessToken.AccessToken, req)
+	return wxa.GenerateScheme(ctx, wx.httpClient, getAccessToken.AccessToken, req)
 }
 
 // QueryScheme 查询 scheme 码
-func (wx *MiniProgram) QueryScheme(req *wxa.QuerySchemeRequest) (*wxa.QuerySchemeResponse, error) {
-	getAccessToken, err := wx.GetAccessToken()
+func (wx *MiniProgram) QueryScheme(ctx context.Context, req *wxa.QuerySchemeRequest) (*wxa.QuerySchemeResponse, error) {
+	getAccessToken, err := wx.GetAccessToken(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	return wxa.QueryScheme(wx.httpClient, getAccessToken.AccessToken, req)
+	return wxa.QueryScheme(ctx, wx.httpClient, getAccessToken.AccessToken, req)
 }
 
 // GetWxaCodeUnlimit 获取不限制的小程序码
-func (wx *MiniProgram) GetWxaCodeUnlimit(req *wxa.GetWxaCodeUnlimitRequest) (*wxa.GetWxaCodeUnlimitResponse, error) {
-	getAccessToken, err := wx.GetAccessToken()
+func (wx *MiniProgram) GetWxaCodeUnlimit(ctx context.Context, req *wxa.GetWxaCodeUnlimitRequest) (*wxa.GetWxaCodeUnlimitResponse, error) {
+	getAccessToken, err := wx.GetAccessToken(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	return wxa.GetWxaCodeUnlimit(wx.httpClient, getAccessToken.AccessToken, req)
+	return wxa.GetWxaCodeUnlimit(ctx, wx.httpClient, getAccessToken.AccessToken, req)
 }

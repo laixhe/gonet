@@ -1,3 +1,4 @@
+// Package client 提供链式 API 的 HTTP 客户端, 内置连接池配置与请求辅助方法。
 package client
 
 import (
@@ -10,13 +11,16 @@ import (
 	"github.com/laixhe/gonet/network/header"
 )
 
+// DefaultClient 默认客户端实例, baseURL 为空, 可直接使用或作为模板
 var DefaultClient = NewClient("")
 
+// Client HTTP 客户端, 链式构建请求
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
 }
 
+// NewClient 创建 HTTP 客户端, baseURL 为空时请求使用相对地址
 func NewClient(baseURL string) *Client {
 	return &Client{
 		baseURL:    baseURL,
@@ -24,6 +28,7 @@ func NewClient(baseURL string) *Client {
 	}
 }
 
+// Get 创建 GET 请求
 func (c *Client) Get(URL string) *Request {
 	req := &Request{
 		c:      c,
@@ -39,6 +44,7 @@ func (c *Client) Get(URL string) *Request {
 	return req
 }
 
+// DefaultPooledTransport 返回带连接池与超时配置的默认 Transport
 func DefaultPooledTransport() *http.Transport {
 	return &http.Transport{
 		Proxy: http.ProxyFromEnvironment, // 使用系统代理
@@ -58,12 +64,14 @@ func DefaultPooledTransport() *http.Transport {
 	}
 }
 
+// DefaultHttpClient 返回使用默认连接池的 HTTP 客户端
 func DefaultHttpClient() *http.Client {
 	return &http.Client{
 		Transport: DefaultPooledTransport(),
 	}
 }
 
+// HttpRequest 创建带默认 User-Agent 的 HTTP 请求
 func HttpRequest(method string, URL string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, URL, body)
 	if err != nil {
@@ -73,6 +81,7 @@ func HttpRequest(method string, URL string, body io.Reader) (*http.Request, erro
 	return req, nil
 }
 
+// CloseResponse 关闭响应体并复用连接
 func CloseResponse(resp *http.Response) {
 	if resp == nil || resp.Body == nil {
 		return

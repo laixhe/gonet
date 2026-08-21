@@ -1,10 +1,11 @@
 package cgibin
 
 import (
-	"errors"
-	"fmt"
+	"context"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 )
 
 type TokenResponse struct {
@@ -17,63 +18,23 @@ type TokenResponse struct {
 // Token 获取接口调用凭据(getAccessToken)
 // DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-access-token/api_getaccesstoken.html
 // GET https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
-func Token(httpClient *resty.Client, appID, secret string) (*TokenResponse, error) {
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"appid":      appID,
-			"secret":     secret,
-			"grant_type": "client_credential",
-		}).
-		SetResult(&TokenResponse{}).
-		SetResponseForceContentType("application/json").
-		Get("/cgi-bin/token")
-	if err != nil {
-		return &TokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*TokenResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &TokenResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func Token(ctx context.Context, httpClient *resty.Client, appID, secret string) (*TokenResponse, error) {
+	return apiutil.Get[TokenResponse](ctx, httpClient, "/cgi-bin/token", map[string]string{
+		"appid":      appID,
+		"secret":     secret,
+		"grant_type": "client_credential",
+	})
 }
 
 // StableToken 获取稳定版接口调用凭据
 // DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/mp-access-token/api_getstableaccesstoken.html
 // POST https://api.weixin.qq.com/cgi-bin/stable_token
 // BODY {"grant_type":"client_credential","appid":"APPID","secret":"APPSECRET","force_refresh":false}
-func StableToken(httpClient *resty.Client, appID string, secret string, forceRefresh bool) (*TokenResponse, error) {
-	httpResp, err := httpClient.R().
-		SetBody(map[string]interface{}{
-			"appid":         appID,
-			"secret":        secret,
-			"force_refresh": forceRefresh,
-			"grant_type":    "client_credential",
-		}).
-		SetResult(&TokenResponse{}).
-		SetResponseForceContentType("application/json").
-		Post("/cgi-bin/stable_token")
-	if err != nil {
-		return &TokenResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*TokenResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &TokenResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func StableToken(ctx context.Context, httpClient *resty.Client, appID string, secret string, forceRefresh bool) (*TokenResponse, error) {
+	return apiutil.Post[TokenResponse](ctx, httpClient, "/cgi-bin/stable_token", nil, map[string]interface{}{
+		"appid":         appID,
+		"secret":        secret,
+		"force_refresh": forceRefresh,
+		"grant_type":    "client_credential",
+	})
 }

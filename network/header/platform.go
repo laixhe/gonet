@@ -14,11 +14,11 @@ const (
 )
 
 const (
-	XPlatformIntHarmonyOs = 1
-	XPlatformIntAndroid   = 2
-	XPlatformIntIos       = 3
-	XPlatformIntWeb       = 4
-	XPlatformIntWindows   = 5
-	XPlatformIntLinux     = 6
-	XPlatformIntMacos     = 7
+	XPlatformIntHarmonyOs = 1 // 鸿蒙
+	XPlatformIntAndroid   = 2 // 安卓
+	XPlatformIntIos       = 3 // iOS
+	XPlatformIntWeb       = 4 // Web
+	XPlatformIntWindows   = 5 // Windows
+	XPlatformIntLinux     = 6 // Linux
+	XPlatformIntMacos     = 7 // macOS
 )

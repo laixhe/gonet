@@ -1,12 +1,12 @@
 package wxa
 
 import (
-	"encoding/json"
+	"context"
 	"errors"
-	"fmt"
-	"strings"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 )
 
 type GetWxaCodeUnlimitRequest struct {
@@ -30,39 +30,19 @@ type GetWxaCodeUnlimitResponse struct {
 // POST https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=ACCESS_TOKEN
 // BODY {"page":"pages/index/index","scene":"id=1&age=18","width":1280}  普通例子
 // BODY {"page":"","scene":"wxcomponent","width":1280,"is_hyaline":true} 主页例子
-func GetWxaCodeUnlimit(httpClient *resty.Client, accessToken string, req *GetWxaCodeUnlimitRequest) (*GetWxaCodeUnlimitResponse, error) {
+func GetWxaCodeUnlimit(ctx context.Context, httpClient *resty.Client, accessToken string, req *GetWxaCodeUnlimitRequest) (*GetWxaCodeUnlimitResponse, error) {
 	if req.Width <= 0 {
 		req.Width = 1280
 	}
-	// 原生的 encoding/json 会对字符串 & < > 进行转义，需要 SetJSONEscapeHTML(false) 禁用转义
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"access_token": accessToken,
-		}).
-		SetBody(req).
-		SetJSONEscapeHTML(false).
-		Post("/wxa/getwxacodeunlimit")
+	resp, err := apiutil.PostBinary(ctx, httpClient, "/wxa/getwxacodeunlimit", map[string]string{
+		"access_token": accessToken,
+	}, req)
 	if err != nil {
+		var apiErr *apiutil.ApiError
+		if errors.As(err, &apiErr) {
+			return &GetWxaCodeUnlimitResponse{ErrCode: apiErr.ErrCode, ErrMsg: apiErr.ErrMsg}, err
+		}
 		return &GetWxaCodeUnlimitResponse{ErrCode: -1, ErrMsg: err.Error()}, err
 	}
-	if httpResp.IsStatusSuccess() {
-		data := httpResp.Bytes()
-		contentType := httpResp.Header().Get("Content-Type")
-		if strings.HasPrefix(contentType, "image") {
-			return &GetWxaCodeUnlimitResponse{
-				ContentType: contentType,
-				Buffer:      data,
-			}, nil
-		}
-		resp := &GetWxaCodeUnlimitResponse{}
-		if err = json.Unmarshal(data, resp); err != nil {
-			resp.ErrCode = 500
-			resp.ErrMsg = err.Error()
-		}
-		return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-	}
-	return &GetWxaCodeUnlimitResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+	return &GetWxaCodeUnlimitResponse{ContentType: resp.ContentType, Buffer: resp.Data}, nil
 }

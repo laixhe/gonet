@@ -45,6 +45,8 @@ type Config struct {
 	MaxLifeTime int `json:"max_life_time" mapstructure:"max_life_time" toml:"max_life_time" yaml:"max_life_time"`
 	// 设置日志级别 1=Silent 2=Error 3=Warn 4=Info (默认 4)
 	LogLevel logger.LogLevel `json:"log_level" mapstructure:"log_level" toml:"log_level" yaml:"log_level"`
+	// 日志是否打印参数化查询(隐藏 SQL 参数) (默认 false)
+	ParameterizedQueries bool `json:"parameterized_queries" mapstructure:"parameterized_queries" toml:"parameterized_queries" yaml:"parameterized_queries"`
 }
 
 func (c *Config) Check() error {
@@ -60,6 +62,15 @@ func (c *Config) Check() error {
 	if !(c.Driver == DriverMysql || c.Driver == DriverPostgresql || c.Driver == DriverSqlite) {
 		return errors.New("数据库驱动只支持 mysql postgresql sqlite")
 	}
+	if c.MaxIdleCount < 0 {
+		return errors.New("空闲连接池最大数量不能小于 0")
+	}
+	if c.MaxOpenCount < 0 {
+		return errors.New("打开连接最大数量不能小于 0")
+	}
+	if c.MaxLifeTime < 0 {
+		return errors.New("连接可复用最大时间不能小于 0")
+	}
 	return nil
 }
 
@@ -73,8 +84,9 @@ func (c *Config) SetLog(writer logger.Writer, requestId string) logger.Interface
 	}
 	return NewLogger(writer,
 		logger.Config{
-			SlowThreshold: 200 * time.Millisecond,
-			LogLevel:      logLevel,
+			SlowThreshold:        200 * time.Millisecond,
+			LogLevel:             logLevel,
+			ParameterizedQueries: c.ParameterizedQueries,
 		}, requestId)
 }
 

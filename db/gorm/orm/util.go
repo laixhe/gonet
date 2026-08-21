@@ -24,11 +24,35 @@ func PageParamCheck[T int | int32 | int64](page, pageSize, pageSizeDefault T) (T
 	return max(page, 1), pageSize
 }
 
+// maxIntegerValue 返回泛型整数的最大值
+func maxIntegerValue[T int | int32 | int64]() T {
+	switch any(T(0)).(type) {
+	case int32:
+		// 先赋值给具体类型变量, 避免常量直接转换 int32 溢出
+		v := int32(^uint32(0) >> 1)
+		return T(v)
+	case int64:
+		v := int64(^uint64(0) >> 1)
+		return T(v)
+	default:
+		v := int(^uint(0) >> 1)
+		return T(v)
+	}
+}
+
 // PageOffsetCalculation 分页数量计算
 // page: 当前页
 // pageSize: 每页数量
 func PageOffsetCalculation[T int | int32 | int64](page, pageSize T) (limit T, offset T) {
-	return pageSize, (page - 1) * pageSize
+	limit = pageSize
+	if page < 1 {
+		page = 1
+	}
+	// 防止偏移量 (page-1)*pageSize 溢出, 页码过大时截断为不会溢出的最大页码
+	if pageSize > 0 && page-1 > maxIntegerValue[T]()/pageSize {
+		page = maxIntegerValue[T]()/pageSize + 1
+	}
+	return limit, (page - 1) * pageSize
 }
 
 // PageOffsetSql 分页SQL

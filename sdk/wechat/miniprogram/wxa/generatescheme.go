@@ -1,10 +1,11 @@
 package wxa
 
 import (
-	"errors"
-	"fmt"
+	"context"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 )
 
 type GenerateSchemeJumpWxa struct {
@@ -30,31 +31,8 @@ type GenerateSchemeResponse struct {
 // DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/url-scheme/api_generatescheme.html
 // POST https://api.weixin.qq.com/wxa/generatescheme?access_token=ACCESS_TOKEN
 // BODY {"jump_wxa":{"path":"/pages/index/index","query":"id=1&age=18"}}
-func GenerateScheme(httpClient *resty.Client, accessToken string, req *GenerateSchemeRequest) (*GenerateSchemeResponse, error) {
-	// 原生的 encoding/json 会对字符串 & < > 进行转义，需要 SetJSONEscapeHTML(false) 禁用转义
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"access_token": accessToken,
-		}).
-		SetBody(req).
-		SetResult(&GenerateSchemeResponse{}).
-		SetJSONEscapeHTML(false).
-		SetResponseForceContentType("application/json").
-		Post("/wxa/generatescheme")
-	if err != nil {
-		return &GenerateSchemeResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*GenerateSchemeResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &GenerateSchemeResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func GenerateScheme(ctx context.Context, httpClient *resty.Client, accessToken string, req *GenerateSchemeRequest) (*GenerateSchemeResponse, error) {
+	return apiutil.Post[GenerateSchemeResponse](ctx, httpClient, "/wxa/generatescheme", map[string]string{
+		"access_token": accessToken,
+	}, req)
 }

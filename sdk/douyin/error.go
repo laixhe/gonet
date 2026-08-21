@@ -15,5 +15,5 @@ func NewErrorData(code int, msg string) *ErrorData {
 }
 
 func (e *ErrorData) Error() string {
-	return fmt.Sprintf("bouyin(%d:%s)", e.Code, e.Msg)
+	return fmt.Sprintf("douyin(%d:%s)", e.Code, e.Msg)
 }

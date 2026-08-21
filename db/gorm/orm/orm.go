@@ -14,6 +14,10 @@ type Client interface {
 	// WithContext 获取gorm客户端
 	WithContext(ctx context.Context) *gorm.DB
 
+	// Transaction 在事务中执行回调函数
+	// fc 回调函数中返回错误会回滚事务, 返回 nil 提交事务
+	Transaction(ctx context.Context, fc func(tx *gorm.DB) error) error
+
 	// GetById 以 id 获取数据
 	// model 指针传递的结构(表结构)
 	GetById(ctx context.Context, model any, id int) error
@@ -23,6 +27,10 @@ type Client interface {
 	// key   要查询的字段名
 	// value 要查询的字段名的值
 	GetByField(ctx context.Context, model any, key string, value any) error
+	// GetByWhere 获取以对应条件的数据
+	// model 指针传递的结构(表结构)
+	// where 查询数据(表对应的字段)
+	GetByWhere(ctx context.Context, model any, where map[string]any) error
 	// LastByField 获取以对应字段条件的数据(最后一条)
 	LastByField(ctx context.Context, model any, key string, value any) error
 	// FirstByField 获取以对应字段条件的数据(第一条)
@@ -54,4 +62,9 @@ type Client interface {
 	// model  指针传递的结构(表结构)
 	// update 修改的数据(表对应的字段)
 	UpdatesById(ctx context.Context, model any, id int, update map[string]any) error
+
+	// Count 统计数量
+	// model 指针传递的结构(表结构)或表名
+	// where 查询数据(表对应的字段)
+	Count(ctx context.Context, model any, where map[string]any) (int64, error)
 }

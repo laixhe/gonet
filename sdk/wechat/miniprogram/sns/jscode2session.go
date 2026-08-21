@@ -1,10 +1,11 @@
 package sns
 
 import (
-	"errors"
-	"fmt"
+	"context"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 )
 
 type JsCode2SessionResponse struct {
@@ -19,31 +20,11 @@ type JsCode2SessionResponse struct {
 // 通过 code 获取 openid
 // DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/user-login/api_code2session.html
 // GET https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JS_CODE&grant_type=GRANT_TYPE
-func JsCode2Session(httpClient *resty.Client, appID, secret, code string) (*JsCode2SessionResponse, error) {
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"appid":      appID,
-			"secret":     secret,
-			"js_code":    code,
-			"grant_type": "authorization_code",
-		}).
-		SetResult(&JsCode2SessionResponse{}).
-		SetResponseForceContentType("application/json").
-		Get("/sns/jscode2session")
-	if err != nil {
-		return &JsCode2SessionResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*JsCode2SessionResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &JsCode2SessionResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func JsCode2Session(ctx context.Context, httpClient *resty.Client, appID, secret, code string) (*JsCode2SessionResponse, error) {
+	return apiutil.Get[JsCode2SessionResponse](ctx, httpClient, "/sns/jscode2session", map[string]string{
+		"appid":      appID,
+		"secret":     secret,
+		"js_code":    code,
+		"grant_type": "authorization_code",
+	})
 }

@@ -22,6 +22,10 @@ func TcpBufRead(buf *bufio.Reader) (msg *Message, err error) {
 	if err = binary.Read(buf, byteOrder(), &msg.DataLen); err != nil {
 		return
 	}
+	if msg.DataLen > MaxMessageLen {
+		err = ErrMessageTooLarge
+		return
+	}
 	if msg.DataLen > 0 {
 		msg.Data = make([]byte, msg.DataLen)
 		if err = binary.Read(buf, byteOrder(), &msg.Data); err != nil {

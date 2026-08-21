@@ -1,10 +1,11 @@
 package wxa
 
 import (
-	"errors"
-	"fmt"
+	"context"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 )
 
 type GetUserPhoneNumberWatermark struct {
@@ -29,31 +30,10 @@ type GetUserPhoneNumberResponse struct {
 // DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/user-info/phone-number/api_getphonenumber.html
 // POST https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=ACCESS_TOKEN
 // BODY {"code":"XXX"}
-func GetUserPhoneNumber(httpClient *resty.Client, accessToken, code string) (*GetUserPhoneNumberResponse, error) {
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"access_token": accessToken,
-		}).
-		SetBody(map[string]string{
-			"code": code,
-		}).
-		SetResult(&GetUserPhoneNumberResponse{}).
-		SetResponseForceContentType("application/json").
-		Post("/wxa/business/getuserphonenumber")
-	if err != nil {
-		return &GetUserPhoneNumberResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*GetUserPhoneNumberResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &GetUserPhoneNumberResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func GetUserPhoneNumber(ctx context.Context, httpClient *resty.Client, accessToken, code string) (*GetUserPhoneNumberResponse, error) {
+	return apiutil.Post[GetUserPhoneNumberResponse](ctx, httpClient, "/wxa/business/getuserphonenumber", map[string]string{
+		"access_token": accessToken,
+	}, map[string]string{
+		"code": code,
+	})
 }

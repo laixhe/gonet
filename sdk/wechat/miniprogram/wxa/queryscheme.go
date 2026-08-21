@@ -1,10 +1,11 @@
 package wxa
 
 import (
-	"errors"
-	"fmt"
+	"context"
 
 	"resty.dev/v3"
+
+	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 )
 
 type QuerySchemeRequest struct {
@@ -36,29 +37,8 @@ type QuerySchemeResponse struct {
 // DOC https://developers.weixin.qq.com/miniprogram/dev/server/API/qrcode-link/url-scheme/api_queryscheme.html
 // POST https://api.weixin.qq.com/wxa/queryscheme?access_token=ACCESS_TOKEN
 // BODY {"scheme":"xxx"}
-func QueryScheme(httpClient *resty.Client, accessToken string, req *QuerySchemeRequest) (*QuerySchemeResponse, error) {
-	httpResp, err := httpClient.R().
-		SetQueryParams(map[string]string{
-			"access_token": accessToken,
-		}).
-		SetBody(req).
-		SetResult(&QuerySchemeResponse{}).
-		SetResponseForceContentType("application/json").
-		Post("/wxa/queryscheme")
-	if err != nil {
-		return &QuerySchemeResponse{ErrCode: -1, ErrMsg: err.Error()}, err
-	}
-	if httpResp.IsStatusSuccess() {
-		resp, is := httpResp.Result().(*QuerySchemeResponse)
-		if is {
-			if resp.ErrCode != 0 {
-				return resp, fmt.Errorf("%d %s", resp.ErrCode, resp.ErrMsg)
-			}
-			return resp, nil
-		}
-	}
-	return &QuerySchemeResponse{
-		ErrCode: httpResp.StatusCode(),
-		ErrMsg:  httpResp.String(),
-	}, errors.New(httpResp.String())
+func QueryScheme(ctx context.Context, httpClient *resty.Client, accessToken string, req *QuerySchemeRequest) (*QuerySchemeResponse, error) {
+	return apiutil.Post[QuerySchemeResponse](ctx, httpClient, "/wxa/queryscheme", map[string]string{
+		"access_token": accessToken,
+	}, req)
 }

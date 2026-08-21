@@ -1,3 +1,4 @@
+// Package header 提供 HTTP 头、MIME 类型以及平台/语言等前后端协议约定的常量。
 package header
 
 // Common MIME types

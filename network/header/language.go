@@ -10,7 +10,7 @@ const (
 )
 
 const (
-	XAcceptLanguageIntZhCn = 1
-	XAcceptLanguageIntZhTw = 2
-	XAcceptLanguageIntEn   = 3
+	XAcceptLanguageIntZhCn = 1 // 中文(简体)
+	XAcceptLanguageIntZhTw = 2 // 中文(繁体)
+	XAcceptLanguageIntEn   = 3 // 英文
 )

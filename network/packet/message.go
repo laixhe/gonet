@@ -1,3 +1,4 @@
+// Package packet 提供二进制消息协议的定义与编解码, 消息格式为 [ID:4字节][DataLen:4字节][Data]。
 package packet
 
 // Message 消息
@@ -16,6 +17,7 @@ func NewMessage(ID uint32, data []byte) *Message {
 	}
 }
 
+// Init 初始化消息字段
 func (msg *Message) Init(ID uint32, data []byte) {
 	msg.ID = ID
 	msg.Data = data
