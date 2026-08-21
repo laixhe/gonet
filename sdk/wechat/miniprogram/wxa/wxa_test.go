@@ -32,7 +32,8 @@ func TestGetUserPhoneNumberSuccess(t *testing.T) {
 			t.Errorf("unexpected body: %s", body)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"errcode":0,"phone_info":{"phoneNumber":"13800138000","purePhoneNumber":"13800138000","countryCode":"86","watermark":{"timestamp":"1700000000","appid":"appid"}}}`))
+		// timestamp 使用数字形态,验证 FlexString 兼容(修复前 string 字段会解析失败)
+		_, _ = w.Write([]byte(`{"errcode":0,"phone_info":{"phoneNumber":"13800138000","purePhoneNumber":"13800138000","countryCode":"86","watermark":{"timestamp":1700000000,"appid":"appid"}}}`))
 	}))
 	defer srv.Close()
 
@@ -42,6 +43,9 @@ func TestGetUserPhoneNumberSuccess(t *testing.T) {
 	}
 	if resp.PhoneInfo.PhoneNumber != "13800138000" || resp.PhoneInfo.CountryCode != "86" {
 		t.Fatalf("unexpected resp: %+v", resp)
+	}
+	if resp.PhoneInfo.Watermark.Timestamp != "1700000000" {
+		t.Fatalf("unexpected timestamp: %q", resp.PhoneInfo.Watermark.Timestamp)
 	}
 }
 

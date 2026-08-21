@@ -2,8 +2,6 @@ module github.com/laixhe/gonet/xgin
 
 go 1.26
 
-replace github.com/laixhe/gonet/jwt => ../jwt
-
 require (
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-contrib/gzip v1.2.6
@@ -12,7 +10,7 @@ require (
 	github.com/gin-contrib/zap v1.1.7
 	github.com/gin-gonic/gin v1.12.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/laixhe/gonet/jwt v0.0.0-00010101000000-000000000000
+	github.com/laixhe/gonet/jwt v0.0.0
 	go.uber.org/zap v1.28.0
 	golang.org/x/time v0.15.0
 )
@@ -50,3 +48,5 @@ require (
 	golang.org/x/text v0.35.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 )
+
+replace github.com/laixhe/gonet/jwt => ../jwt

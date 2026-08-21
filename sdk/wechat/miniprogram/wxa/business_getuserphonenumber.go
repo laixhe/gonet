@@ -9,8 +9,8 @@ import (
 )
 
 type GetUserPhoneNumberWatermark struct {
-	Timestamp string `json:"timestamp"` // 用户获取手机号操作的时间戳
-	AppID     string `json:"appid"`     // 小程序 appid
+	Timestamp apiutil.FlexString `json:"timestamp"` // 用户获取手机号操作的时间戳(兼容数字/字符串)
+	AppID     string             `json:"appid"`     // 小程序 appid
 }
 
 type GetUserPhoneNumberPhoneInfo struct {

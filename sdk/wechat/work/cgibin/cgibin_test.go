@@ -78,7 +78,8 @@ func TestGetUserDetailSuccess(t *testing.T) {
 			t.Errorf("unexpected body: %s", body)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"errcode":0,"userid":"zhangsan","mobile":"13800138000"}`))
+		// gender 使用数字形态,验证 FlexString 兼容(修复前 string 字段会解析失败)
+		_, _ = w.Write([]byte(`{"errcode":0,"userid":"zhangsan","gender":1,"mobile":"13800138000"}`))
 	}))
 	defer srv.Close()
 
@@ -88,6 +89,9 @@ func TestGetUserDetailSuccess(t *testing.T) {
 	}
 	if resp.UserID != "zhangsan" || resp.Mobile != "13800138000" {
 		t.Fatalf("unexpected resp: %+v", resp)
+	}
+	if resp.Gender != "1" {
+		t.Fatalf("unexpected gender: %q", resp.Gender)
 	}
 }
 
@@ -101,7 +105,7 @@ func TestUserGetSuccess(t *testing.T) {
 			t.Errorf("unexpected query: %v", q)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"errcode":0,"userid":"zhangsan","name":"张三","mobile":"13800138000","department":[1,2]}`))
+		_, _ = w.Write([]byte(`{"errcode":0,"userid":"zhangsan","name":"张三","gender":1,"mobile":"13800138000","department":[1,2]}`))
 	}))
 	defer srv.Close()
 
@@ -111,6 +115,9 @@ func TestUserGetSuccess(t *testing.T) {
 	}
 	if resp.Name != "张三" || len(resp.Department) != 2 {
 		t.Fatalf("unexpected resp: %+v", resp)
+	}
+	if resp.Gender != "1" {
+		t.Fatalf("unexpected gender: %q", resp.Gender)
 	}
 }
 

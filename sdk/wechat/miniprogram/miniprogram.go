@@ -18,11 +18,20 @@ import (
 // defaultHTTPTimeout 微信接口默认超时时间。
 const defaultHTTPTimeout = 10 * time.Second
 
-// ApiError 微信接口调用错误,可通过 errors.As 获取错误码。
+// ApiError 微信接口调用错误,可通过 errors.As 获取错误码,通过 errors.Is 判断错误类别。
 //
 //	var apiErr *miniprogram.ApiError
 //	if errors.As(err, &apiErr) { _ = apiErr.ErrCode }
+//	if errors.Is(err, ErrNetwork) { ... }
 type ApiError = apiutil.ApiError
+
+// 错误类别哨兵,可通过 errors.Is 判断错误类型。
+var (
+	ErrNetwork  = apiutil.ErrNetwork  // 网络错误(连接失败、超时、上下文取消)
+	ErrHTTP     = apiutil.ErrHTTP     // HTTP 非 2xx 响应
+	ErrBusiness = apiutil.ErrBusiness // 业务错误(errcode != 0)
+	ErrDecode   = apiutil.ErrDecode   // 响应体解析失败
+)
 
 type Token struct {
 	mutex       *sync.Mutex

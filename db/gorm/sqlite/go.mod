@@ -2,11 +2,9 @@ module github.com/laixhe/gonet/db/sqlite
 
 go 1.26
 
-replace github.com/laixhe/gonet/db/gorm/orm => ../orm
-
 require (
 	github.com/glebarez/sqlite v1.11.0
-	github.com/laixhe/gonet/db/gorm/orm v0.0.0-00010101000000-000000000000
+	github.com/laixhe/gonet/db/gorm/orm v0.0.0
 	gorm.io/gorm v1.31.2
 )
 
@@ -25,3 +23,5 @@ require (
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/sqlite v1.23.1 // indirect
 )
+
+replace github.com/laixhe/gonet/db/gorm/orm => ../orm
