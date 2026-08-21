@@ -7,8 +7,8 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/laixhe/gonet/sdk/wechat/apiutil"
 	"github.com/laixhe/gonet/sdk/wechat/miniprogram/cgibin"
-	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
 	"github.com/laixhe/gonet/sdk/wechat/miniprogram/sns"
 	"github.com/laixhe/gonet/sdk/wechat/miniprogram/wxa"
 )
@@ -43,7 +43,11 @@ func NewMiniProgram(config *Config) *MiniProgram {
 	}
 	httpClient := resty.New()
 	httpClient.SetBaseURL("https://api.weixin.qq.com")
-	httpClient.SetTimeout(defaultHTTPTimeout)
+	timeout := config.Timeout
+	if timeout <= 0 {
+		timeout = defaultHTTPTimeout
+	}
+	httpClient.SetTimeout(timeout)
 	return &MiniProgram{
 		config:     config,
 		httpClient: httpClient,

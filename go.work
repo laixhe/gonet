@@ -18,6 +18,7 @@ use (
     ./sdk/alibaba/oss
     ./sdk/alibaba/sms
 	./sdk/douyin
+	./sdk/wechat/apiutil
 	./sdk/wechat/miniprogram
 	./sdk/wechat/oplatform
 	./sdk/wechat/work

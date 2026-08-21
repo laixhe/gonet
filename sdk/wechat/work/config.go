@@ -1,6 +1,9 @@
 package work
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 type Config struct {
 	// 企业ID
@@ -9,6 +12,8 @@ type Config struct {
 	CorpSecret string `json:"corpsecret" mapstructure:"corpsecret" toml:"corpsecret" yaml:"corpsecret"`
 	// 企业应用ID
 	AgentID string `json:"agentid" mapstructure:"agentid" toml:"agentid" yaml:"agentid"`
+	// Timeout 接口调用超时时间,0 表示使用默认 10 秒
+	Timeout time.Duration `json:"timeout" mapstructure:"timeout" toml:"timeout" yaml:"timeout"`
 }
 
 func (c *Config) Check() error {

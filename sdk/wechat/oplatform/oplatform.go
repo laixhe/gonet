@@ -6,7 +6,7 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/laixhe/gonet/sdk/wechat/oplatform/internal/apiutil"
+	"github.com/laixhe/gonet/sdk/wechat/apiutil"
 	"github.com/laixhe/gonet/sdk/wechat/oplatform/sns/oauth2"
 )
 
@@ -32,7 +32,11 @@ func NewOpenPlatform(config *Config) *OpenPlatform {
 	}
 	httpClient := resty.New()
 	httpClient.SetBaseURL("https://api.weixin.qq.com")
-	httpClient.SetTimeout(defaultHTTPTimeout)
+	timeout := config.Timeout
+	if timeout <= 0 {
+		timeout = defaultHTTPTimeout
+	}
+	httpClient.SetTimeout(timeout)
 	return &OpenPlatform{
 		config:     config,
 		httpClient: httpClient,

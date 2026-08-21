@@ -11,7 +11,7 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
+	"github.com/laixhe/gonet/sdk/wechat/apiutil"
 )
 
 func testClient(t *testing.T, srv *httptest.Server) *resty.Client {

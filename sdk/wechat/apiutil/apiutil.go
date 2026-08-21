@@ -1,4 +1,9 @@
-// Package apiutil 提供企业微信接口调用共用的请求封装与错误类型。
+// Package apiutil 提供微信系列 SDK(miniprogram/oplatform/work)接口调用共用的请求封装与错误类型。
+//
+// 各 SDK 模块通过 ApiError 别名导出错误类型,例如:
+//
+//	var apiErr *miniprogram.ApiError
+//	if errors.As(err, &apiErr) { _ = apiErr.ErrCode }
 package apiutil
 
 import (
@@ -11,11 +16,6 @@ import (
 )
 
 // ApiError 微信接口调用错误。
-//
-// 可通过 errors.As 从返回值中提取,例如:
-//
-//	var apiErr *work.ApiError
-//	if errors.As(err, &apiErr) { _ = apiErr.ErrCode }
 type ApiError struct {
 	ErrCode int    // 微信错误码,0 表示成功
 	ErrMsg  string // 错误信息,请求失败时返回

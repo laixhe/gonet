@@ -6,7 +6,7 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/laixhe/gonet/sdk/wechat/miniprogram/internal/apiutil"
+	"github.com/laixhe/gonet/sdk/wechat/apiutil"
 )
 
 type GetWxaCodeUnlimitRequest struct {
@@ -14,7 +14,7 @@ type GetWxaCodeUnlimitRequest struct {
 	Scene      string `json:"scene"`                 // 通过小程序码进入小程序时的 query 最大1024个字符，只支持数字，大小写英文以及部分特殊字 = &（格式遵循URL标准，即k1=v1&k2=v2）
 	CheckPath  bool   `json:"check_path"`            // 检查 page 是否存在，为 true 时 page 必须是已经发布的小程序存在的页面（否则报错）；为 false 时允许小程序未发布或者 page 不存在， 但 page 有数量上限（60000个）请勿滥用
 	EnvVersion string `json:"env_version,omitempty"` // 默认值 release 要打开的小程序版本。正式版为release，体验版为trial，开发版为develop，仅在微信外打开时生效
-	Width      int    `json:"width,omitempty"`       // 默认 430 二维码的宽度，单位 px，最小 280 px，最大 1280 px
+	Width      int    `json:"width,omitempty"`       // 默认 1280 二维码的宽度，单位 px，最小 280 px，最大 1280 px
 	IsHyaline  bool   `json:"is_hyaline,omitempty"`  // 默认是 false 是否需要透明底色，为 true 时，生成透明底色的小程序
 }
 
@@ -31,12 +31,14 @@ type GetWxaCodeUnlimitResponse struct {
 // BODY {"page":"pages/index/index","scene":"id=1&age=18","width":1280}  普通例子
 // BODY {"page":"","scene":"wxcomponent","width":1280,"is_hyaline":true} 主页例子
 func GetWxaCodeUnlimit(ctx context.Context, httpClient *resty.Client, accessToken string, req *GetWxaCodeUnlimitRequest) (*GetWxaCodeUnlimitResponse, error) {
-	if req.Width <= 0 {
-		req.Width = 1280
+	// 局部拷贝,避免改写调用方传入的请求结构体
+	body := *req
+	if body.Width <= 0 {
+		body.Width = 1280
 	}
 	resp, err := apiutil.PostBinary(ctx, httpClient, "/wxa/getwxacodeunlimit", map[string]string{
 		"access_token": accessToken,
-	}, req)
+	}, &body)
 	if err != nil {
 		var apiErr *apiutil.ApiError
 		if errors.As(err, &apiErr) {

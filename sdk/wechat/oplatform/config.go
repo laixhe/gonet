@@ -1,6 +1,9 @@
 package oplatform
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 // Config 微信开放平台配置
 type Config struct {
@@ -8,6 +11,8 @@ type Config struct {
 	AppID string `json:"app_id" mapstructure:"appid" toml:"appid" yaml:"appid"`
 	// 密钥 App Secret
 	Secret string `json:"secret" mapstructure:"secret" toml:"secret" yaml:"secret"`
+	// Timeout 接口调用超时时间,0 表示使用默认 10 秒
+	Timeout time.Duration `json:"timeout" mapstructure:"timeout" toml:"timeout" yaml:"timeout"`
 }
 
 // Check 检查

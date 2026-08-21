@@ -7,8 +7,8 @@ import (
 
 	"resty.dev/v3"
 
+	"github.com/laixhe/gonet/sdk/wechat/apiutil"
 	"github.com/laixhe/gonet/sdk/wechat/work/cgibin"
-	"github.com/laixhe/gonet/sdk/wechat/work/internal/apiutil"
 )
 
 // 企业微信
@@ -41,7 +41,11 @@ func NewWork(config *Config) *Work {
 	}
 	httpClient := resty.New()
 	httpClient.SetBaseURL("https://qyapi.weixin.qq.com")
-	httpClient.SetTimeout(defaultHTTPTimeout)
+	timeout := config.Timeout
+	if timeout <= 0 {
+		timeout = defaultHTTPTimeout
+	}
+	httpClient.SetTimeout(timeout)
 	return &Work{
 		config:     config,
 		httpClient: httpClient,

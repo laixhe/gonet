@@ -5,7 +5,7 @@ import (
 
 	"resty.dev/v3"
 
-	"github.com/laixhe/gonet/sdk/wechat/oplatform/internal/apiutil"
+	"github.com/laixhe/gonet/sdk/wechat/apiutil"
 )
 
 type AccessTokenResponse struct {

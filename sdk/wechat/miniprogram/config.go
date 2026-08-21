@@ -1,6 +1,9 @@
 package miniprogram
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 type Config struct {
 	// 唯一凭证 App ID
@@ -11,6 +14,8 @@ type Config struct {
 	Token string `json:"token" mapstructure:"token" toml:"token" yaml:"token"`
 	// (可选)回调消息密钥 AESKey
 	AesKey string `json:"aeskey" mapstructure:"aeskey" toml:"aeskey" yaml:"aeskey"`
+	// Timeout 接口调用超时时间,0 表示使用默认 10 秒
+	Timeout time.Duration `json:"timeout" mapstructure:"timeout" toml:"timeout" yaml:"timeout"`
 }
 
 func (c *Config) Check() error {
