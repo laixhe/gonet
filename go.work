@@ -1,22 +1,22 @@
 go 1.26
 
 use (
-
 	./config
 	./crypto
-    ./db/gorm/orm
 	./db/gorm/mysql
-    ./db/gorm/postgres
-    ./db/gorm/sqlite
+	./db/gorm/orm
+	./db/gorm/postgres
+	./db/gorm/sqlite
 	./db/mongo
 	./db/redis
 	./imaging
 	./jwt
 	./network
 	./rpc
+	./rpc/test
 	./sdk/alibaba/imagesearch
-    ./sdk/alibaba/oss
-    ./sdk/alibaba/sms
+	./sdk/alibaba/oss
+	./sdk/alibaba/sms
 	./sdk/douyin
 	./sdk/wechat/apiutil
 	./sdk/wechat/miniprogram
