@@ -19,14 +19,20 @@ type JsCode2SessionResponse struct {
 // 通常用于小程序通过临时登录凭证 code 换取用户唯一标识 openid unionid session_key 等信息
 // DOC https://developer.open-douyin.com/docs/resource/zh-CN/mini-app/develop/server/basic-abilities/log-in/code-2-session
 func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (*JsCode2SessionResponse, error) {
+	anonymous := ""
+	if len(anonymousCode) > 0 {
+		anonymous = anonymousCode[0]
+	}
+	if code == "" && anonymous == "" {
+		return nil, newError(ErrKindLocal, ECodeCall, 0, "code 与 anonymous_code 不能同时为空")
+	}
 	req := &openApiSdkClient.V2Jscode2sessionRequest{}
 	req.SetAppid(d.config.AppID)
 	req.SetSecret(d.config.AppSecret)
 	if code != "" {
 		req.SetCode(code)
-	}
-	if code == "" && len(anonymousCode) > 0 && len(anonymousCode[0]) > 0 {
-		req.SetAnonymousCode(anonymousCode[0])
+	} else {
+		req.SetAnonymousCode(anonymous)
 	}
 	resp, err := d.client.V2Jscode2session(req)
 	if err != nil {
@@ -39,6 +45,13 @@ func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (
 			return nil, newError(ErrKindLocal, ECodeCall, 0, err.Error())
 		}
 	}
+	return parseJsCode2Session(resp, code, anonymous)
+}
+
+// parseJsCode2Session 校验并转换 code2session 响应。
+// 注意:unionid 需在开发者后台绑定后才返回,未绑定的小程序所有用户 unionid 均为空,
+// 因此 code 模式仅强制校验 openid(登录主键),unionid 允许为空。
+func parseJsCode2Session(resp *openApiSdkClient.V2Jscode2sessionResponse, code, anonymous string) (*JsCode2SessionResponse, error) {
 	if resp == nil {
 		return nil, newError(ErrKindLocal, ECodeCall, 0, "调用失败:响应为空")
 	}
@@ -47,25 +60,13 @@ func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (
 		return nil, newError(ErrKindBusiness, int(tea.Int64Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrTips))
 	}
 	if code != "" {
-		if resp.Data == nil || resp.Data.Openid == nil || resp.Data.Unionid == nil || *resp.Data.Openid == "" || *resp.Data.Unionid == "" {
-			if resp.ErrNo == nil {
-				resp.ErrNo = tea.Int64(ECodeCall)
-			}
-			if resp.ErrTips == nil {
-				resp.ErrTips = tea.String("调用失败")
-			}
-			return nil, newError(ErrKindBusiness, int(tea.Int64Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrTips))
+		if resp.Data == nil || resp.Data.Openid == nil || *resp.Data.Openid == "" {
+			return nil, jsCode2SessionError(resp.ErrNo, resp.ErrTips)
 		}
 	}
-	if code == "" && len(anonymousCode) > 0 && len(anonymousCode[0]) > 0 {
+	if code == "" && anonymous != "" {
 		if resp.Data == nil || resp.Data.AnonymousOpenid == nil || *resp.Data.AnonymousOpenid == "" {
-			if resp.ErrNo == nil {
-				resp.ErrNo = tea.Int64(ECodeCall)
-			}
-			if resp.ErrTips == nil {
-				resp.ErrTips = tea.String("调用失败")
-			}
-			return nil, newError(ErrKindBusiness, int(tea.Int64Value(resp.ErrNo)), 0, tea.StringValue(resp.ErrTips))
+			return nil, jsCode2SessionError(resp.ErrNo, resp.ErrTips)
 		}
 	}
 	return &JsCode2SessionResponse{
@@ -74,6 +75,17 @@ func (d *Douyin) MiniLoginJsCode2Session(code string, anonymousCode ...string) (
 		SessionKey:      tea.StringValue(resp.Data.SessionKey),
 		AnonymousOpenID: tea.StringValue(resp.Data.AnonymousOpenid),
 	}, nil
+}
+
+// jsCode2SessionError 兜底构造业务错误:err_no/err_tips 缺失时回退为通用失败
+func jsCode2SessionError(errNo *int64, errTips *string) error {
+	if errNo == nil {
+		errNo = tea.Int64(ECodeCall)
+	}
+	if errTips == nil {
+		errTips = tea.String("调用失败")
+	}
+	return newError(ErrKindBusiness, int(tea.Int64Value(errNo)), 0, tea.StringValue(errTips))
 }
 
 type GetPhoneNumberResponse struct {
