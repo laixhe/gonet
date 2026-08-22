@@ -28,7 +28,18 @@ func (isc *ISClient) Delete(req *clientv4.DeleteImageRequest) error {
 	if err != nil {
 		return err
 	}
-	if resp.Body == nil || resp.Body.Success == nil || !tea.BoolValue(resp.Body.Success) || resp.Body.Code == nil || tea.Int32Value(resp.Body.Code) != 0 {
+	return deleteImageRespErr(resp)
+}
+
+// deleteImageRespErr 校验 DeleteImage 响应,成功返回 nil
+func deleteImageRespErr(resp *clientv4.DeleteImageResponse) error {
+	if resp == nil {
+		return fmt.Errorf("imagesearch delete fail: 响应为空")
+	}
+	if resp.Body == nil {
+		return fmt.Errorf("imagesearch delete fail: %d", tea.Int32Value(resp.StatusCode))
+	}
+	if resp.Body.Success == nil || !tea.BoolValue(resp.Body.Success) || resp.Body.Code == nil || tea.Int32Value(resp.Body.Code) != 0 {
 		if resp.Body.Message != nil && tea.StringValue(resp.Body.Message) != "" {
 			return fmt.Errorf("imagesearch delete fail: %d %s", tea.Int32Value(resp.Body.Code), tea.StringValue(resp.Body.Message))
 		}

@@ -64,6 +64,9 @@ type ISClient struct {
 	client *clientv4.Client
 }
 
+// Init 创建图像搜索客户端并校验实例存在性。
+// 注意:Init 会发起一次网络调用(Detail 查询实例),启动时网络异常/实例不可达会导致初始化失败;
+// 这是刻意的 fail-fast 设计,如需跳过校验请自行构造 ISClient。
 func Init(config *Config) (*ISClient, error) {
 	if err := config.Check(); err != nil {
 		return nil, err
@@ -84,7 +87,7 @@ func Init(config *Config) (*ISClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	if resp.Body == nil || resp.Body.Success == nil || !tea.BoolValue(resp.Body.Success) {
+	if resp == nil || resp.Body == nil || resp.Body.Success == nil || !tea.BoolValue(resp.Body.Success) {
 		return nil, fmt.Errorf("imagesearch detail fail: %d", tea.Int32Value(resp.StatusCode))
 	}
 	return &ISClient{

@@ -26,7 +26,7 @@ func (oc *OClient) SetPreSignatureURL(ctx context.Context, fileDir string, fileN
 	list := make([]FilePreSignatureURL, 0, len(fileNames))
 	for _, fileName := range fileNames {
 		ext := filepath.Ext(fileName)
-		mimeType := mime.TypeByExtension(ext)
+		mimeType := contentTypeByExt(ext)
 		// if mimeType == "" {
 		// 	mimeType = "application/octet-stream"
 		// }
@@ -59,10 +59,61 @@ func (oc *OClient) SetPreSignatureURL(ctx context.Context, fileDir string, fileN
 	return list, nil
 }
 
-// GetUrl 获取对象存储URL
-func (oc *OClient) GetUrl(objectName string, isInternal ...bool) string {
-	if len(isInternal) > 0 && isInternal[0] {
-		return "https://" + oc.config.Bucket + ".oss-" + oc.config.Region + "-internal.aliyuncs.com/" + objectName
+// commonMimeTypes 常用类型 Content-Type 兜底表。
+// 直接查表避免依赖系统 mime 表(Windows 查注册表、Linux 查内置表,结果可能不一致)
+var commonMimeTypes = map[string]string{
+	".jpg":  "image/jpeg",
+	".jpeg": "image/jpeg",
+	".png":  "image/png",
+	".gif":  "image/gif",
+	".webp": "image/webp",
+	".bmp":  "image/bmp",
+	".svg":  "image/svg+xml",
+	".ico":  "image/x-icon",
+	".pdf":  "application/pdf",
+	".mp4":  "video/mp4",
+	".mp3":  "audio/mpeg",
+	".zip":  "application/zip",
+}
+
+// contentTypeByExt 根据扩展名获取 Content-Type,优先查内置表,查不到再回退系统 mime 表
+func contentTypeByExt(ext string) string {
+	if mimeType, ok := commonMimeTypes[strings.ToLower(ext)]; ok {
+		return mimeType
 	}
-	return "https://" + oc.config.Bucket + ".oss-" + oc.config.Region + ".aliyuncs.com/" + objectName
+	return mime.TypeByExtension(ext)
+}
+
+// parseEndpoint 解析 endpoint 的协议与域名(去掉路径与末尾斜杠),未显式指定协议时默认 https
+func parseEndpoint(endpoint string) (scheme, host string) {
+	scheme = "https"
+	switch {
+	case strings.HasPrefix(endpoint, "http://"):
+		scheme = "http"
+		endpoint = strings.TrimPrefix(endpoint, "http://")
+	case strings.HasPrefix(endpoint, "https://"):
+		endpoint = strings.TrimPrefix(endpoint, "https://")
+	}
+	if idx := strings.Index(endpoint, "/"); idx >= 0 {
+		endpoint = endpoint[:idx]
+	}
+	return scheme, endpoint
+}
+
+// GetUrl 获取对象存储URL
+// 优先基于 Config.Endpoint 生成(虚拟主机风格: {协议}://{bucket}.{endpoint域名}/{object}),
+// 未配置 Endpoint 时回退为标准 OSS 地域域名
+func (oc *OClient) GetUrl(objectName string, isInternal ...bool) string {
+	internal := len(isInternal) > 0 && isInternal[0]
+	if oc.config.Endpoint == "" {
+		if internal {
+			return "https://" + oc.config.Bucket + ".oss-" + oc.config.Region + "-internal.aliyuncs.com/" + objectName
+		}
+		return "https://" + oc.config.Bucket + ".oss-" + oc.config.Region + ".aliyuncs.com/" + objectName
+	}
+	scheme, host := parseEndpoint(oc.config.Endpoint)
+	if internal {
+		host = strings.Replace(host, ".aliyuncs.com", "-internal.aliyuncs.com", 1)
+	}
+	return scheme + "://" + oc.config.Bucket + "." + host + "/" + objectName
 }

@@ -35,14 +35,23 @@ func (sc *SClient) Send(key string, phone string, params map[string]string) (*dy
 			if err != nil {
 				return nil, err
 			}
-			if response.Body == nil {
-				return nil, errors.New("短信发送失败")
-			}
-			if response.Body.Code != nil && *response.Body.Code != "OK" {
-				return nil, errors.New("短信发送失败：" + tea.StringValue(response.Body.Message))
+			if err := checkSendSmsResp(response.Body); err != nil {
+				return nil, err
 			}
 			return response.Body, nil
 		}
 	}
 	return nil, errors.New("没有短信发送配置：" + key)
+}
+
+// checkSendSmsResp 校验短信发送响应,成功返回 nil
+// Code 为空(响应体畸形)或非 "OK" 均视为失败
+func checkSendSmsResp(body *dysmsapi.SendSmsResponseBody) error {
+	if body == nil {
+		return errors.New("短信发送失败")
+	}
+	if body.Code == nil || *body.Code != "OK" {
+		return errors.New("短信发送失败：" + tea.StringValue(body.Message))
+	}
+	return nil
 }

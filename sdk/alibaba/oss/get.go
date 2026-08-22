@@ -7,9 +7,13 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	ossv2 "github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss"
 )
+
+// imageInfoHTTPClient GetInfo 使用的 HTTP 客户端,带超时避免对端不响应时永久挂起
+var imageInfoHTTPClient = &http.Client{Timeout: 10 * time.Second}
 
 // Get 简单下载
 func (oc *OClient) Get(ctx context.Context, objectName string) ([]byte, error) {
@@ -48,7 +52,7 @@ func (oc *OClient) GetInfo(ctx context.Context, objectName string) (*GetInfoResp
 	} else {
 		objectName = oc.GetUrl(objectName)
 	}
-	resp, err := http.Get(objectName + "?x-oss-process=image/info")
+	resp, err := imageInfoHTTPClient.Get(objectName + "?x-oss-process=image/info")
 	if err != nil {
 		return nil, err
 	}

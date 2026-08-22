@@ -36,8 +36,6 @@ func (oc *OClient) ProcessImageWatermark(ctx context.Context,
 	default:
 		watermarkG = "se"
 	}
-	watermarkP = max(watermarkP, 1)
-	watermarkP = min(watermarkP, 100)
 	watermarkT = max(watermarkT, 0)
 	watermarkT = min(watermarkT, 100)
 	watermarkY = max(watermarkY, 0)
@@ -45,10 +43,7 @@ func (oc *OClient) ProcessImageWatermark(ctx context.Context,
 	watermarkX = max(watermarkX, 0)
 	watermarkX = min(watermarkX, 4096)
 	// 处理水印
-	watermarkProcess := watermarkObjectName
-	if watermarkP > 0 {
-		watermarkProcess += fmt.Sprintf("?x-oss-process=image/resize,P_%d", watermarkP)
-	}
+	watermarkProcess := watermarkResizeProcess(watermarkObjectName, watermarkP)
 	watermarkBase64 := base64.RawURLEncoding.EncodeToString([]byte(watermarkProcess))
 	// 存储位置
 	if saveObjectName == "" {
@@ -79,4 +74,15 @@ func (oc *OClient) ProcessImageWatermark(ctx context.Context,
 		return "", err
 	}
 	return saveObjectName, nil
+}
+
+// watermarkResizeProcess 构造水印缩放指令。
+// watermarkP <= 0 表示不缩放(水印保持原图大小);1~100 表示相对原图的缩放百分比,越界值钳制到区间内
+func watermarkResizeProcess(watermarkObjectName string, watermarkP int) string {
+	if watermarkP <= 0 {
+		return watermarkObjectName
+	}
+	watermarkP = max(watermarkP, 1)
+	watermarkP = min(watermarkP, 100)
+	return watermarkObjectName + fmt.Sprintf("?x-oss-process=image/resize,P_%d", watermarkP)
 }

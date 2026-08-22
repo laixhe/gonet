@@ -58,11 +58,25 @@ func (isc *ISClient) SearchByPic(req *clientv4.SearchImageByPicAdvanceRequest,
 	if err != nil {
 		return nil, err
 	}
-	if resp.Body == nil || resp.Body.Success == nil || !tea.BoolValue(resp.Body.Success) || resp.Body.Code == nil || tea.Int32Value(resp.Body.Code) != 0 {
-		if resp.Body.Msg != nil && tea.StringValue(resp.Body.Msg) != "" {
-			return nil, fmt.Errorf("imagesearch search pic fail: %d %s", tea.Int32Value(resp.Body.Code), tea.StringValue(resp.Body.Msg))
-		}
-		return nil, fmt.Errorf("imagesearch search pic fail: %d", tea.Int32Value(resp.StatusCode))
+	if err := searchImageByPicRespErr(resp); err != nil {
+		return nil, err
 	}
 	return resp.Body.Auctions, nil
+}
+
+// searchImageByPicRespErr 校验 SearchImageByPic 响应,成功返回 nil
+func searchImageByPicRespErr(resp *clientv4.SearchImageByPicResponse) error {
+	if resp == nil {
+		return fmt.Errorf("imagesearch search pic fail: 响应为空")
+	}
+	if resp.Body == nil {
+		return fmt.Errorf("imagesearch search pic fail: %d", tea.Int32Value(resp.StatusCode))
+	}
+	if resp.Body.Success == nil || !tea.BoolValue(resp.Body.Success) || resp.Body.Code == nil || tea.Int32Value(resp.Body.Code) != 0 {
+		if resp.Body.Msg != nil && tea.StringValue(resp.Body.Msg) != "" {
+			return fmt.Errorf("imagesearch search pic fail: %d %s", tea.Int32Value(resp.Body.Code), tea.StringValue(resp.Body.Msg))
+		}
+		return fmt.Errorf("imagesearch search pic fail: %d", tea.Int32Value(resp.StatusCode))
+	}
+	return nil
 }
