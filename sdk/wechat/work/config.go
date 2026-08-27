@@ -1,0 +1,33 @@
+package work
+
+import (
+	"errors"
+	"time"
+)
+
+type Config struct {
+	// 企业ID
+	CorpID string `json:"corpid" mapstructure:"corpid" toml:"corpid" yaml:"corpid"`
+	// 企业凭证密钥
+	CorpSecret string `json:"corpsecret" mapstructure:"corpsecret" toml:"corpsecret" yaml:"corpsecret"`
+	// 企业应用ID
+	AgentID string `json:"agentid" mapstructure:"agentid" toml:"agentid" yaml:"agentid"`
+	// Timeout 接口调用超时时间,0 表示使用默认 10 秒
+	Timeout time.Duration `json:"timeout" mapstructure:"timeout" toml:"timeout" yaml:"timeout"`
+}
+
+func (c *Config) Check() error {
+	if c == nil {
+		return errors.New("企业微信配置不能为空")
+	}
+	if c.CorpID == "" {
+		return errors.New("企业微信 corpid 不能为空")
+	}
+	if c.CorpSecret == "" {
+		return errors.New("企业微信 corpsecret 不能为空")
+	}
+	if c.AgentID == "" {
+		return errors.New("企业微信 agentid 不能为空")
+	}
+	return nil
+}

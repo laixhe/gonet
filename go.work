@@ -1,0 +1,28 @@
+go 1.26
+
+use (
+	./config
+	./crypto
+	./db/gorm/mysql
+	./db/gorm/orm
+	./db/gorm/postgres
+	./db/gorm/sqlite
+	./db/mongo
+	./db/redis
+	./imaging
+	./jwt
+	./network
+	./rpc
+	./sdk/alibaba/imagesearch
+	./sdk/alibaba/oss
+	./sdk/alibaba/sms
+	./sdk/douyin
+	./sdk/wechat/apiutil
+	./sdk/wechat/miniprogram
+	./sdk/wechat/oplatform
+	./sdk/wechat/work
+	./utils
+	./xfiber
+	./xgin
+	./xlog
+)
