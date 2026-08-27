@@ -2,9 +2,11 @@ module github.com/laixhe/gonet/network
 
 go 1.26
 
+replace github.com/laixhe/gonet/xlog => ../xlog
+
 require (
 	github.com/gorilla/websocket v1.5.3
-	github.com/laixhe/gonet/xlog v0.0.0
+	github.com/laixhe/gonet/xlog v0.0.0-00010101000000-000000000000
 	github.com/xtaci/kcp-go/v5 v5.6.72
 )
 
@@ -21,5 +23,3 @@ require (
 	golang.org/x/time v0.14.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
-
-replace github.com/laixhe/gonet/xlog => ../xlog
