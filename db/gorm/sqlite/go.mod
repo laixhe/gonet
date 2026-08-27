@@ -1,4 +1,4 @@
-module github.com/laixhe/gonet/db/sqlite
+module github.com/laixhe/gonet/db/gorm/sqlite
 
 go 1.26
 
